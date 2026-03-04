@@ -101,11 +101,11 @@
                             <VBox id="AuthDetailDateTimeBox">
                                 <!-- CREATED AT -->
                                 <Label id="LabelCreatedAt" text="{i18n>createAt}" design="Bold" />
-                                <Text id="TextCreatedAt" text="{detailData>/LoginTime}" />
+                                <Text id="TextCreatedAt" text="{detailData>/CreateAt}" />
 
                                 <!-- CREATED ON -->
                                 <Label id="LabelCreatedOn" text="{i18n>createOn}" design="Bold" class="sapUiSmallMarginTop" />
-                                <Text id="TextCreatedOn" text="{detailData>/LoginDate}" />
+                                <Text id="TextCreatedOn" text="{detailData>/CreateOn}" />
                             </VBox>
                         </layout:Grid>
                     </f:ObjectPageSubSection>

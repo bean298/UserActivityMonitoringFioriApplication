@@ -14,6 +14,7 @@ import Formatter from "useraudit/formatter/Formatter";
 import MessageBox from "sap/m/MessageBox";
 import DateRangeSelection from "sap/m/DateRangeSelection";
 import Spreadsheet from "sap/ui/export/Spreadsheet";
+import MessageToast from "sap/m/MessageToast";
 
 export default class Main extends Controller {
   public formatter = Formatter;
@@ -113,9 +114,6 @@ export default class Main extends Controller {
     const oTable = this.byId("maiTableId");
     const oBinding = oTable?.getBinding("rows") as ODataListBinding;
 
-    if (!oBinding) {
-      return;
-    }
     // Get value from search and select
     const sSearch = (this.byId("userSearchId") as Input).getValue();
     if (sSearch) {
@@ -126,10 +124,11 @@ export default class Main extends Controller {
       this.byId("mainHeaderSelectId") as Select
     ).getSelectedKey();
 
-    if (sStatus && sStatus !== "ALL") {
+    if (sStatus) {
       aFilters.push(new Filter("LoginResult", FilterOperator.EQ, sStatus));
     }
 
+    // Get value select date range
     const oDateRange = this.byId("mainDateRangeId") as DateRangeSelection;
 
     if (oDateRange) {
@@ -145,6 +144,10 @@ export default class Main extends Controller {
 
     oBinding.filter(aFilters);
   }
+
+  /**
+   * Triggered when the user changes the "Rows per page".
+   */
   public onRowCountChange(oEvent: any): void {
     const sKey = oEvent.getParameter("selectedItem").getKey();
     const oTable = this.byId("maiTableId") as any;
@@ -152,27 +155,43 @@ export default class Main extends Controller {
       oTable.setVisibleRowCount(parseInt(sKey));
     }
   }
+
   /**
-   * Export Excel
-   **/
+   * Exports the currently bound table data to an Excel file.
+   * Uses sap.ui.export.Spreadsheet to generate the file
+   * based on the current OData V4 list binding.
+   */
   public onExportExcel(): void {
+    // Get table and its OData list binding
     const oTable = this.byId("maiTableId");
     const oBinding = oTable?.getBinding("rows") as ODataListBinding;
 
-    if (!oBinding) {
-      MessageBox.error("No data to export.");
-      return;
-    }
-
+    // Format in Excel
     const aCols = [
-      { label: "User Session", property: "SessionId", width: 25 },
+      {
+        label: "User Session",
+        property: "SessionId",
+        width: 25,
+      },
       { label: "User Name", property: "Username", width: 15 },
-      { label: "Login Result", property: "LoginResult", width: 10 },
+      {
+        label: "Login Result",
+        property: "LoginResult",
+        width: 10,
+      },
       { label: "Login Date", property: "LoginDate", width: 15 },
       { label: "Login Time", property: "LoginTime", width: 15 },
-      { label: "Login Message", property: "LoginMessage", width: 30 },
+      {
+        label: "Login Message",
+        property: "LoginMessage",
+        width: 150,
+      },
+      { label: "Logout Date", property: "LogoutDate", width: 15 },
+      { label: "Logout Time", property: "LogoutTime", width: 15 },
+      { label: "Event ID", property: "EventId", width: 10 },
     ];
 
+    // Spreadsheet config
     const oSettings = {
       workbook: {
         columns: aCols,
@@ -182,10 +201,23 @@ export default class Main extends Controller {
       worker: false,
     };
 
+    // Spreadsheet config
     const oSheet = new Spreadsheet(oSettings);
-    oSheet.build().finally(() => {
-      oSheet.destroy();
-    });
+
+    // Create Excel file and download it
+    oSheet
+      .build()
+      .then(() => {
+        MessageToast.show("Export successful!", {
+          duration: 3000,
+        });
+      })
+      .catch(() => {
+        MessageBox.error("Export failed.");
+      })
+      .finally(() => {
+        oSheet.destroy();
+      });
   }
 
   /**
