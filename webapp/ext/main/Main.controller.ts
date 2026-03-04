@@ -111,7 +111,7 @@ export default class Main extends Controller {
 
     // Get table and its OData list binding
     const oTable = this.byId("maiTableId");
-    const oBinding = oTable?.getBinding("items") as ODataListBinding;
+    const oBinding = oTable?.getBinding("rows") as ODataListBinding;
 
     if (!oBinding) {
       return;
@@ -145,13 +145,19 @@ export default class Main extends Controller {
 
     oBinding.filter(aFilters);
   }
-
+  public onRowCountChange(oEvent: any): void {
+    const sKey = oEvent.getParameter("selectedItem").getKey();
+    const oTable = this.byId("maiTableId") as any;
+    if (oTable) {
+      oTable.setVisibleRowCount(parseInt(sKey));
+    }
+  }
   /**
    * Export Excel
    **/
   public onExportExcel(): void {
     const oTable = this.byId("maiTableId");
-    const oBinding = oTable?.getBinding("items") as ODataListBinding;
+    const oBinding = oTable?.getBinding("rows") as ODataListBinding;
 
     if (!oBinding) {
       MessageBox.error("No data to export.");
@@ -196,7 +202,7 @@ export default class Main extends Controller {
 
       // Executes the OData call and load data
       const aContexts = await oBinding.requestContexts();
-      const aData = aContexts.map((oContext) => oContext.getObject());
+      const aData = aContexts.map((oContent) => oContent.getObject());
 
       const oJsonModel = new JSONModel(aData);
 
