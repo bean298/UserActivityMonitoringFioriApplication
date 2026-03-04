@@ -12,6 +12,8 @@ import Dialog from "sap/m/Dialog";
 import Button from "sap/m/Button";
 import Formatter from "useraudit/formatter/Formatter";
 import MessageBox from "sap/m/MessageBox";
+import DateRangeSelection from "sap/m/DateRangeSelection";
+import Spreadsheet from "sap/ui/export/Spreadsheet";
 
 export default class Main extends Controller {
   public formatter = Formatter;
@@ -76,7 +78,7 @@ export default class Main extends Controller {
       // Executes the OData call
       const aContexts = await oBinding.requestContexts();
 
-      const aData = aContexts.map((oContenxt) => oContenxt.getObject());
+      const aData = aContexts.map((oContext) => oContext.getObject());
 
       const oJsonModel = new JSONModel(aData);
 
@@ -111,22 +113,73 @@ export default class Main extends Controller {
     const oTable = this.byId("maiTableId");
     const oBinding = oTable?.getBinding("items") as ODataListBinding;
 
+    if (!oBinding) {
+      return;
+    }
     // Get value from search and select
     const sSearch = (this.byId("userSearchId") as Input).getValue();
+    if (sSearch) {
+      aFilters.push(new Filter("Username", FilterOperator.Contains, sSearch));
+    }
+
     const sStatus = (
       this.byId("mainHeaderSelectId") as Select
     ).getSelectedKey();
 
-    // Search and Filter
-    if (sSearch) {
-      aFilters.push(new Filter("Username", FilterOperator.Contains, sSearch));
-    }
-    if (sStatus) {
+    if (sStatus && sStatus !== "ALL") {
       aFilters.push(new Filter("LoginResult", FilterOperator.EQ, sStatus));
     }
 
-    // Apply filters to binding (triggers OData request)
+    const oDateRange = this.byId("mainDateRangeId") as DateRangeSelection;
+
+    if (oDateRange) {
+      const oFromDate = oDateRange.getDateValue();
+      const oToDate = oDateRange.getSecondDateValue();
+
+      if (oFromDate && oToDate) {
+        aFilters.push(
+          new Filter("LoginDate", FilterOperator.BT, oFromDate, oToDate),
+        );
+      }
+    }
+
     oBinding.filter(aFilters);
+  }
+
+  /**
+   * Export Excel
+   **/
+  public onExportExcel(): void {
+    const oTable = this.byId("maiTableId");
+    const oBinding = oTable?.getBinding("items") as ODataListBinding;
+
+    if (!oBinding) {
+      MessageBox.error("No data to export.");
+      return;
+    }
+
+    const aCols = [
+      { label: "User Session", property: "SessionId", width: 25 },
+      { label: "User Name", property: "Username", width: 15 },
+      { label: "Login Result", property: "LoginResult", width: 10 },
+      { label: "Login Date", property: "LoginDate", width: 15 },
+      { label: "Login Time", property: "LoginTime", width: 15 },
+      { label: "Login Message", property: "LoginMessage", width: 30 },
+    ];
+
+    const oSettings = {
+      workbook: {
+        columns: aCols,
+      },
+      dataSource: oBinding,
+      fileName: "UserAuthenticationLogs.xlsx",
+      worker: false,
+    };
+
+    const oSheet = new Spreadsheet(oSettings);
+    oSheet.build().finally(() => {
+      oSheet.destroy();
+    });
   }
 
   /**

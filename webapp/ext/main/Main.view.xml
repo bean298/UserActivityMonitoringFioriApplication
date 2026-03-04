@@ -6,16 +6,18 @@
     xmlns:viz="sap.viz.ui5.controls"
     xmlns:viz.feeds="sap.viz.ui5.controls.common.feeds"
     xmlns:viz.data="sap.viz.ui5.data">
-    <f:DynamicPage id='mainDynamicPageId'>
+
+    <f:DynamicPage id="mainDynamicPageId">
+
         <!-- TITLE | SUBTITLE -->
         <f:title>
-            <f:DynamicPageTitle id='mainDynamicPageTitleId'>
+            <f:DynamicPageTitle id="mainDynamicPageTitleId">
                 <f:heading>
-                    <Title id='titleId' text="{i18n>title}" />
+                    <Title id="titleId" text="{i18n>title}" />
                 </f:heading>
 
                 <f:expandedContent>
-                    <Label id='subTitleId' text="{i18n>subTitle}" />
+                    <Label id="subTitleId" text="{i18n>subTitle}" />
                 </f:expandedContent>
             </f:DynamicPageTitle>
         </f:title>
@@ -23,64 +25,135 @@
         <!-- MAIN CONTENT -->
         <f:content>
             <VBox id="vBoxMainContent">
+
                 <HBox id="hBoxChartContent" class="sapUiSmallMarginBottom">
+
                     <!-- DONUT CHART -->
-                    <viz:VizFrame vizProperties="{
-                                title: { visible: true,  text: 'Login Result Overview' },
-                                plotArea: {
-                                    colorPalette: ['#ff4d4f', '#52c41a'],
-                                    dataLabel: {  visible: true,  type: 'value' }
-                                }
-                              }" id="loginChart" vizType="donut" width="400px" height="400px">
-                        <!-- Define data of chart -->
+                    <viz:VizFrame
+                        vizProperties="{
+                            title: { visible: true,  text: 'Login Result Overview' },
+                            plotArea: {
+                                colorPalette: ['#ff4d4f', '#52c41a'],
+                                dataLabel: {  visible: true,  type: 'value' }
+                            }
+                        }"
+                        id="loginChart"
+                        vizType="donut"
+                        width="400px"
+                        height="400px">
+
                         <viz:dataset>
-                            <viz.data:FlattenedDataset id="donutDataset" data="{authLogChart>/}">
-                                <!-- Category  -->
+                            <viz.data:FlattenedDataset
+                                id="donutDataset"
+                                data="{authLogChart>/}">
+
                                 <viz.data:dimensions>
-                                    <viz.data:DimensionDefinition id="donutDimensionStatus" name="Status" value="{LoginResult}" />
+                                    <viz.data:DimensionDefinition
+                                        id="donutDimensionStatus"
+                                        name="Status"
+                                        value="{LoginResult}" />
                                 </viz.data:dimensions>
 
-                                <!-- Value -->
                                 <viz.data:measures>
-                                    <viz.data:MeasureDefinition id="donutMeasureCount" name="Count" value="{CountLoginLog}" />
+                                    <viz.data:MeasureDefinition
+                                        id="donutMeasureCount"
+                                        name="Count"
+                                        value="{CountLoginLog}" />
                                 </viz.data:measures>
+
                             </viz.data:FlattenedDataset>
                         </viz:dataset>
 
-                        <!-- Mapping dimension/measure into chart -->
                         <viz:feeds>
-                            <viz.feeds:FeedItem id="donutFeedColor" uid="color" type="Dimension" values="Status" />
-                            <viz.feeds:FeedItem id="donutFeedSize" uid="size" type="Measure" values="Count" />
+                            <viz.feeds:FeedItem
+                                id="donutFeedColor"
+                                uid="color"
+                                type="Dimension"
+                                values="Status" />
+                            <viz.feeds:FeedItem
+                                id="donutFeedSize"
+                                uid="size"
+                                type="Measure"
+                                values="Count" />
                         </viz:feeds>
+
                     </viz:VizFrame>
                 </HBox>
 
                 <!-- FILTER + SEARCH -->
-                <Toolbar id="toolbarId" class="sapUiMediumMarginBottom" design="Transparent">
-                    <Title id="filterTitleId" text="Filters" level="H5" class="sapUiSmallMarginEnd"/>
+                <Toolbar
+                    id="toolbarId"
+                    class="sapUiMediumMarginBottom"
+                    design="Transparent">
+
+                    <Title
+                        id="filterTitleId"
+                        text="Filters"
+                        level="H5"
+                        class="sapUiSmallMarginEnd"/>
 
                     <ToolbarSpacer id="filterToolbarSpacerId"/>
 
-                    <Input id="userSearchId" width="300px" placeholder="Search User" showValueHelp="true" liveChange="onSearchUserName" valueHelpRequest="onUserSearchHelp" showClearIcon="true" class="sapUiSmallMarginEnd" />
+                    <Input
+                        id="userSearchId"
+                        width="300px"
+                        placeholder="Search User"
+                        showValueHelp="true"
+                        liveChange="onSearchUserName"
+                        valueHelpRequest="onUserSearchHelp"
+                        showClearIcon="true"
+                        class="sapUiSmallMarginEnd" />
 
-                    <Select id="mainHeaderSelectId" width="200px" change="onFilterStatus">
+                    <Select
+                        id="mainHeaderSelectId"
+                        width="200px"
+                        change="onFilterStatus"
+                        class="sapUiSmallMarginEnd">
+
                         <core:Item id="itemId1" key="" text="All" />
                         <core:Item id="itemId2" key="SUCCESS" text="Success" />
                         <core:Item id="itemId3" key="FAIL" text="Failed" />
                     </Select>
+
+                    <!-- Date range filter -->
+                    <DateRangeSelection
+                        id="mainDateRangeId"
+                        width="250px"
+                        placeholder="Select date range..."
+                        change=".applyFilters"/>
+
                 </Toolbar>
 
                 <!-- TABLE -->
-                <Table id="maiTableId" items="{
-                    path: '/UserAuthLog',
-                    sorter: { path: 'LoginDate', descending: true }
-                   }" class="sapUiLargeMarginBottom" growing="true" growingThreshold="100" growingScrollToLoad="false">
+                <Table
+                    id="maiTableId"
+                    items="{
+                        path: '/UserAuthLog',
+                        sorter: { path: 'LoginDate', descending: true }
+                    }"
+                    class="sapUiLargeMarginBottom"
+                    growing="true"
+                    growingThreshold="100"
+                    growingScrollToLoad="false">
+
                     <!-- HEADER TOOLBAR -->
                     <headerToolbar>
                         <Toolbar id="mainToolbarId">
-                            <Title id="mainTitleTableId" text="{= ${i18n>headerTitleTable} + ' (' + ${view>/count} + ')' }" level="H2" />
+
+                            <Title
+                                id="mainTitleTableId"
+                                text="{= ${i18n>headerTitleTable} + ' (' + ${view>/count} + ')' }"
+                                level="H2" />
 
                             <ToolbarSpacer id="mainToolSpace" />
+
+                            <!-- Export Excel -->
+                            <Button
+                                id="btnExportExcel"
+                                icon="sap-icon://excel-attachment"
+                                text="Export Excel"
+                                press=".onExportExcel" />
+
                         </Toolbar>
                     </headerToolbar>
 
@@ -124,36 +197,57 @@
                         <Column id="columnLogoutTime">
                             <Text id="textLogoutTime" text="{i18n>logoutTime}" />
                         </Column>
+
                     </columns>
 
                     <items>
-                        <ColumnListItem id="item" type="Navigation" press="onPressNavigate">
+                        <ColumnListItem
+                            id="item"
+                            type="Navigation"
+                            press="onPressNavigate">
+
                             <cells>
                                 <Text id="item1" text="{SessionId}"/>
                                 <Text id="item2" text="{Username}" />
-                                <ObjectStatus id="item3" text="{LoginResult}" icon="{
-                                    path: 'LoginResult',
-                                    formatter: '.formatter.formatLoginResultIcon'
-                                }" state="{
-                                    path: 'LoginResult',
-                                    formatter: '.formatter.formatLoginResultState'
-                                }" />
+
+                                <ObjectStatus
+                                    id="item3"
+                                    text="{LoginResult}"
+                                    icon="{
+                                        path: 'LoginResult',
+                                        formatter: '.formatter.formatLoginResultIcon'
+                                    }"
+                                    state="{
+                                        path: 'LoginResult',
+                                        formatter: '.formatter.formatLoginResultState'
+                                    }" />
+
                                 <Text id="item4" text="{LoginDate}" />
                                 <Text id="item5" text="{LoginTime}" />
-                                <ObjectStatus id="item6" text="{LoginMessage}" icon="{
-                                    path: 'EventId',
-                                    formatter: '.formatter.formatLoginMessageIcon'
-                                }" state="{
-                                    path: 'EventId',
-                                    formatter: '.formatter.formatLoginMessageState'
-                                }" />
+
+                                <ObjectStatus
+                                    id="item6"
+                                    text="{LoginMessage}"
+                                    icon="{
+                                        path: 'EventId',
+                                        formatter: '.formatter.formatLoginMessageIcon'
+                                    }"
+                                    state="{
+                                        path: 'EventId',
+                                        formatter: '.formatter.formatLoginMessageState'
+                                    }" />
+
                                 <Text id="item7" text="{LogoutDate}" />
                                 <Text id="item8" text="{LogoutTime}" />
                             </cells>
+
                         </ColumnListItem>
                     </items>
+
                 </Table>
+
             </VBox>
         </f:content>
+
     </f:DynamicPage>
 </mvc:View>
