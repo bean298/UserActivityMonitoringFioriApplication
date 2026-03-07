@@ -83,10 +83,19 @@
                 </Toolbar>
 
                 <!-- TABLE -->
-                <ui:Table id="maiTableId" rows="{
-                        path: '/UserAuthLog',
-                        sorter: { path: 'LoginDate', descending: true }
-                    }" selectionMode="None" class="sapUiLargeMarginBottom">
+                <ui:Table
+    id="maiTableId"
+    rows="{
+        path: '/UserAuthLog',
+        sorter: { path: 'LoginDate', descending: true }
+    }"
+    selectionMode="None"
+    visibleRowCount="15"
+    visibleRowCountMode="Fixed"
+    navigationMode="Paginator"
+    firstVisibleRow="0"
+    enableColumnReordering="true"
+    class="sapUiLargeMarginBottom">
                     <!-- HEADER TOOLBAR -->
                     <ui:extension>
                         <OverflowToolbar id="mainToolbarId">
@@ -94,17 +103,14 @@
 
                             <ToolbarSpacer id="mainToolSpace" />
 
-                            <!-- PAGINATION BTN -->
-                            <Label id="mainTableRowPerPageLabel" text="{i18n>rowsPerPage}"/>
-                            <Select id="rowCountSelect" change="onRowCountChange" selectedKey="10" width="100px">
-                                <core:Item id="rowCountItem10" key="10" text="10"/>
-                                <core:Item id="rowCountItem25" key="25" text="25"/>
-                                <core:Item id="rowCountItem50" key="50" text="50"/>
-                                <core:Item id="rowCountItem100" key="100" text="100"/>
-                            </Select>
-
                             <!-- EXPORT BTN -->
                             <Button id="btnExportExcel" icon="sap-icon://excel-attachment" tooltip="{i18n>exportExcel}" press="onExportExcel" />
+                            <!-- VIEW SETTINGS BTN -->
+<Button
+    id="btnViewSettings"
+    icon="sap-icon://action-settings"
+    tooltip="View Settings"
+    press="onOpenViewSettings"/>
                         </OverflowToolbar>
                     </ui:extension>
 

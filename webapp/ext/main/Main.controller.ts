@@ -15,9 +15,13 @@ import MessageBox from "sap/m/MessageBox";
 import DateRangeSelection from "sap/m/DateRangeSelection";
 import Spreadsheet from "sap/ui/export/Spreadsheet";
 import MessageToast from "sap/m/MessageToast";
+import Fragment from "sap/ui/core/Fragment";
 
 export default class Main extends Controller {
   public formatter = Formatter;
+
+  // ===== View Settings Feature =====
+  private _oViewSettingsDialog: Dialog | null = null;
 
   /**
    * Called when the controller is initialized.
@@ -318,22 +322,86 @@ export default class Main extends Controller {
     }
   }
 
-  /**
-   * Called before the view is re-rendered.
-   **/
-  // public  onBeforeRendering(): void {
-  //
-  //  }
-  /**
-   * Called after the view has been rendered.
-   **/
-  // public  onAfterRendering(): void {
-  //
-  //  }
-  /**
-   * Called when the controller is destroyed.
-   **/
-  // public onExit(): void {
-  //
-  //  }
+  // ===== View Settings Feature =====
+
+  public async onOpenViewSettings(): Promise<void> {
+    if (!this._oViewSettingsDialog) {
+      this._oViewSettingsDialog = (await Fragment.load({
+        name: "useraudit.ext.main.ViewSettingsDialog",
+        controller: this,
+      })) as Dialog;
+
+      this.getView()?.addDependent(this._oViewSettingsDialog);
+
+      this.initializeColumnModel();
+    }
+
+    this._oViewSettingsDialog.open();
+  }
+
+  private initializeColumnModel(): void {
+    const oTable = this.byId("maiTableId") as any;
+    const aColumns = oTable.getColumns();
+
+    const aColumnData = aColumns
+      .filter((oColumn: any) => !oColumn.getId().includes("columnNavigator"))
+      .map((oColumn: any) => {
+        const oLabel = oColumn.getLabel();
+
+        return {
+          id: oColumn.getId(),
+          label: oLabel ? oLabel.getText() : oColumn.getId(),
+          visible: oColumn.getVisible(),
+        };
+      });
+
+    console.log("Column Data:", aColumnData);
+
+    const oModel = new JSONModel({
+      columns: aColumnData,
+    });
+
+    this.getView()?.setModel(oModel, "columnsModel");
+  }
+
+  public onConfirmViewSettings(): void {
+    const oTable = this.byId("maiTableId") as any;
+    const aColumns = oTable.getColumns();
+
+    const oModel = this.getView()?.getModel("columnsModel") as JSONModel;
+    const aData = oModel.getProperty("/columns");
+
+    aColumns.forEach((oColumn: any) => {
+      const oMatch = aData.find((c: any) => c.id === oColumn.getId());
+
+      if (oMatch) {
+        oColumn.setVisible(oMatch.visible);
+      }
+    });
+
+    this._oViewSettingsDialog?.close();
+  }
+
+  public onCancelViewSettings(): void {
+    this._oViewSettingsDialog?.close();
+  }
 }
+
+/**
+ * Called before the view is re-rendered.
+ **/
+// public  onBeforeRendering(): void {
+//
+//  }
+/**
+ * Called after the view has been rendered.
+ **/
+// public  onAfterRendering(): void {
+//
+//  }
+/**
+ * Called when the controller is destroyed.
+ **/
+// public onExit(): void {
+//
+//  }
