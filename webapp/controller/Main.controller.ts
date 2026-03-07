@@ -322,41 +322,53 @@ export default class Main extends Controller {
     }
   }
 
-  // ===== View Settings Feature =====
-
+  /**
+   * Open Fragment Settings Columns
+   **/
   public async onOpenViewSettings(): Promise<void> {
     if (!this._oViewSettingsDialog) {
+      // Load fragment
       this._oViewSettingsDialog = (await Fragment.load({
-        name: "useraudit.ext.main.ViewSettingsDialog",
+        name: "useraudit.fragment.ViewSettingsDialog",
         controller: this,
       })) as Dialog;
 
+      // Add Fragment into view
       this.getView()?.addDependent(this._oViewSettingsDialog);
 
       this.initializeColumnModel();
     }
 
+    // Open
     this._oViewSettingsDialog.open();
   }
 
-  private initializeColumnModel(): void {
+  /**
+   * Read columns list of table -> JSONModel
+   * Bring it into Dialog View
+   **/
+  public initializeColumnModel(): void {
+    // Get table and its colums
     const oTable = this.byId("maiTableId") as any;
     const aColumns = oTable.getColumns();
 
-    const aColumnData = aColumns
-      .filter((oColumn: any) => !oColumn.getId().includes("columnNavigator"))
-      .map((oColumn: any) => {
-        const oLabel = oColumn.getLabel();
+    // Remove Navigator column
+    const aFilteredColumns = aColumns.filter(
+      (oColumn: any) => !oColumn.getId().includes("columnNavigator"),
+    );
 
-        return {
-          id: oColumn.getId(),
-          label: oLabel ? oLabel.getText() : oColumn.getId(),
-          visible: oColumn.getVisible(),
-        };
-      });
+    // Create new array contain every column object
+    const aColumnData = aFilteredColumns.map((oColumn: any) => {
+      const oLabel = oColumn.getLabel();
 
-    console.log("Column Data:", aColumnData);
+      return {
+        id: oColumn.getId(),
+        label: oLabel ? oLabel.getText() : oColumn.getId(),
+        visible: oColumn.getVisible(),
+      };
+    });
 
+    // Create JSONModel, property columns
     const oModel = new JSONModel({
       columns: aColumnData,
     });
@@ -364,15 +376,21 @@ export default class Main extends Controller {
     this.getView()?.setModel(oModel, "columnsModel");
   }
 
+  /**
+   * Open Fragment Settings Columns
+   **/
   public onConfirmViewSettings(): void {
+    // Get table and its colums
     const oTable = this.byId("maiTableId") as any;
     const aColumns = oTable.getColumns();
 
+    // Get model and property
     const oModel = this.getView()?.getModel("columnsModel") as JSONModel;
     const aData = oModel.getProperty("/columns");
 
+    // Set visible for column
     aColumns.forEach((oColumn: any) => {
-      const oMatch = aData.find((c: any) => c.id === oColumn.getId());
+      const oMatch = aData.find((column: any) => column.id === oColumn.getId());
 
       if (oMatch) {
         oColumn.setVisible(oMatch.visible);
@@ -382,6 +400,9 @@ export default class Main extends Controller {
     this._oViewSettingsDialog?.close();
   }
 
+  /**
+   * Close Fragment Settings Columns
+   **/
   public onCancelViewSettings(): void {
     this._oViewSettingsDialog?.close();
   }

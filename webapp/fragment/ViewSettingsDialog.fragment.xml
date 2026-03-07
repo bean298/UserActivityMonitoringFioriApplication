@@ -1,0 +1,24 @@
+<core:FragmentDefinition xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+    <!-- Main Dialog for Column Settings -->
+    <Dialog id="viewSettingsDialog" title="{i18n>viewSettings}" contentWidth="400px" contentHeight="500px" draggable="true" resizable="true">
+        <!-- Container for dialog content -->
+        <VBox id="viewSettingsVBox" class="sapUiSmallMargin">
+            <Title id="columnsTitle" text="Columns" level="H5"/>
+
+            <List id="columnList" mode="MultiSelect" items="{columnsModel>/columns}">
+                <StandardListItem id="columnListItem" title="{columnsModel>label}" selected="{columnsModel>visible}"/>
+            </List>
+        </VBox>
+
+        <!-- Confirm button: Apply column visibility changes -->
+        <beginButton>
+            <Button id="confirmViewSettingsButton" text="{i18n>ok}" press="onConfirmViewSettings" type="Emphasized"/>
+        </beginButton>
+
+        <!-- Cancel button: Close dialog without applying changes -->
+        <endButton>
+            <Button id="cancelViewSettingsButton" text="{i18n>cancel}" press="onCancelViewSettings"/>
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>

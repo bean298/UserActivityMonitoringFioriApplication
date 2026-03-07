@@ -21,7 +21,7 @@ const Formatter = {
 
   //   Format State Login Message
   formatLoginMessageState: function (sValue: string): ValueState {
-    if (sValue === "AU2" || sValue === "BU1") {
+    if (sValue === "AU2" || sValue === "BU1" || sValue === "AUM") {
       return ValueState.Error;
     } else {
       return ValueState.Success;
@@ -32,6 +32,8 @@ const Formatter = {
   formatLoginMessageIcon: function (sValue: string): string {
     if (sValue === "AU2" || sValue === "BU1") {
       return "sap-icon://message-error";
+    } else if (sValue === "AUM") {
+      return "sap-icon://locked";
     } else {
       return "sap-icon://message-success";
     }

@@ -120,7 +120,7 @@
           "options": {
             "settings": {
               "contextPath": "/UserAuthLog",
-              "viewName": "useraudit.ext.main.Main"
+              "viewName": "useraudit.view.Main"
             }
           }
         },
@@ -131,7 +131,7 @@
           "options": {
             "settings": {
               "contextPath": "/UserAuthLog",
-              "viewName": "useraudit.ext.AuthDetail.AuthDetail"
+              "viewName": "useraudit.view.AuthDetail"
             }
           }
         }
