@@ -87,12 +87,15 @@
                     path: '/UserAuthLog',
                     sorter: { path: 'LoginDate', descending: true }
                 }" selectionMode="None" firstVisibleRow="0" enableColumnReordering="true" class="sapUiLargeMarginBottom">
-                    <!-- HEADER TOOLBAR -->
+                    <!-- HEADER TOOLBAR | BUTTON -->
                     <ui:extension>
                         <OverflowToolbar id="mainToolbarId">
                             <Title id="mainTitleTableId" text="{= ${i18n>headerTitleTable} + ' (' + ${view>/count} + ')' }" level="H2" />
 
                             <ToolbarSpacer id="mainToolSpace" />
+
+                            <!-- REFRESH BTN -->
+                            <Button id="btnRefreshData" icon="sap-icon://refresh" tooltip="{i18n>refreshData}" press="onRefreshTable"/>
 
                             <!-- EXPORT BTN -->
                             <Button id="btnExportExcel" icon="sap-icon://excel-attachment" tooltip="{i18n>exportExcel}" press="onExportExcel" />
@@ -159,7 +162,7 @@
 
                         <!-- LOGOUT DATE COLUMN -->
                         <ui:Column id="columnLogoutDate" width="9rem">
-                            <Label id="laeblLogoutDate" text="{i18n>logoutDate}" />
+                            <Label id="labelLogoutDate" text="{i18n>logoutDate}" />
 
                             <ui:template>
                                 <Text id="textLogoutDate" text="{LogoutDate}" />

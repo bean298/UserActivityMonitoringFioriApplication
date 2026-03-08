@@ -406,6 +406,42 @@ export default class Main extends Controller {
   public onCancelViewSettings(): void {
     this._oViewSettingsDialog?.close();
   }
+
+  /**
+   * Refresh data of table
+   **/
+  public async onRefreshTable(): Promise<void> {
+    const oTable = this.byId("maiTableId") as any;
+    const oBinding = oTable.getBinding("rows") as ODataListBinding;
+
+    oTable.setBusy(true);
+
+    try {
+      // Refresh data
+      await this.onInitCount();
+      await oBinding?.requestRefresh();
+      await this.onInitLogCount();
+    } finally {
+      oTable.setBusy(false);
+    }
+  }
+
+  public onFullScreen(): void {
+    debugger;
+    const oTable = this.byId("maiTableId") as any;
+
+    if (!oTable) {
+      return;
+    }
+
+    const bFullScreen = oTable.hasStyleClass("fullScreenMode");
+
+    if (bFullScreen) {
+      oTable.removeStyleClass("fullScreenMode");
+    } else {
+      oTable.addStyleClass("fullScreenMode");
+    }
+  }
 }
 
 /**
