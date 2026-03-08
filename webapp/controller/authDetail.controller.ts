@@ -40,21 +40,29 @@ export default class AuthDetail extends Controller {
     try {
       const sSessionId = sKey.match(/'([^']+)'/)?.[1] || sKey;
       const oModel = (this as any).getAppComponent().getModel() as ODataModel;
+
+      // Create a list binding to /UserAuthLog with $expand _Activity
       const oDetailBinding = oModel.bindList(
         "/UserAuthLog",
         undefined,
         undefined,
         [new Filter("SessionId", FilterOperator.EQ, sSessionId)],
+        {
+          $expand: "_Activity",
+        },
       ) as ODataListBinding;
 
+      // Executes the OData call
       const aContexts = await oDetailBinding.requestContexts(0, 1);
 
+      // Set data into model
       if (aContexts.length > 0) {
         const oData = aContexts[0].getObject();
         const oDetailModel = new JSONModel(oData);
+
         oView.setModel(oDetailModel, "detailData");
       } else {
-        console.error("No data found for SessionId:", sSessionId);
+        MessageBox.error("Failed to load detail data. Please try again.");
       }
     } catch (oError) {
       MessageBox.error("Failed to load detail data. Please try again.");

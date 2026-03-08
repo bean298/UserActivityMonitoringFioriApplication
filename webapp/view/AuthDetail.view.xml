@@ -156,6 +156,55 @@
                     </f:ObjectPageSubSection>
                 </f:subSections>
             </f:ObjectPageSection>
+
+            <!-- ACTIVITY SECTIONS -->
+            <f:ObjectPageSection id="SectionActivity" title="{i18n>activityLog}">
+                <f:subSections>
+                    <f:ObjectPageSubSection id="SubSectionActivity">
+                        <!-- TABLE -->
+                        <Table id="ActivityTable" items="{detailData>/_Activity}" growing="true" growingThreshold="20">
+                            <columns>
+                                <!-- LOGID COLUMN -->
+                                <Column id="ColumnLogId">
+                                    <Text id="TextLogId" text="{i18n>logId}" />
+                                </Column>
+
+                                <!-- ACTIVITY TYPE COLUMN -->
+                                <Column id="ColumnActivityTypeId">
+                                    <Text id="TextActivityTypeId" text="{i18n>activityType}"/>
+                                </Column>
+
+                                <!-- TCODE COLUMN -->
+                                <Column id="ColumnTCodeId">
+                                    <Text id="TextTCodeId" text="{i18n>tCode}"/>
+                                </Column>
+
+                                <!-- ACTIVITY MESSAGE COLUMN -->
+                                <Column id="ColumnMsgId">
+                                    <Text id="TextMsgId" text="{i18n>activityMessage}"/>
+                                </Column>
+
+                                <!-- TIME COLUMN -->
+                                <Column id="ColumnTieId">
+                                    <Text id="TextTieId" text="{i18n>activityTime}"/>
+                                </Column>
+                            </columns>
+
+                            <items>
+                                <ColumnListItem id="ActivityRowItemId" type="Navigation">
+                                    <cells>
+                                        <Text id="item1" text="{detailData>LogId}"/>
+                                        <Text id="item2" text="{detailData>ActivityType}"/>
+                                        <Text id="item3" text="{detailData>TCode}"/>
+                                        <Text id="item4" text="{detailData>ActivityMessage}"/>
+                                        <Text id="item5" text="{detailData>ActivityTime}"/>
+                                    </cells>
+                                </ColumnListItem>
+                            </items>
+                        </Table>
+                    </f:ObjectPageSubSection>
+                </f:subSections>
+            </f:ObjectPageSection>
         </f:sections>
     </f:ObjectPageLayout>
 </mvc:View>
