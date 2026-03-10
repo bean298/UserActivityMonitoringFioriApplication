@@ -230,13 +230,13 @@
                     <!-- FIRST -->
                     <Button
                         icon="sap-icon://media-rewind"
-                        tooltip="First Page"
+                        tooltip="{i18n>firstPage}"
                         press="onFirstPage" />
 
                     <!-- PREVIOUS -->
                     <Button
                         icon="sap-icon://navigation-left-arrow"
-                        tooltip="Previous Page"
+                        tooltip="{i18n>previousPage}"
                         press="onPrevPage" />
 
                     <!-- PAGE INFO -->
@@ -247,18 +247,18 @@
                     <!-- NEXT -->
                     <Button
                         icon="sap-icon://navigation-right-arrow"
-                        tooltip="Next Page"
+                        tooltip="{i18n>nextPage}"
                         press="onNextPage" />
 
                     <!-- LAST -->
                     <Button
                         icon="sap-icon://media-forward"
-                        tooltip="Last Page"
+                        tooltip="{i18n>lastPage}"
                         press="onLastPage" />
 
                     <!-- ROWS PER PAGE -->
                     <Text
-                        text="Rows:"
+                        text="{i18n>rows}"
                         class="sapUiSmallMarginBegin" />
 
                     <Select
