@@ -29,9 +29,106 @@ export default class Main extends Controller {
   public onInit(): void {
     super.onInit();
 
+    // ===== Pagination Model =====
+    const oPagination = new JSONModel({
+      page: 1,
+      pageSize: 20,
+      total: 0,
+      totalPages: 1,
+    });
+
+    this.getView()?.setModel(oPagination, "pagination");
+
     this.onInitCount();
 
     this.onInitLogCount();
+
+    // Load first page
+    this.loadPage();
+  }
+
+  /**
+   * Load table data by page
+   **/
+  public loadPage(): void {
+    const oTable = this.byId("maiTableId") as any;
+
+    if (!oTable) return;
+
+    const oBinding = oTable.getBinding("rows") as ODataListBinding;
+
+    if (!oBinding) return;
+
+    const oPageModel = this.getView()?.getModel("pagination") as JSONModel;
+
+    const page = oPageModel.getProperty("/page");
+    const size = oPageModel.getProperty("/pageSize");
+
+    const skip = (page - 1) * size;
+
+    oBinding.changeParameters({
+      $skip: skip,
+      $top: size,
+    });
+
+    // refresh data
+    oBinding.refresh();
+  }
+
+  /**
+   * FIRST PAGE
+   **/
+  public onFirstPage(): void {
+    const oModel = this.getView()?.getModel("pagination") as JSONModel;
+
+    oModel.setProperty("/page", 1);
+
+    this.loadPage();
+  }
+
+  /**
+   * PREVIOUS PAGE
+   **/
+  public onPrevPage(): void {
+    const oModel = this.getView()?.getModel("pagination") as JSONModel;
+
+    let page = oModel.getProperty("/page");
+
+    if (page > 1) {
+      oModel.setProperty("/page", page - 1);
+
+      this.loadPage();
+    }
+  }
+
+  /**
+   * NEXT PAGE
+   **/
+  public onNextPage(): void {
+    const oModel = this.getView()?.getModel("pagination") as JSONModel;
+
+    let page = oModel.getProperty("/page");
+
+    const totalPages = oModel.getProperty("/totalPages");
+
+    if (page < totalPages) {
+      oModel.setProperty("/page", page + 1);
+
+      this.loadPage();
+    }
+  }
+
+  /**
+   * LAST PAGE
+   **/
+  public onLastPage(): void {
+    const oModel = this.getView()?.getModel("pagination") as JSONModel;
+
+    const totalPages = oModel.getProperty("/totalPages");
+
+    oModel.setProperty("/page", totalPages);
+
+    this.loadPage();
   }
 
   /**
@@ -64,6 +161,17 @@ export default class Main extends Controller {
 
       // Create property of view model
       oViewModel.setProperty("/count", iCount);
+
+      // ===== Pagination update =====
+      const oPageModel = this.getView()?.getModel("pagination") as JSONModel;
+
+      oPageModel.setProperty("/total", iCount);
+
+      const size = oPageModel.getProperty("/pageSize");
+
+      const totalPages = Math.ceil(iCount / size);
+
+      oPageModel.setProperty("/totalPages", totalPages);
     } catch (error) {
       MessageBox.error("Failed to load chart data.");
     }
@@ -147,17 +255,31 @@ export default class Main extends Controller {
     }
 
     oBinding.filter(aFilters);
+
+    // Reset page when filter changes
+    const oPageModel = this.getView()?.getModel("pagination") as JSONModel;
+    oPageModel.setProperty("/page", 1);
+    this.loadPage();
   }
 
   /**
    * Triggered when the user changes the "Rows per page".
    */
   public onRowCountChange(oEvent: any): void {
-    const sKey = oEvent.getParameter("selectedItem").getKey();
-    const oTable = this.byId("maiTableId") as any;
-    if (oTable) {
-      oTable.setVisibleRowCount(parseInt(sKey));
-    }
+    const size = parseInt(oEvent.getParameter("selectedItem").getKey());
+
+    const oModel = this.getView()?.getModel("pagination") as JSONModel;
+
+    oModel.setProperty("/pageSize", size);
+    oModel.setProperty("/page", 1);
+
+    const total = oModel.getProperty("/total");
+
+    const totalPages = Math.ceil(total / size);
+
+    oModel.setProperty("/totalPages", totalPages);
+
+    this.loadPage();
   }
 
   /**
@@ -185,11 +307,7 @@ export default class Main extends Controller {
       },
       { label: "Login Date", property: "LoginDate", width: 15 },
       { label: "Login Time", property: "LoginTime", width: 15 },
-      {
-        label: "Login Message",
-        property: "LoginMessage",
-        width: 150,
-      },
+      { label: "Login Message", property: "LoginMessage", width: 150 },
       { label: "Logout Date", property: "LogoutDate", width: 15 },
       { label: "Logout Time", property: "LogoutTime", width: 15 },
       { label: "Event ID", property: "EventId", width: 10 },
@@ -197,9 +315,7 @@ export default class Main extends Controller {
 
     // Spreadsheet config
     const oSettings = {
-      workbook: {
-        columns: aCols,
-      },
+      workbook: { columns: aCols },
       dataSource: oBinding,
       fileName: "UserAuthenticationLogs.xlsx",
       worker: false,
@@ -212,9 +328,7 @@ export default class Main extends Controller {
     oSheet
       .build()
       .then(() => {
-        MessageToast.show("Export successful!", {
-          duration: 3000,
-        });
+        MessageToast.show("Export successful!", { duration: 3000 });
       })
       .catch(() => {
         MessageBox.error("Export failed.");
