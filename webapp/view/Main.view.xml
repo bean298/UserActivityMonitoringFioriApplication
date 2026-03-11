@@ -30,39 +30,33 @@
                 <HBox id="hBoxChartContent" class="sapUiSmallMarginBottom">
 
                     <!-- DONUT CHART -->
-                    <viz:VizFrame
-                        vizProperties="{
+                    <viz:VizFrame vizProperties="{
                             title: { visible: true,  text: 'Login Result Overview' },
                             plotArea: {
                                 colorPalette: ['#ff4d4f', '#52c41a'],
                                 dataLabel: {  visible: true,  type: 'value' }
                             }
-                        }"
-                        id="loginChart" vizType="donut" width="400px" height="400px">
+                        }" id="loginChart" vizType="donut" width="400px" height="400px">
 
                         <!-- Define data of chart -->
                         <viz:dataset>
                             <viz.data:FlattenedDataset id="donutDataset" data="{authLogChart>/}">
                                 <!-- Category  -->
                                 <viz.data:dimensions>
-                                    <viz.data:DimensionDefinition id="donutDimensionStatus"
-                                        name="Status" value="{LoginResult}" />
+                                    <viz.data:DimensionDefinition id="donutDimensionStatus" name="Status" value="{LoginResult}" />
                                 </viz.data:dimensions>
 
                                 <!-- Value -->
                                 <viz.data:measures>
-                                    <viz.data:MeasureDefinition id="donutMeasureCount" name="Count"
-                                        value="{CountLoginLog}" />
+                                    <viz.data:MeasureDefinition id="donutMeasureCount" name="Count" value="{CountLoginLog}" />
                                 </viz.data:measures>
                             </viz.data:FlattenedDataset>
                         </viz:dataset>
 
                         <!-- Mapping dimension/measure into chart -->
                         <viz:feeds>
-                            <viz.feeds:FeedItem id="donutFeedColor" uid="color" type="Dimension"
-                                values="Status" />
-                            <viz.feeds:FeedItem id="donutFeedSize" uid="size" type="Measure"
-                                values="Count" />
+                            <viz.feeds:FeedItem id="donutFeedColor" uid="color" type="Dimension" values="Status" />
+                            <viz.feeds:FeedItem id="donutFeedSize" uid="size" type="Measure" values="Count" />
                         </viz:feeds>
 
                     </viz:VizFrame>
@@ -71,66 +65,46 @@
                 <!-- FILTER + SEARCH -->
                 <Toolbar id="toolbarId" class="sapUiMediumMarginBottom" design="Transparent">
 
-                    <Title id="filterTitleId" text="{i18n>filter}" level="H5"
-                        class="sapUiSmallMarginEnd" />
+                    <Title id="filterTitleId" text="{i18n>filter}" level="H5" class="sapUiSmallMarginEnd" />
 
                     <ToolbarSpacer id="filterToolbarSpacerId" />
 
-                    <Input id="userSearchId" width="300px" placeholder="{i18n>searchUser}"
-                        showValueHelp="true" liveChange="onSearchUserName"
-                        valueHelpRequest="onUserSearchHelp" showClearIcon="true"
-                        class="sapUiSmallMarginEnd" />
+                    <Input id="userSearchId" width="300px" placeholder="{i18n>searchUser}" showValueHelp="true" liveChange="onSearchUserName" valueHelpRequest="onUserSearchHelp" showClearIcon="true" class="sapUiSmallMarginEnd" />
 
-                    <Select id="mainHeaderSelectId" width="200px" change="onFilterStatus"
-                        class="sapUiSmallMarginEnd">
+                    <Select id="mainHeaderSelectId" width="200px" change="onFilterStatus" class="sapUiSmallMarginEnd">
                         <core:Item id="itemId1" key="" text="{i18n>all}" />
                         <core:Item id="itemId2" key="SUCCESS" text="{i18n>success}" />
                         <core:Item id="itemId3" key="FAIL" text="{i18n>failed}" />
                     </Select>
 
                     <!-- Date range filter -->
-                    <DateRangeSelection id="mainDateRangeId" width="250px"
-                        placeholder="{i18n>selectDateRange}" change="applyFilters" />
+                    <DateRangeSelection id="mainDateRangeId" width="250px" placeholder="{i18n>selectDateRange}" change="applyFilters" />
 
                 </Toolbar>
 
                 <!-- TABLE -->
-                <ui:Table
-                    id="maiTableId"
-                    visibleRowCountMode="Fixed"
-                    visibleRowCount="{pagination>/pageSize}"
-                    threshold="0"
-                    rows="{
-    path: '/UserAuthLog',
-    parameters: {
-        $count: true
-    },
-    sorter: { path: 'LoginDate', descending: true }
-}"
-                    selectionMode="None"
-                    firstVisibleRow="0"
-                    enableColumnReordering="true"
-                    class="sapUiLargeMarginBottom">
+                <ui:Table id="maiTableId" threshold="0" rows="{
+                    path: '/UserAuthLog',
+                    parameters: {
+                        $count: true
+                    },
+                    sorter: { path: 'LoginDate', descending: true }
+                }" selectionMode="None" firstVisibleRow="0" enableColumnReordering="true" class="sapUiLargeMarginBottom">
                     <!-- HEADER TOOLBAR | BUTTON -->
                     <ui:extension>
                         <OverflowToolbar id="mainToolbarId">
-                            <Title id="mainTitleTableId"
-                                text="{= ${i18n>headerTitleTable} + ' (' + ${view>/count} + ')' }"
-                                level="H2" />
+                            <Title id="mainTitleTableId" text="{= ${i18n>headerTitleTable} + ' (' + ${view>/count} + ')' }" level="H2" />
 
                             <ToolbarSpacer id="mainToolSpace" />
 
                             <!-- REFRESH BTN -->
-                            <Button id="btnRefreshData" icon="sap-icon://refresh"
-                                tooltip="{i18n>refreshData}" press="onRefreshTable" />
+                            <Button id="btnRefreshData" icon="sap-icon://refresh" tooltip="{i18n>refreshData}" press="onRefreshTable" />
 
                             <!-- EXPORT BTN -->
-                            <Button id="btnExportExcel" icon="sap-icon://excel-attachment"
-                                tooltip="{i18n>exportExcel}" press="onExportExcel" />
+                            <Button id="btnExportExcel" icon="sap-icon://excel-attachment" tooltip="{i18n>exportExcel}" press="onExportExcel" />
 
                             <!-- VIEW SETTINGS BTN -->
-                            <Button id="btnViewSettings" icon="sap-icon://action-settings"
-                                tooltip="{i18n>viewSettings}" press="onOpenViewSettings" />
+                            <Button id="btnViewSettings" icon="sap-icon://action-settings" tooltip="{i18n>viewSettings}" press="onOpenViewSettings" />
                         </OverflowToolbar>
                     </ui:extension>
 
@@ -158,9 +132,7 @@
                             <Label id="labelLoginResult" text="{i18n>loginResult}" />
 
                             <ui:template>
-                                <ObjectStatus id="textLoginResult" text="{LoginResult}"
-                                    icon="{path: 'LoginResult', formatter: '.formatter.formatLoginResultIcon'}"
-                                    state="{path: 'LoginResult', formatter: '.formatter.formatLoginResultState'}" />
+                                <ObjectStatus id="textLoginResult" text="{LoginResult}" icon="{path: 'LoginResult', formatter: '.formatter.formatLoginResultIcon'}" state="{path: 'LoginResult', formatter: '.formatter.formatLoginResultState'}" />
                             </ui:template>
                         </ui:Column>
 
@@ -187,9 +159,7 @@
                             <Label id="labelLoginMessage" text="{i18n>loginMessage}" />
 
                             <ui:template>
-                                <ObjectStatus id="textLoginMessage" text="{LoginMessage}"
-                                    icon="{path: 'EventId', formatter: '.formatter.formatLoginMessageIcon'}"
-                                    state="{path: 'EventId', formatter: '.formatter.formatLoginMessageState'}" />
+                                <ObjectStatus id="textLoginMessage" text="{LoginMessage}" icon="{path: 'EventId', formatter: '.formatter.formatLoginMessageIcon'}" state="{path: 'EventId', formatter: '.formatter.formatLoginMessageState'}" />
                             </ui:template>
                         </ui:Column>
 
@@ -214,65 +184,38 @@
                         <!-- NAVIGATOR COLUMN -->
                         <ui:Column id="columnNavigator" width="4rem" hAlign="Center">
                             <ui:template>
-                                <Button id="btnNavigator" icon="sap-icon://navigation-right-arrow"
-                                    type="Transparent" press="onPressNavigate" />
+                                <Button id="btnNavigator" icon="sap-icon://navigation-right-arrow" type="Transparent" press="onPressNavigate" />
                             </ui:template>
                         </ui:Column>
                     </ui:columns>
                 </ui:Table>
-                <!-- PAGINATION -->
-                <HBox
-                    id="paginationBar"
-                    justifyContent="Center"
-                    alignItems="Center"
-                    class="sapUiSmallMarginBottom">
 
+                <!-- PAGINATION -->
+                <HBox id="paginationBar" justifyContent="Center" alignItems="Center" class="sapUiSmallMarginBottom">
                     <!-- FIRST -->
-                    <Button
-                        icon="sap-icon://media-rewind"
-                        tooltip="{i18n>firstPage}"
-                        press="onFirstPage" />
+                    <Button id="btnFirstPage" icon="sap-icon://media-rewind" tooltip="{i18n>firstPage}" press="onFirstPage" />
 
                     <!-- PREVIOUS -->
-                    <Button
-                        icon="sap-icon://navigation-left-arrow"
-                        tooltip="{i18n>previousPage}"
-                        press="onPrevPage" />
+                    <Button id="btnPrevPage" icon="sap-icon://navigation-left-arrow" tooltip="{i18n>previousPage}" press="onPrevPage" />
 
                     <!-- PAGE INFO -->
-                    <Text
-                        text="Page {pagination>/page} / {pagination>/totalPages}"
-                        class="sapUiSmallMarginBegin sapUiSmallMarginEnd" />
+                    <Text id="txtPageInfo" text="Page {pagination>/page} / {pagination>/totalPages}" class="sapUiSmallMarginBegin sapUiSmallMarginEnd" />
 
                     <!-- NEXT -->
-                    <Button
-                        icon="sap-icon://navigation-right-arrow"
-                        tooltip="{i18n>nextPage}"
-                        press="onNextPage" />
+                    <Button id="btnNextPage" icon="sap-icon://navigation-right-arrow" tooltip="{i18n>nextPage}" press="onNextPage" />
 
                     <!-- LAST -->
-                    <Button
-                        icon="sap-icon://media-forward"
-                        tooltip="{i18n>lastPage}"
-                        press="onLastPage" />
+                    <Button id="btnLastPage" icon="sap-icon://media-forward" tooltip="{i18n>lastPage}" press="onLastPage" />
 
                     <!-- ROWS PER PAGE -->
-                    <Text
-                        text="{i18n>rows}"
-                        class="sapUiSmallMarginBegin" />
+                    <Text id="txtRowsPerPage" text="{i18n>rows}" class="sapUiSmallMarginBegin" />
 
-                    <Select
-                        width="80px"
-                        selectedKey="{pagination>/pageSize}"
-                        change="onRowCountChange">
-
-                        <core:Item key="10" text="10" />
-                        <core:Item key="20" text="20" />
-                        <core:Item key="50" text="50" />
-                        <core:Item key="100" text="100" />
-
+                    <Select id="selectPageSize" width="80px" selectedKey="{pagination>/pageSize}" change="onRowCountChange">
+                        <core:Item id="itemPageSize10" key="10" text="10" />
+                        <core:Item id="itemPageSize20" key="20" text="20" />
+                        <core:Item id="itemPageSize50" key="50" text="50" />
+                        <core:Item id="itemPageSize100" key="100" text="100" />
                     </Select>
-
                 </HBox>
             </VBox>
         </f:content>
