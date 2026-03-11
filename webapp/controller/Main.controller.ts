@@ -22,6 +22,7 @@ export default class Main extends Controller {
 
   // ===== View Settings Feature =====
   private _oViewSettingsDialog: Dialog | null = null;
+  private _oUserSearchHelpDialog: Dialog | null = null;
 
   /**
    * Called when the controller is initialized.
@@ -30,106 +31,107 @@ export default class Main extends Controller {
     super.onInit();
 
     // ===== Pagination Model =====
-    const oPagination = new JSONModel({
-      page: 1,
-      pageSize: 20,
-      total: 0,
-      totalPages: 1,
-    });
+    // const oPagination = new JSONModel({
+    //   page: 1,
+    //   pageSize: 20,
+    //   total: 0,
+    //   totalPages: 1,
+    // });
 
-    this.getView()?.setModel(oPagination, "pagination");
-
-    this.onInitCount();
-
-    this.onInitLogCount();
+    // this.getView()?.setModel(oPagination, "pagination");
 
     // Load first page
-    this.loadPage();
+    // this.loadPage();
+
+    this.onInitCount();
+    this.onInitLogCount();
+    this.onInitTcodeCount();
+    this.onInitDumpCount();
   }
 
   /**
    * Load table data by page
    **/
-  public loadPage(): void {
-    const oTable = this.byId("maiTableId") as any;
+  // public loadPage(): void {
+  //   const oTable = this.byId("maiTableId") as any;
 
-    if (!oTable) return;
+  //   if (!oTable) return;
 
-    const oBinding = oTable.getBinding("rows") as ODataListBinding;
+  //   const oBinding = oTable.getBinding("rows") as ODataListBinding;
 
-    if (!oBinding) return;
+  //   if (!oBinding) return;
 
-    const oPageModel = this.getView()?.getModel("pagination") as JSONModel;
+  //   const oPageModel = this.getView()?.getModel("pagination") as JSONModel;
 
-    const page = oPageModel.getProperty("/page");
-    const size = oPageModel.getProperty("/pageSize");
+  //   const page = oPageModel.getProperty("/page");
+  //   const size = oPageModel.getProperty("/pageSize");
 
-    const skip = (page - 1) * size;
+  //   const skip = (page - 1) * size;
 
-    oBinding.changeParameters({
-      $skip: skip,
-      $top: size,
-    });
+  //   oBinding.changeParameters({
+  //     $skip: skip,
+  //     $top: size,
+  //   });
 
-    // refresh data
-    oBinding.refresh();
-  }
+  //   // refresh data
+  //   oBinding.refresh();
+  // }
 
   /**
    * FIRST PAGE
    **/
-  public onFirstPage(): void {
-    const oModel = this.getView()?.getModel("pagination") as JSONModel;
+  // public onFirstPage(): void {
+  //   const oModel = this.getView()?.getModel("pagination") as JSONModel;
 
-    oModel.setProperty("/page", 1);
+  //   oModel.setProperty("/page", 1);
 
-    this.loadPage();
-  }
+  //   this.loadPage();
+  // }
 
   /**
    * PREVIOUS PAGE
    **/
-  public onPrevPage(): void {
-    const oModel = this.getView()?.getModel("pagination") as JSONModel;
+  // public onPrevPage(): void {
+  //   const oModel = this.getView()?.getModel("pagination") as JSONModel;
 
-    let page = oModel.getProperty("/page");
+  //   let page = oModel.getProperty("/page");
 
-    if (page > 1) {
-      oModel.setProperty("/page", page - 1);
+  //   if (page > 1) {
+  //     oModel.setProperty("/page", page - 1);
 
-      this.loadPage();
-    }
-  }
+  //     this.loadPage();
+  //   }
+  // }
 
   /**
    * NEXT PAGE
    **/
-  public onNextPage(): void {
-    const oModel = this.getView()?.getModel("pagination") as JSONModel;
+  // public onNextPage(): void {
+  //   const oModel = this.getView()?.getModel("pagination") as JSONModel;
 
-    let page = oModel.getProperty("/page");
+  //   let page = oModel.getProperty("/page");
 
-    const totalPages = oModel.getProperty("/totalPages");
+  //   const totalPages = oModel.getProperty("/totalPages");
 
-    if (page < totalPages) {
-      oModel.setProperty("/page", page + 1);
+  //   if (page < totalPages) {
+  //     oModel.setProperty("/page", page + 1);
 
-      this.loadPage();
-    }
-  }
+  //     this.loadPage();
+  //   }
+  // }
 
   /**
    * LAST PAGE
    **/
-  public onLastPage(): void {
-    const oModel = this.getView()?.getModel("pagination") as JSONModel;
+  // public onLastPage(): void {
+  //   const oModel = this.getView()?.getModel("pagination") as JSONModel;
 
-    const totalPages = oModel.getProperty("/totalPages");
+  //   const totalPages = oModel.getProperty("/totalPages");
 
-    oModel.setProperty("/page", totalPages);
+  //   oModel.setProperty("/page", totalPages);
 
-    this.loadPage();
-  }
+  //   this.loadPage();
+  // }
 
   /**
    * Fetches the total number of records from the UserAuthLog entity
@@ -163,15 +165,15 @@ export default class Main extends Controller {
       oViewModel.setProperty("/count", iCount);
 
       // ===== Pagination update =====
-      const oPageModel = this.getView()?.getModel("pagination") as JSONModel;
+      // const oPageModel = this.getView()?.getModel("pagination") as JSONModel;
 
-      oPageModel.setProperty("/total", iCount);
+      // oPageModel.setProperty("/total", iCount);
 
-      const size = oPageModel.getProperty("/pageSize");
+      // const size = oPageModel.getProperty("/pageSize");
 
-      const totalPages = Math.ceil(iCount / size);
+      // const totalPages = Math.ceil(iCount / size);
 
-      oPageModel.setProperty("/totalPages", totalPages);
+      // oPageModel.setProperty("/totalPages", totalPages);
     } catch (error) {
       MessageBox.error("Failed to load chart data.");
     }
@@ -198,7 +200,80 @@ export default class Main extends Controller {
       // Set data into Model authLogChart
       this.getView()?.setModel(oJsonModel, "authLogChart");
     } catch (error) {
-      MessageBox.error("Failed to load chart data.");
+      MessageBox.error("Failed to load Login data.");
+    }
+  }
+
+  /**
+   * Fetches the data of ActivityLogChart entity
+   **/
+  public async onInitTcodeCount(): Promise<void> {
+    try {
+      // Get OData V4 model from the App Component
+      const oModel = this.getAppComponent().getModel() as ODataModel;
+
+      // Create a list binding to /ActivityLogChart
+      const oBinding = oModel.bindList(
+        "/ActivityLogChart",
+        undefined,
+        undefined,
+        undefined,
+        {
+          $orderby: "TCodeCount desc",
+        },
+      ) as ODataListBinding;
+
+      // Executes the OData call
+      const aContexts = await oBinding.requestContexts(0, 5);
+
+      const aData = aContexts.map((oContext) => {
+        // Create label field
+        const oObj = oContext.getObject();
+        oObj.Label = `${oObj.TCode} - ${oObj.TCodeName}`;
+
+        return oObj;
+      });
+
+      const oJsonModel = new JSONModel(aData);
+
+      // Set data into Model tCodeChart
+      this.getView()?.setModel(oJsonModel, "tCodeChart");
+    } catch (error) {
+      MessageBox.error("Failed to load TCode data.");
+    }
+  }
+
+  /**
+   * Fetches the data of DumpActivityChart entity
+   **/
+  public async onInitDumpCount(): Promise<void> {
+    try {
+      // Get OData V4 model from the App Component
+      const oModel = this.getAppComponent().getModel() as ODataModel;
+
+      // Create a list binding to /DumpActivityChart
+      const oBinding = oModel.bindList(
+        "/DumpActivityChart",
+        undefined,
+        undefined,
+        undefined,
+        {
+          $orderby: "DumpCount desc",
+        },
+      ) as ODataListBinding;
+
+      debugger;
+      // Executes the OData call
+      const aContexts = await oBinding.requestContexts(0, 10);
+
+      const aData = aContexts.map((oContext) => oContext.getObject());
+
+      const oJsonModel = new JSONModel(aData);
+
+      // Set data into Model tCodeChart
+      this.getView()?.setModel(oJsonModel, "dumpChart");
+    } catch (error) {
+      MessageBox.error("Failed to load Dump data.");
     }
   }
 
@@ -257,30 +332,30 @@ export default class Main extends Controller {
     oBinding.filter(aFilters);
 
     // Reset page when filter changes
-    const oPageModel = this.getView()?.getModel("pagination") as JSONModel;
-    oPageModel.setProperty("/page", 1);
-    this.loadPage();
+    // const oPageModel = this.getView()?.getModel("pagination") as JSONModel;
+    // oPageModel.setProperty("/page", 1);
+    // this.loadPage();
   }
 
   /**
    * Triggered when the user changes the "Rows per page".
    */
-  public onRowCountChange(oEvent: any): void {
-    const size = parseInt(oEvent.getParameter("selectedItem").getKey());
+  // public onRowCountChange(oEvent: any): void {
+  //   const size = parseInt(oEvent.getParameter("selectedItem").getKey());
 
-    const oModel = this.getView()?.getModel("pagination") as JSONModel;
+  //   const oModel = this.getView()?.getModel("pagination") as JSONModel;
 
-    oModel.setProperty("/pageSize", size);
-    oModel.setProperty("/page", 1);
+  //   oModel.setProperty("/pageSize", size);
+  //   oModel.setProperty("/page", 1);
 
-    const total = oModel.getProperty("/total");
+  //   const total = oModel.getProperty("/total");
 
-    const totalPages = Math.ceil(total / size);
+  //   const totalPages = Math.ceil(total / size);
 
-    oModel.setProperty("/totalPages", totalPages);
+  //   oModel.setProperty("/totalPages", totalPages);
 
-    this.loadPage();
-  }
+  //   this.loadPage();
+  // }
 
   /**
    * Exports the currently bound table data to an Excel file.
@@ -356,58 +431,48 @@ export default class Main extends Controller {
 
       const oJsonModel = new JSONModel(aData);
 
-      // Create List
-      const oList = new List({
-        mode: "SingleSelectMaster",
-        items: {
-          path: "/",
-          template: new StandardListItem({
-            title: "{Username}",
-          }),
-        },
-        selectionChange: (oEvent) => {
-          //Get line that user click
-          const oItem = oEvent.getParameter("listItem");
-          if (!oItem) {
-            return;
-          }
+      this.getView()?.setModel(oJsonModel, "userSeachHelp");
 
-          // Connects the UI item to its underlying model data
-          const oContext = oItem.getBindingContext();
+      if (!this._oUserSearchHelpDialog) {
+        // Load fragment
+        this._oUserSearchHelpDialog = (await Fragment.load({
+          name: "useraudit.fragment.UserSearchHelp",
+          controller: this,
+        })) as Dialog;
 
-          // Get the actual data object from the model
-          const oSelected = oContext?.getObject();
+        this.getView()?.addDependent(this._oUserSearchHelpDialog);
+      }
 
-          if (oSelected) {
-            (this.byId("userSearchId") as Input).setValue(oSelected.Username);
-          }
-
-          // Filter
-          this.applyFilters();
-
-          oDialog.close();
-        },
-      });
-
-      // Set data for List
-      oList.setModel(oJsonModel);
-
-      // Create Dialog
-      const oDialog = new Dialog({
-        title: "Select User",
-        contentWidth: "400px",
-        contentHeight: "500px",
-        content: [oList],
-        endButton: new Button({
-          text: "Close",
-          press: () => oDialog.close(),
-        }),
-      });
-
-      oDialog.open();
+      this._oUserSearchHelpDialog.open();
     } catch (error) {
       MessageBox.error("Failed to load user search help.");
     }
+  }
+
+  /**
+   * Select User SearchHelp
+   **/
+  public onUserSelect(oEvent: any): void {
+    const oItem = oEvent.getParameter("listItem");
+
+    debugger;
+    const oContext = oItem.getBindingContext("userSeachHelp");
+    const oSelected = oContext?.getObject();
+
+    if (oSelected) {
+      (this.byId("userSearchId") as Input).setValue(oSelected.Username);
+    }
+
+    this.applyFilters();
+
+    this._oUserSearchHelpDialog?.close();
+  }
+
+  /**
+   * Close Fragment User Search Help
+   **/
+  public onCloseUserDialog(): void {
+    this._oUserSearchHelpDialog?.close();
   }
 
   /**
@@ -532,47 +597,16 @@ export default class Main extends Controller {
 
     try {
       // Refresh data
-      await this.onInitCount();
       await oBinding?.requestRefresh();
+
+      // Refresh dashboard data
+      await this.onInitCount();
       await this.onInitLogCount();
+      await this.onInitTcodeCount();
+
+      MessageToast.show("Data refreshed");
     } finally {
       oTable.setBusy(false);
     }
   }
-
-  public onFullScreen(): void {
-    debugger;
-    const oTable = this.byId("maiTableId") as any;
-
-    if (!oTable) {
-      return;
-    }
-
-    const bFullScreen = oTable.hasStyleClass("fullScreenMode");
-
-    if (bFullScreen) {
-      oTable.removeStyleClass("fullScreenMode");
-    } else {
-      oTable.addStyleClass("fullScreenMode");
-    }
-  }
 }
-
-/**
- * Called before the view is re-rendered.
- **/
-// public  onBeforeRendering(): void {
-//
-//  }
-/**
- * Called after the view has been rendered.
- **/
-// public  onAfterRendering(): void {
-//
-//  }
-/**
- * Called when the controller is destroyed.
- **/
-// public onExit(): void {
-//
-//  }

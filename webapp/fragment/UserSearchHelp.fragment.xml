@@ -1,0 +1,22 @@
+<core:FragmentDefinition xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+    <Dialog id="userSearchDialog" title="{i18n>selectUser}" contentWidth="400px" contentHeight="500px" draggable="true" resizable="true">
+        <content>
+            <VBox id="VBox" width="100%">
+                <!-- USER LIST -->
+                <List id="userList" mode="SingleSelectMaster" items="{
+                        path: 'userSeachHelp>/'
+                    }" selectionChange="onUserSelect">
+
+                    <StandardListItem id="StandardListItem" title="{userSeachHelp>Username}" />
+                </List>
+            </VBox>
+        </content>
+
+        <!-- CLOSE BUTTON -->
+        <endButton>
+            <Button id="btnClose" text="{i18n>cancel}" press="onCloseUserDialog"/>
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>
+
