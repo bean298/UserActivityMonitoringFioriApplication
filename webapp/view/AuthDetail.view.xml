@@ -28,16 +28,13 @@
                     <Title id="TitleUsername" text="{detailData>/Username}" level="H5" />
 
                     <!-- LOGIN RESULT -->
-                    <ObjectStatus id="StatusLoginResultHeader" text="{detailData>/LoginResult}"
-                        state="{
+                    <ObjectStatus id="StatusLoginResultHeader" text="{detailData>/LoginResult}" state="{
                         path: 'detailData>/LoginResult',
                         formatter: '.formatter.formatLoginResultState'
-                    }"
-                        icon="{
+                    }" icon="{
                         path: 'detailData>/LoginResult',
                         formatter: '.formatter.formatLoginResultIcon'
-                    }"
-                        class="sapUiSmallMarginBottom" />
+                    }" class="sapUiSmallMarginBottom" />
 
                     <Label id="LabelClient" text="{i18n>client}" design="Bold" />
                     <Text id="TextClient" text="{i18n>clientNum}" />
@@ -59,37 +56,28 @@
                                 <Text id="TextSessionId" text="{detailData>/SessionId}" />
 
                                 <!-- USERNAME -->
-                                <Label id="LabelUsername" text="{i18n>username}" design="Bold"
-                                    class="sapUiSmallMarginTop" />
+                                <Label id="LabelUsername" text="{i18n>username}" design="Bold" class="sapUiSmallMarginTop" />
                                 <Text id="TextUsername" text="{detailData>/Username}" />
                             </VBox>
 
                             <!-- COLUMN 2 -->
                             <VBox id="BoxLoginResult">
                                 <!-- LOGIN RESULT -->
-                                <Label id="LabelLoginResultId" text="{i18n>loginResult}"
-                                    design="Bold" />
-                                <ObjectStatus id="StatusLoginResultId"
-                                    text="{detailData>/LoginResult}"
-                                    state="{
+                                <Label id="LabelLoginResultId" text="{i18n>loginResult}" design="Bold" />
+                                <ObjectStatus id="StatusLoginResultId" text="{detailData>/LoginResult}" state="{
                                             path: 'detailData>/LoginResult',
                                             formatter: '.formatter.formatLoginResultState'
-                                        }"
-                                    icon="{
+                                        }" icon="{
                                             path: 'detailData>/LoginResult',
                                             formatter: '.formatter.formatLoginResultIcon'
                                     }" />
 
                                 <!-- LOGIN MESSAGE -->
-                                <Label id="LabelLoginMessageId" text="{i18n>loginMessage}"
-                                    design="Bold" class="sapUiSmallMarginTop" />
-                                <ObjectStatus id="StatusLoginMessageId"
-                                    text="{detailData>/LoginMessage}"
-                                    state="{
+                                <Label id="LabelLoginMessageId" text="{i18n>loginMessage}" design="Bold" class="sapUiSmallMarginTop" />
+                                <ObjectStatus id="StatusLoginMessageId" text="{detailData>/LoginMessage}" state="{
                                             path: 'detailData>/EventId',
                                             formatter: '.formatter.formatLoginMessageState'
-                                        }"
-                                    icon="{
+                                        }" icon="{
                                             path: 'detailData>/EventId',
                                             formatter: '.formatter.formatLoginMessageIcon'
                                     }" />
@@ -102,10 +90,8 @@
                                 <Text id="TextTerminal" text="{detailData>/TerminalId}" />
 
                                 <!-- EVENT ID -->
-                                <Label id="LabelEvent" text="{i18n>eventId}" design="Bold"
-                                    class="sapUiSmallMarginTop" />
-                                <ObjectStatus id="StatusEvent" text="{detailData>/EventId}"
-                                    state="{
+                                <Label id="LabelEvent" text="{i18n>eventId}" design="Bold" class="sapUiSmallMarginTop" />
+                                <ObjectStatus id="StatusEvent" text="{detailData>/EventId}" state="{
                                             path: 'detailData>/EventId',
                                             formatter: '.formatter.formatLoginMessageState'
                                         }" />
@@ -118,8 +104,7 @@
                                 <Text id="TextCreateAt" text="{detailData>/CreateAt}" />
 
                                 <!-- CREATED ON -->
-                                <Label id="LabelCreateOn" text="{i18n>createOn}" design="Bold"
-                                    class="sapUiSmallMarginTop" />
+                                <Label id="LabelCreateOn" text="{i18n>createOn}" design="Bold" class="sapUiSmallMarginTop" />
                                 <Text id="TextCreateOn" text="{detailData>/CreateOn}" />
                             </VBox>
 
@@ -127,9 +112,7 @@
                             <VBox id="BoxEmail">
                                 <!-- SEND EMAIL -->
                                 <Label id="LabelSendEmailId" text="{i18n>sendEmail}" design="Bold" />
-                                <CheckBox id="CheckSendEmail"
-                                    selected="{= ${detailData>/SendEmail} ? true : false }"
-                                    enabled="false" />
+                                <core:Icon id="icon" src="{= ${detailData>/SendMailFlag} ? 'sap-icon://accept' : 'sap-icon://decline'}" color="{= ${detailData>/SendMailFlag} ? 'green' : 'red'}" size="1.5rem"/>
                             </VBox>
 
                         </layout:Grid>
@@ -179,8 +162,7 @@
                 <f:subSections>
                     <f:ObjectPageSubSection id="SubSectionActivity">
                         <!-- TABLE -->
-                        <Table id="ActivityTable" items="{detailData>/_Activity}" growing="true"
-                            growingThreshold="20">
+                        <Table id="ActivityTable" items="{detailData>/_Activity}" growing="true" growingThreshold="20">
                             <columns>
                                 <!-- LOGID COLUMN -->
                                 <Column id="ColumnLogId">
