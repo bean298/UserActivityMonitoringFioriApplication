@@ -129,7 +129,7 @@
                             <VBox id="BoxLoginDate">
                                 <!-- Login Date -->
                                 <Label id="LabelLoginDateId" text="{i18n>loginDate}" design="Bold" />
-                                <Text id="TextLoginDateId" text="{detailData>/LoginDate}" />
+                                <Text id="TextLoginDateId" text="{path:'detailData>/LoginDate', formatter: '.formatter.formatISODate'}" />
                             </VBox>
 
                             <!-- COLUMN 2 -->
@@ -143,14 +143,14 @@
                             <VBox id="BoxLogoutTime">
                                 <!-- Logout Time -->
                                 <Label id="LabelLogoutTimeId" text="{i18n>logoutTime}" design="Bold" />
-                                <Text id="TextLogoutTimeId" text="{detailData>/LogoutTime}" />
+                                <Text id="TextLogoutTimeId" text="{path:'detailData>/LogoutTime', formatter: '.formatter.formatLogoutTime'}" />
                             </VBox>
 
                             <!-- COLUMN 4 -->
                             <VBox id="BoxLogoutDate">
                                 <!-- Logout Date -->
                                 <Label id="LabelLogoutDateId" text="{i18n>logoutDate}" design="Bold" />
-                                <Text id="TextLogoutDateId" text="{detailData>/LogoutDate}" />
+                                <Text id="TextLogoutDateId" text="{path:'detailData>/LogoutDate', formatter: '.formatter.formatISODate'}"/>
                             </VBox>
                         </layout:Grid>
                     </f:ObjectPageSubSection>

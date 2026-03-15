@@ -109,7 +109,7 @@
                             dataLabel: { visible: true },
                             colorPalette: ['#fa8c16']
                         }
-                    }"  vizType="bar" width="400px" height="400px">
+                    }" vizType="bar" width="400px" height="400px">
                         <!-- Define data of chart -->
                         <viz:dataset>
                             <viz.data:FlattenedDataset id="barDataset" data="{dumpChart>/}">
@@ -137,7 +137,6 @@
 
                 <!-- FILTER + SEARCH -->
                 <Toolbar id="toolbarId" class="sapUiMediumMarginBottom" design="Transparent">
-
                     <Title id="filterTitleId" text="{i18n>filter}" level="H5" class="sapUiSmallMarginEnd" />
 
                     <ToolbarSpacer id="filterToolbarSpacerId" />
@@ -150,19 +149,17 @@
                         <core:Item id="itemId3" key="FAIL" text="{i18n>failed}" />
                     </Select>
 
-                    <!-- Date range filter -->
-                    <DateRangeSelection id="mainDateRangeId" width="250px" placeholder="{i18n>selectDateRange}" change="applyFilters" />
-
+                    <DatePicker id="mainDatePickerId" width="200px" placeholder="{i18n>selectDate}" change="onFilterLoginDate" />
                 </Toolbar>
 
                 <!-- TABLE -->
-                <ui:Table id="maiTableId" threshold="0" rows="{
+                <ui:Table id="maiTableId" rows="{
                     path: '/UserAuthLog',
                     parameters: {
                         $count: true
                     },
                     sorter: { path: 'LoginDate', descending: true }
-                }" selectionMode="None" firstVisibleRow="0" enableColumnReordering="true" class="sapUiLargeMarginBottom">
+                }" selectionMode="Single" class="sapUiLargeMarginBottom">
                     <!-- HEADER TOOLBAR | BUTTON -->
                     <ui:extension>
                         <OverflowToolbar id="mainToolbarId">
@@ -196,7 +193,10 @@
                             <Label id="labelName" text="{i18n>username}" />
 
                             <ui:template>
-                                <Text id="textName" text="{Username}" wrapping="false" />
+                                <HBox id="hBoxUser" alignItems="Center" renderType="Bare" class="sapUiTinyMarginBeginEnd">
+                                    <core:Icon id="userIcon" src="sap-icon://employee" size="0.9rem" class="sapUiTinyMarginEnd" />
+                                    <Link id="textName" tooltip="{i18n>userInfoDetail}" text="{Username}" wrapping="false" />
+                                </HBox>
                             </ui:template>
                         </ui:Column>
 
@@ -214,7 +214,7 @@
                             <Label id="labelLoginDate" text="{i18n>loginDate}" />
 
                             <ui:template>
-                                <Text id="textLoginDate" text="{LoginDate}" />
+                                <Text id="textLoginDate" text="{path:'LoginDate', formatter: '.formatter.formatISODate'}" />
                             </ui:template>
                         </ui:Column>
 
@@ -241,7 +241,7 @@
                             <Label id="labelLogoutDate" text="{i18n>logoutDate}" />
 
                             <ui:template>
-                                <Text id="textLogoutDate" text="{LogoutDate}" />
+                                <Text id="textLogoutDate" text="{path:'LogoutDate', formatter: '.formatter.formatISODate'}" />
                             </ui:template>
                         </ui:Column>
 
@@ -250,14 +250,14 @@
                             <Label id="labelLogoutTime" text="{i18n>logoutTime}" />
 
                             <ui:template>
-                                <Text id="textLogoutTime" text="{LogoutTime}" />
+                                <Text id="textLogoutTime" text="{path:'LogoutTime', formatter: '.formatter.formatLogoutTime'}" />
                             </ui:template>
                         </ui:Column>
 
                         <!-- NAVIGATOR COLUMN -->
                         <ui:Column id="columnNavigator" width="4rem" hAlign="Center">
                             <ui:template>
-                                <Button id="btnNavigator" icon="sap-icon://navigation-right-arrow" type="Transparent" press="onPressNavigate" />
+                                <Button id="btnNavigator" tooltip="{i18n>navigateAuth}" icon="sap-icon://navigation-right-arrow" type="Transparent" press="onPressNavigate" />
                             </ui:template>
                         </ui:Column>
                     </ui:columns>

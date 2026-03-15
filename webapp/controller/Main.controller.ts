@@ -6,16 +6,15 @@ import Input from "sap/m/Input";
 import Filter from "sap/ui/model/Filter";
 import FilterOperator from "sap/ui/model/FilterOperator";
 import Select from "sap/m/Select";
-import List from "sap/m/List";
-import StandardListItem from "sap/m/StandardListItem";
 import Dialog from "sap/m/Dialog";
-import Button from "sap/m/Button";
 import Formatter from "useraudit/formatter/Formatter";
 import MessageBox from "sap/m/MessageBox";
 import DateRangeSelection from "sap/m/DateRangeSelection";
 import Spreadsheet from "sap/ui/export/Spreadsheet";
 import MessageToast from "sap/m/MessageToast";
 import Fragment from "sap/ui/core/Fragment";
+import DateFormat from "sap/ui/core/format/DateFormat";
+import DatePicker from "sap/m/DatePicker";
 
 export default class Main extends Controller {
   public formatter = Formatter;
@@ -262,7 +261,6 @@ export default class Main extends Controller {
         },
       ) as ODataListBinding;
 
-      debugger;
       // Executes the OData call
       const aContexts = await oBinding.requestContexts(0, 10);
 
@@ -285,9 +283,16 @@ export default class Main extends Controller {
   }
 
   /**
-   * Called when the user use filter
+   * Called when the user use filter status
    **/
   public onFilterStatus(): void {
+    this.applyFilters();
+  }
+
+  /**
+   * Called when the user use filter date
+   **/
+  public onFilterLoginDate(): void {
     this.applyFilters();
   }
 
@@ -315,17 +320,20 @@ export default class Main extends Controller {
       aFilters.push(new Filter("LoginResult", FilterOperator.EQ, sStatus));
     }
 
-    // Get value select date range
-    const oDateRange = this.byId("mainDateRangeId") as DateRangeSelection;
+    // Get value select date picker
+    const oDatePicker = this.byId("mainDatePickerId") as DatePicker;
 
-    if (oDateRange) {
-      const oFromDate = oDateRange.getDateValue();
-      const oToDate = oDateRange.getSecondDateValue();
+    if (oDatePicker) {
+      const oDate = oDatePicker.getDateValue();
 
-      if (oFromDate && oToDate) {
-        aFilters.push(
-          new Filter("LoginDate", FilterOperator.BT, oFromDate, oToDate),
-        );
+      if (oDate) {
+        const oFormatter = DateFormat.getDateInstance({
+          pattern: "yyyy-MM-dd",
+        });
+
+        const sDate = oFormatter.format(oDate);
+
+        aFilters.push(new Filter("LoginDate", FilterOperator.EQ, sDate));
       }
     }
 
@@ -455,7 +463,6 @@ export default class Main extends Controller {
   public onUserSelect(oEvent: any): void {
     const oItem = oEvent.getParameter("listItem");
 
-    debugger;
     const oContext = oItem.getBindingContext("userSeachHelp");
     const oSelected = oContext?.getObject();
 
