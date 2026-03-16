@@ -195,7 +195,7 @@
                             <ui:template>
                                 <HBox id="hBoxUser" alignItems="Center" renderType="Bare" class="sapUiTinyMarginBeginEnd">
                                     <core:Icon id="userIcon" src="sap-icon://employee" size="0.9rem" class="sapUiTinyMarginEnd" />
-                                    <Link id="textName" tooltip="{i18n>userInfoDetail}" text="{Username}" wrapping="false" />
+                                    <Link id="textName" tooltip="{i18n>userInfoDetail}" text="{Username}" wrapping="false" press="onNavigateUserDetail"/>
                                 </HBox>
                             </ui:template>
                         </ui:Column>

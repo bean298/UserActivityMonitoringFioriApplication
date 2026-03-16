@@ -67,6 +67,19 @@ const Formatter = {
 
     return oTime;
   },
+
+  // Format Lock
+  formatTextLockStatus: function (sValue: string): string {
+    return sValue === "0" ? "Active" : "Locked";
+  },
+
+  formatTextLockState: function (sValue: string): string {
+    return sValue === "0" ? "Success" : "Error";
+  },
+
+  formatTextLockIcon: function (sValue: string): string {
+    return sValue === "0" ? "sap-icon://accept" : "sap-icon://locked";
+  },
 };
 
 export default Formatter;

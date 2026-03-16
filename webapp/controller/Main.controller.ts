@@ -616,4 +616,25 @@ export default class Main extends Controller {
       oTable.setBusy(false);
     }
   }
+
+  /**
+   * Navigate to user detail page
+   **/
+  public onNavigateUserDetail(oEvent: any): void {
+    // Get control and BindingContext of line
+    const oItem = oEvent.getSource();
+    const oContext = oItem.getBindingContext();
+
+    if (oContext) {
+      const sUsername = oContext.getProperty("Username");
+
+      // Navigate with parameter username
+      const oRouter = (this as any).getAppComponent().getRouter();
+      if (oRouter) {
+        oRouter.navTo("UserDetail", {
+          username: sUsername,
+        });
+      }
+    }
+  }
 }
