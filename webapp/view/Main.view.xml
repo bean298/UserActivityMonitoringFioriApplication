@@ -262,34 +262,6 @@
                         </ui:Column>
                     </ui:columns>
                 </ui:Table>
-
-                <!-- PAGINATION -->
-                <HBox id="paginationBar" justifyContent="Center" alignItems="Center" class="sapUiSmallMarginBottom">
-                    <!-- FIRST -->
-                    <Button id="btnFirstPage" icon="sap-icon://media-rewind" tooltip="{i18n>firstPage}" press="onFirstPage" />
-
-                    <!-- PREVIOUS -->
-                    <Button id="btnPrevPage" icon="sap-icon://navigation-left-arrow" tooltip="{i18n>previousPage}" press="onPrevPage" />
-
-                    <!-- PAGE INFO -->
-                    <Text id="txtPageInfo" text="Page {pagination>/page} / {pagination>/totalPages}" class="sapUiSmallMarginBegin sapUiSmallMarginEnd" />
-
-                    <!-- NEXT -->
-                    <Button id="btnNextPage" icon="sap-icon://navigation-right-arrow" tooltip="{i18n>nextPage}" press="onNextPage" />
-
-                    <!-- LAST -->
-                    <Button id="btnLastPage" icon="sap-icon://media-forward" tooltip="{i18n>lastPage}" press="onLastPage" />
-
-                    <!-- ROWS PER PAGE -->
-                    <Text id="txtRowsPerPage" text="{i18n>rows}" class="sapUiSmallMarginBegin" />
-
-                    <Select id="selectPageSize" width="80px" selectedKey="{pagination>/pageSize}" change="onRowCountChange">
-                        <core:Item id="itemPageSize10" key="10" text="10" />
-                        <core:Item id="itemPageSize20" key="20" text="20" />
-                        <core:Item id="itemPageSize50" key="50" text="50" />
-                        <core:Item id="itemPageSize100" key="100" text="100" />
-                    </Select>
-                </HBox>
             </VBox>
         </f:content>
     </f:DynamicPage>

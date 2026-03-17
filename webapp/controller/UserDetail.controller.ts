@@ -38,29 +38,79 @@ export default class UserDetail extends Controller {
     oView.setBusy(true);
 
     try {
-      const oModel = (this as any).getAppComponent().getModel() as ODataModel;
-
-      // Create a list binding to /UserDetail with $filter
-      const oUserDetai = oModel.bindList("/UserDetail", undefined, undefined, [
-        new Filter("UserName", FilterOperator.EQ, sUsername),
-      ]) as ODataListBinding;
-
-      // Executes the OData call
-      const aContexts = await oUserDetai.requestContexts(0, 1);
-
-      // Set data into model
-      if (aContexts.length > 0) {
-        const oData = aContexts[0].getObject();
-        const oUserDetailModel = new JSONModel(oData);
-
-        oView.setModel(oUserDetailModel, "UserDetailData");
-      } else {
-        MessageBox.error("Failed to load user detail data. Please try again.");
-      }
+      await Promise.all([
+        this._loadUserDetail(sUsername),
+        this._loadUserLogs(sUsername),
+      ]);
     } catch (oError) {
-      MessageBox.error("Failed to load user detail data. Please try again.");
+      MessageBox.error("Failed to load user data. Please try again.");
     } finally {
       oView.setBusy(false);
     }
+  }
+
+  /**
+   * Load user detail information
+   **/
+  private async _loadUserDetail(sUsername: string): Promise<void> {
+    const oView = this.getView();
+    const oModel = (this as any).getAppComponent().getModel() as ODataModel;
+
+    // Create a list binding to /UserDetail with $filter
+    const oUserDetai = oModel.bindList("/UserDetail", undefined, undefined, [
+      new Filter("UserName", FilterOperator.EQ, sUsername),
+    ]) as ODataListBinding;
+
+    // Executes the OData call
+    const aContexts = await oUserDetai.requestContexts(0, 1);
+
+    // Set data into model
+    if (aContexts.length > 0) {
+      const oData = aContexts[0].getObject();
+      const oUserDetailModel = new JSONModel(oData);
+
+      oView?.setModel(oUserDetailModel, "UserDetailData");
+    } else {
+      MessageBox.error("Failed to load user detail data. Please try again.");
+    }
+  }
+
+  /**
+   * Load user auth log
+   **/
+  private async _loadUserLogs(sUsername: string): Promise<void> {
+    const oModel = (this as any).getAppComponent().getModel() as ODataModel;
+
+    // Create a list binding to /AuthLogChartByUser with $filter
+    const oUserAuthChart = oModel.bindList(
+      "/AuthLogChartByUser",
+      undefined,
+      undefined,
+      [new Filter("Username", FilterOperator.EQ, sUsername)],
+    ) as ODataListBinding;
+
+    // Executes the OData call
+    const aContextsChart = await oUserAuthChart.requestContexts();
+
+    const aDataChart = aContextsChart.map((oContext) => oContext.getObject());
+
+    const oJsonModel = new JSONModel(aDataChart);
+
+    // Set data into Model AuthLogChartByUser
+    this.getView()?.setModel(oJsonModel, "AuthLogChartByUserData");
+
+    // Create a list binding to /UserAuthLog with $filter
+    const oUserAuthTable = oModel.bindList(
+      "/UserAuthLog",
+      undefined,
+      undefined,
+      [new Filter("Username", FilterOperator.EQ, sUsername)],
+    ) as ODataListBinding;
+
+    const aContextsTable = await oUserAuthTable.requestContexts();
+    const aDataTable = aContextsTable.map((oContext) => oContext.getObject());
+
+    const oTableModel = new JSONModel(aDataTable);
+    this.getView()?.setModel(oTableModel, "UserAuthLogData");
   }
 }

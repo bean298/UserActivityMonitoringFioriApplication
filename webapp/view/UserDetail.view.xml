@@ -2,7 +2,10 @@
     xmlns="sap.m"
     xmlns:f="sap.uxap"
     xmlns:core="sap.ui.core"
-    xmlns:layout="sap.ui.layout" controllerName="useraudit.controller.UserDetail" height="100%">
+    xmlns:layout="sap.ui.layout" controllerName="useraudit.controller.UserDetail" height="100%"
+    xmlns:viz="sap.viz.ui5.controls"
+    xmlns:viz.feeds="sap.viz.ui5.controls.common.feeds"
+    xmlns:viz.data="sap.viz.ui5.data">
 
     <f:ObjectPageLayout id="UserDetailObjectPageLayoutId" showTitleInHeaderContent="true" upperCaseAnchorBar="false">
         <!-- HEADER TITLE -->
@@ -51,7 +54,7 @@
             <f:ObjectPageSection id="UserDetailSectionUserInfoId" title="{i18n>userDetailTitle}">
                 <f:subSections>
                     <f:ObjectPageSubSection id="UserDetailSubSectionUserInfoId">
-                        <layout:Grid id="UserDetailGridUserInfoId" defaultSpan="L3 M6 S12" >
+                        <layout:Grid id="UserDetailGridUserInfoId" defaultSpan="L3 M6 S12">
                             <!-- ================= USER NAME ================= -->
                             <VBox id="UserDetailBoxUserNameId">
                                 <Label id="UserDetailLabelUserNameId" text="{i18n>username}" design="Bold"/>
@@ -158,7 +161,85 @@
             <!-- AUTHENTICATION -->
             <f:ObjectPageSection id="UserDetailSectionAuth" title="{i18n>auth}">
                 <f:subSections>
-                    <f:ObjectPageSubSection id="UserDetailSubSectionAuth"></f:ObjectPageSubSection>
+                    <f:ObjectPageSubSection id="UserDetailSubSectionAuth">
+                        <VBox id="AuthChartBoxId" class="sapUiMediumMargin sapUiContentPadding">
+                            <!-- AUTH - DONUT CHART -->
+                            <HBox id="hBoxChart" class="sapUiSmallMarginBottom" justifyContent="SpaceAround">
+                                <viz:VizFrame id="AuthVizFrameId" height="300px" width="400px" vizType="donut" vizProperties="{
+                                    title: {
+                                        text: 'User Authentication Result'
+                                    },
+                                    plotArea: {
+                                        colorPalette: ['#e74c3c', '#2ecc71'],
+                                        dataLabel: {
+                                            visible: true
+                                        }
+                                    },
+                                    legend: {
+                                        visible: true
+                                    }
+                                }">
+                                    <!-- Define data of chart -->
+                                    <viz:dataset>
+                                        <viz.data:FlattenedDataset id="AuthDatasetId" data="{AuthLogChartByUserData>/}">
+                                            <!-- Category -->
+                                            <viz.data:dimensions>
+                                                <viz.data:DimensionDefinition id="AuthDimLoginResultId" name="Login Result" value="{AuthLogChartByUserData>LoginResult}" />
+                                            </viz.data:dimensions>
+
+                                            <!-- Value  -->
+                                            <viz.data:measures>
+                                                <viz.data:MeasureDefinition id="AuthMeasureCountId" name="Count" value="{AuthLogChartByUserData>CountLoginLog}" />
+                                            </viz.data:measures>
+                                        </viz.data:FlattenedDataset>
+                                    </viz:dataset>
+
+                                    <!-- Mapping dimension/measure into chart -->
+                                    <viz:feeds>
+                                        <viz.feeds:FeedItem id="AuthFeedSizeId" uid="size" type="Measure" values="Count" />
+                                        <viz.feeds:FeedItem id="AuthFeedColorId" uid="color" type="Dimension" values="Login Result" />
+                                    </viz:feeds>
+                                </viz:VizFrame>
+                            </HBox>
+
+                            <!-- AUTHENTICATION TABLE -->
+                            <Table id="AuthTableId" items="{UserAuthLogData>/}" growing="true" growingThreshold="20">
+                                <columns>
+                                    <Column id="AuthColSessionId">
+                                        <Text id="AuthColSessionTextId" text="{i18n>sessionId}"/>
+                                    </Column>
+
+                                    <Column id="AuthColEventId">
+                                        <Text id="AuthColEventTextId" text="{i18n>eventId}"/>
+                                    </Column>
+
+                                    <Column id="AuthColLoginDateId">
+                                        <Text id="AuthColLoginDateTextId" text="{i18n>loginDate}"/>
+                                    </Column>
+
+                                    <Column id="AuthColLoginTimeId">
+                                        <Text id="AuthColLoginTimeTextId" text="{i18n>loginTime}"/>
+                                    </Column>
+
+                                    <Column id="AuthColResultId">
+                                        <Text id="AuthColResultTextId" text="{i18n>loginResult}"/>
+                                    </Column>
+                                </columns>
+
+                                <items>
+                                    <ColumnListItem id="AuthTableItemId">
+                                        <cells>
+                                            <Text id="AuthCellSessionId" text="{UserAuthLogData>SessionId}"/>
+                                            <Text id="AuthCellEventId" text="{UserAuthLogData>EventId}"/>
+                                            <Text id="AuthCellLoginDateId" text="{UserAuthLogData>LoginDate}"/>
+                                            <Text id="AuthCellLoginTimeId" text="{UserAuthLogData>LoginTime}"/>
+                                            <ObjectStatus id="AuthCellResultId" text="{UserAuthLogData>LoginResult}"/>
+                                        </cells>
+                                    </ColumnListItem>
+                                </items>
+                            </Table>
+                        </VBox>
+                    </f:ObjectPageSubSection>
                 </f:subSections>
             </f:ObjectPageSection>
         </f:sections>
