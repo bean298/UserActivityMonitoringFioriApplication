@@ -6,16 +6,14 @@ import Input from "sap/m/Input";
 import Filter from "sap/ui/model/Filter";
 import FilterOperator from "sap/ui/model/FilterOperator";
 import Select from "sap/m/Select";
-import List from "sap/m/List";
-import StandardListItem from "sap/m/StandardListItem";
 import Dialog from "sap/m/Dialog";
-import Button from "sap/m/Button";
 import Formatter from "useraudit/formatter/Formatter";
 import MessageBox from "sap/m/MessageBox";
-import DateRangeSelection from "sap/m/DateRangeSelection";
 import Spreadsheet from "sap/ui/export/Spreadsheet";
 import MessageToast from "sap/m/MessageToast";
 import Fragment from "sap/ui/core/Fragment";
+import DateFormat from "sap/ui/core/format/DateFormat";
+import DatePicker from "sap/m/DatePicker";
 
 export default class Main extends Controller {
   public formatter = Formatter;
@@ -64,90 +62,6 @@ export default class Main extends Controller {
   }
 
   /**
-   * Load table data by page
-   **/
-  // public loadPage(): void {
-  //   const oTable = this.byId("maiTableId") as any;
-
-  //   if (!oTable) return;
-
-  //   const oBinding = oTable.getBinding("rows") as ODataListBinding;
-
-  //   if (!oBinding) return;
-
-  //   const oPageModel = this.getView()?.getModel("pagination") as JSONModel;
-
-  //   const page = oPageModel.getProperty("/page");
-  //   const size = oPageModel.getProperty("/pageSize");
-
-  //   const skip = (page - 1) * size;
-
-  //   oBinding.changeParameters({
-  //     $skip: skip,
-  //     $top: size,
-  //   });
-
-  //   // refresh data
-  //   oBinding.refresh();
-  // }
-
-  /**
-   * FIRST PAGE
-   **/
-  // public onFirstPage(): void {
-  //   const oModel = this.getView()?.getModel("pagination") as JSONModel;
-
-  //   oModel.setProperty("/page", 1);
-
-  //   this.loadPage();
-  // }
-
-  /**
-   * PREVIOUS PAGE
-   **/
-  // public onPrevPage(): void {
-  //   const oModel = this.getView()?.getModel("pagination") as JSONModel;
-
-  //   let page = oModel.getProperty("/page");
-
-  //   if (page > 1) {
-  //     oModel.setProperty("/page", page - 1);
-
-  //     this.loadPage();
-  //   }
-  // }
-
-  /**
-   * NEXT PAGE
-   **/
-  // public onNextPage(): void {
-  //   const oModel = this.getView()?.getModel("pagination") as JSONModel;
-
-  //   let page = oModel.getProperty("/page");
-
-  //   const totalPages = oModel.getProperty("/totalPages");
-
-  //   if (page < totalPages) {
-  //     oModel.setProperty("/page", page + 1);
-
-  //     this.loadPage();
-  //   }
-  // }
-
-  /**
-   * LAST PAGE
-   **/
-  // public onLastPage(): void {
-  //   const oModel = this.getView()?.getModel("pagination") as JSONModel;
-
-  //   const totalPages = oModel.getProperty("/totalPages");
-
-  //   oModel.setProperty("/page", totalPages);
-
-  //   this.loadPage();
-  // }
-
-  /**
    * Fetches the total number of records from the UserAuthLog entity
    **/
   public async onInitCount(): Promise<void> {
@@ -177,17 +91,6 @@ export default class Main extends Controller {
 
       // Create property of view model
       oViewModel.setProperty("/count", iCount);
-
-      // ===== Pagination update =====
-      // const oPageModel = this.getView()?.getModel("pagination") as JSONModel;
-
-      // oPageModel.setProperty("/total", iCount);
-
-      // const size = oPageModel.getProperty("/pageSize");
-
-      // const totalPages = Math.ceil(iCount / size);
-
-      // oPageModel.setProperty("/totalPages", totalPages);
     } catch (error) {
       MessageBox.error("Failed to load chart data.");
     }
@@ -276,7 +179,6 @@ export default class Main extends Controller {
         },
       ) as ODataListBinding;
 
-      debugger;
       // Executes the OData call
       const aContexts = await oBinding.requestContexts(0, 10);
 
@@ -299,9 +201,16 @@ export default class Main extends Controller {
   }
 
   /**
-   * Called when the user use filter
+   * Called when the user use filter status
    **/
   public onFilterStatus(): void {
+    this.applyFilters();
+  }
+
+  /**
+   * Called when the user use filter date
+   **/
+  public onFilterLoginDate(): void {
     this.applyFilters();
   }
 
@@ -329,47 +238,25 @@ export default class Main extends Controller {
       aFilters.push(new Filter("LoginResult", FilterOperator.EQ, sStatus));
     }
 
-    // Get value select date range
-    const oDateRange = this.byId("mainDateRangeId") as DateRangeSelection;
+    // Get value select date picker
+    const oDatePicker = this.byId("mainDatePickerId") as DatePicker;
 
-    if (oDateRange) {
-      const oFromDate = oDateRange.getDateValue();
-      const oToDate = oDateRange.getSecondDateValue();
+    if (oDatePicker) {
+      const oDate = oDatePicker.getDateValue();
 
-      if (oFromDate && oToDate) {
-        aFilters.push(
-          new Filter("LoginDate", FilterOperator.BT, oFromDate, oToDate),
-        );
+      if (oDate) {
+        const oFormatter = DateFormat.getDateInstance({
+          pattern: "yyyy-MM-dd",
+        });
+
+        const sDate = oFormatter.format(oDate);
+
+        aFilters.push(new Filter("LoginDate", FilterOperator.EQ, sDate));
       }
     }
 
     oBinding.filter(aFilters);
-
-    // Reset page when filter changes
-    // const oPageModel = this.getView()?.getModel("pagination") as JSONModel;
-    // oPageModel.setProperty("/page", 1);
-    // this.loadPage();
   }
-
-  /**
-   * Triggered when the user changes the "Rows per page".
-   */
-  // public onRowCountChange(oEvent: any): void {
-  //   const size = parseInt(oEvent.getParameter("selectedItem").getKey());
-
-  //   const oModel = this.getView()?.getModel("pagination") as JSONModel;
-
-  //   oModel.setProperty("/pageSize", size);
-  //   oModel.setProperty("/page", 1);
-
-  //   const total = oModel.getProperty("/total");
-
-  //   const totalPages = Math.ceil(total / size);
-
-  //   oModel.setProperty("/totalPages", totalPages);
-
-  //   this.loadPage();
-  // }
 
   /**
    * Exports the currently bound table data to an Excel file.
@@ -469,7 +356,6 @@ export default class Main extends Controller {
   public onUserSelect(oEvent: any): void {
     const oItem = oEvent.getParameter("listItem");
 
-    debugger;
     const oContext = oItem.getBindingContext("userSeachHelp");
     const oSelected = oContext?.getObject();
 
@@ -621,6 +507,27 @@ export default class Main extends Controller {
       MessageToast.show("Data refreshed");
     } finally {
       oTable.setBusy(false);
+    }
+  }
+
+  /**
+   * Navigate to user detail page
+   **/
+  public onNavigateUserDetail(oEvent: any): void {
+    // Get control and BindingContext of line
+    const oItem = oEvent.getSource();
+    const oContext = oItem.getBindingContext();
+
+    if (oContext) {
+      const sUsername = oContext.getProperty("Username");
+
+      // Navigate with parameter username
+      const oRouter = (this as any).getAppComponent().getRouter();
+      if (oRouter) {
+        oRouter.navTo("UserDetail", {
+          username: sUsername,
+        });
+      }
     }
   }
 }

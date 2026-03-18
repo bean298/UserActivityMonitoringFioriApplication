@@ -156,8 +156,7 @@
 
                 <!-- FILTER + SEARCH -->
                 <Toolbar id="toolbarId" class="sapUiMediumMarginBottom" design="Transparent">
-
-                    <Title id="filterTitleId" text="{i18n>filter}" level="H2"
+                    <Title id="filterTitleId" text="{i18n>filter}" level="H5"
                         class="sapUiSmallMarginEnd" />
 
                     <ToolbarSpacer id="filterToolbarSpacerId" />
@@ -174,14 +173,12 @@
                         <core:Item id="itemId3" key="FAIL" text="{i18n>failed}" />
                     </Select>
 
-                    <!-- Date range filter -->
-                    <DateRangeSelection id="mainDateRangeId" width="300px"
-                        placeholder="{i18n>selectDateRange}" change="applyFilters" />
-
+                    <DatePicker id="mainDatePickerId" width="200px" placeholder="{i18n>selectDate}"
+                        change="onFilterLoginDate" />
                 </Toolbar>
 
                 <!-- TABLE -->
-                <ui:Table id="maiTableId" threshold="0"
+                <ui:Table id="maiTableId"
                     rows="{
                     path: '/UserAuthLog',
                     parameters: {
@@ -189,8 +186,7 @@
                     },
                     sorter: { path: 'LoginDate', descending: true }
                 }"
-                    selectionMode="None" firstVisibleRow="0" enableColumnReordering="true"
-                    class="sapUiLargeMarginBottom">
+                    selectionMode="Single" class="sapUiLargeMarginBottom">
                     <!-- HEADER TOOLBAR | BUTTON -->
                     <ui:extension>
                         <OverflowToolbar id="mainToolbarId">
@@ -229,10 +225,16 @@
                             <Label id="labelName" text="{i18n>username}" />
 
                             <ui:template>
-                                <Text id="textName" text="{Username}" wrapping="false" />
+                                <HBox id="hBoxUser" alignItems="Center" renderType="Bare"
+                                    class="sapUiTinyMarginBeginEnd">
+                                    <core:Icon id="userIcon" src="sap-icon://employee" size="0.9rem"
+                                        class="sapUiTinyMarginEnd" />
+                                    <Link id="textName" tooltip="{i18n>userInfoDetail}"
+                                        text="{Username}" wrapping="false"
+                                        press="onNavigateUserDetail" />
+                                </HBox>
                             </ui:template>
                         </ui:Column>
-
                         <!-- CLIENT COLUMN -->
                         <ui:Column id="columnClient" width="6rem">
                             <Label text="{i18n>client}" />
@@ -258,7 +260,8 @@
                             <Label id="labelLoginDate" text="{i18n>loginDate}" />
 
                             <ui:template>
-                                <Text id="textLoginDate" text="{LoginDate}" />
+                                <Text id="textLoginDate"
+                                    text="{path:'LoginDate', formatter: '.formatter.formatISODate'}" />
                             </ui:template>
                         </ui:Column>
 
@@ -287,7 +290,8 @@
                             <Label id="labelLogoutDate" text="{i18n>logoutDate}" />
 
                             <ui:template>
-                                <Text id="textLogoutDate" text="{LogoutDate}" />
+                                <Text id="textLogoutDate"
+                                    text="{path:'LogoutDate', formatter: '.formatter.formatISODate'}" />
                             </ui:template>
                         </ui:Column>
 
@@ -296,54 +300,21 @@
                             <Label id="labelLogoutTime" text="{i18n>logoutTime}" />
 
                             <ui:template>
-                                <Text id="textLogoutTime" text="{LogoutTime}" />
+                                <Text id="textLogoutTime"
+                                    text="{path:'LogoutTime', formatter: '.formatter.formatLogoutTime'}" />
                             </ui:template>
                         </ui:Column>
 
                         <!-- NAVIGATOR COLUMN -->
                         <ui:Column id="columnNavigator" width="4rem" hAlign="Center">
                             <ui:template>
-                                <Button id="btnNavigator" icon="sap-icon://navigation-right-arrow"
-                                    type="Transparent" press="onPressNavigate" />
+                                <Button id="btnNavigator" tooltip="{i18n>navigateAuth}"
+                                    icon="sap-icon://navigation-right-arrow" type="Transparent"
+                                    press="onPressNavigate" />
                             </ui:template>
                         </ui:Column>
                     </ui:columns>
                 </ui:Table>
-
-                <!-- PAGINATION -->
-                <HBox id="paginationBar" justifyContent="Center" alignItems="Center"
-                    class="sapUiSmallMarginBottom">
-                    <!-- FIRST -->
-                    <Button id="btnFirstPage" icon="sap-icon://media-rewind"
-                        tooltip="{i18n>firstPage}" press="onFirstPage" />
-
-                    <!-- PREVIOUS -->
-                    <Button id="btnPrevPage" icon="sap-icon://navigation-left-arrow"
-                        tooltip="{i18n>previousPage}" press="onPrevPage" />
-
-                    <!-- PAGE INFO -->
-                    <Text id="txtPageInfo" text="Page {pagination>/page} / {pagination>/totalPages}"
-                        class="sapUiSmallMarginBegin sapUiSmallMarginEnd" />
-
-                    <!-- NEXT -->
-                    <Button id="btnNextPage" icon="sap-icon://navigation-right-arrow"
-                        tooltip="{i18n>nextPage}" press="onNextPage" />
-
-                    <!-- LAST -->
-                    <Button id="btnLastPage" icon="sap-icon://media-forward"
-                        tooltip="{i18n>lastPage}" press="onLastPage" />
-
-                    <!-- ROWS PER PAGE -->
-                    <Text id="txtRowsPerPage" text="{i18n>rows}" class="sapUiSmallMarginBegin" />
-
-                    <Select id="selectPageSize" width="80px" selectedKey="{pagination>/pageSize}"
-                        change="onRowCountChange">
-                        <core:Item id="itemPageSize10" key="10" text="10" />
-                        <core:Item id="itemPageSize20" key="20" text="20" />
-                        <core:Item id="itemPageSize50" key="50" text="50" />
-                        <core:Item id="itemPageSize100" key="100" text="100" />
-                    </Select>
-                </HBox>
             </VBox>
         </f:content>
     </f:DynamicPage>

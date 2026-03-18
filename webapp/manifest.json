@@ -80,12 +80,13 @@
         }
       },
       "": {
+        "type": "sap.ui.model.odata.v4.ODataModel",
         "dataSource": "mainService",
         "preload": true,
         "settings": {
           "operationMode": "Server",
-          "autoExpandSelect": true,
-          "earlyRequests": true
+          "synchronizationMode": "None",
+          "groupId": "$direct"
         }
       }
     },
@@ -110,6 +111,11 @@
           "name": "AuthDetail",
           "pattern": "UserAuthLog({key}):?query:",
           "target": "AuthDetail"
+        },
+        {
+          "name": "UserDetail",
+          "pattern": "UserDetail({username}):?query:",
+          "target": "UserDetail"
         }
       ],
       "targets": {
@@ -132,6 +138,17 @@
             "settings": {
               "contextPath": "/UserAuthLog",
               "viewName": "useraudit.view.AuthDetail"
+            }
+          }
+        },
+        "UserDetail": {
+          "type": "Component",
+          "id": "UserDetail",
+          "name": "sap.fe.core.fpm",
+          "options": {
+            "settings": {
+              "contextPath": "/UserDetail",
+              "viewName": "useraudit.view.UserDetail"
             }
           }
         }
