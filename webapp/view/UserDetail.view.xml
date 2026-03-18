@@ -162,7 +162,7 @@
             <f:ObjectPageSection id="UserDetailSectionAuth" title="{i18n>auth}">
                 <f:subSections>
                     <f:ObjectPageSubSection id="UserDetailSubSectionAuth">
-                        <VBox id="AuthChartBoxId" class="sapUiMediumMargin sapUiContentPadding">
+                        <VBox id="AuthBoxId" class="sapUiMediumMargin sapUiContentPadding">
                             <!-- AUTH - DONUT CHART -->
                             <HBox id="hBoxChart" class="sapUiSmallMarginBottom" justifyContent="SpaceAround">
                                 <viz:VizFrame id="AuthVizFrameId" height="300px" width="400px" vizType="donut" vizProperties="{
@@ -203,37 +203,154 @@
                             </HBox>
 
                             <!-- AUTHENTICATION TABLE -->
-                            <Table id="AuthTableId" items="{UserAuthLogData>/}" growing="true" growingThreshold="20">
+                            <Table id="AuthTableId" items="{
+                                path: 'UserAuthLogData>/',
+                                sorter: {
+                                    path: 'LoginDate',
+                                    descending: true
+                                }
+                            }" growing="true" growingThreshold="10">
+                                <!-- TITLE -->
+                                <headerToolbar>
+                                    <Toolbar id="AuthToolbarId">
+                                        <Title id="AuthTitleId" text="{i18n>headerTitleTable}" level="H2"/>
+                                    </Toolbar>
+                                </headerToolbar>
+
                                 <columns>
+                                    <!-- SESSION ID COLUMN -->
                                     <Column id="AuthColSessionId">
                                         <Text id="AuthColSessionTextId" text="{i18n>sessionId}"/>
                                     </Column>
 
-                                    <Column id="AuthColEventId">
-                                        <Text id="AuthColEventTextId" text="{i18n>eventId}"/>
+                                    <!-- LOGIN RESULT COLUMN -->
+                                    <Column id="AuthColResultId">
+                                        <Text id="AuthColResultTextId" text="{i18n>loginResult}"/>
                                     </Column>
 
+                                    <!-- LOGIN DATE COLUMN -->
                                     <Column id="AuthColLoginDateId">
                                         <Text id="AuthColLoginDateTextId" text="{i18n>loginDate}"/>
                                     </Column>
 
+                                    <!-- LOGIN TIME COLUMN -->
                                     <Column id="AuthColLoginTimeId">
                                         <Text id="AuthColLoginTimeTextId" text="{i18n>loginTime}"/>
                                     </Column>
 
-                                    <Column id="AuthColResultId">
-                                        <Text id="AuthColResultTextId" text="{i18n>loginResult}"/>
+                                    <!-- LOGIN MESSAGE COLUMN -->
+                                    <Column id="AuthColMsgId" width="">
+                                        <Text id="AuthColMsgTextId" text="{i18n>loginMessage}"/>
+                                    </Column>
+
+                                    <!-- LOGOUT DATE COLUMN -->
+                                    <Column id="AuthColLoginOutDateId">
+                                        <Text id="AuthColLoginOutDateTextId" text="{i18n>logoutDate}"/>
+                                    </Column>
+
+                                    <!-- LOGOUT TIME COLUMN -->
+                                    <Column id="AuthColLoginOutTimeId">
+                                        <Text id="AuthColLoginOutTimeTextId" text="{i18n>logoutTime}"/>
                                     </Column>
                                 </columns>
 
                                 <items>
-                                    <ColumnListItem id="AuthTableItemId">
+                                    <ColumnListItem id="AuthTableItemId" type="Navigation" press="onNavigationToAuthDetail">
                                         <cells>
+                                            <!-- SessionId -->
                                             <Text id="AuthCellSessionId" text="{UserAuthLogData>SessionId}"/>
-                                            <Text id="AuthCellEventId" text="{UserAuthLogData>EventId}"/>
-                                            <Text id="AuthCellLoginDateId" text="{UserAuthLogData>LoginDate}"/>
+
+                                            <!-- LoginResult -->
+                                            <ObjectStatus id="AuthCellResultId" text="{UserAuthLogData>LoginResult}" icon="{
+                                                path: 'UserAuthLogData>LoginResult',
+                                                formatter: '.formatter.formatLoginResultIcon'}" state="{
+                                                path: 'UserAuthLogData>LoginResult',
+                                                formatter: '.formatter.formatLoginResultState'}"/>
+
+                                            <!-- LoginDate -->
+                                            <Text id="AuthCellLoginDateId" text="{path:'UserAuthLogData>LoginDate', formatter: '.formatter.formatISODate'}"/>
+
+                                            <!-- LoginTime -->
                                             <Text id="AuthCellLoginTimeId" text="{UserAuthLogData>LoginTime}"/>
-                                            <ObjectStatus id="AuthCellResultId" text="{UserAuthLogData>LoginResult}"/>
+
+                                            <!-- LoginMessage -->
+                                            <ObjectStatus id="AuthCellLoginMsgId" text="{UserAuthLogData>LoginMessage}" icon="{
+                                                path: 'UserAuthLogData>EventId',
+                                                formatter: '.formatter.formatLoginMessageIcon'}" state="{
+                                                path: 'UserAuthLogData>EventId',
+                                                formatter: '.formatter.formatLoginMessageState'}" />
+
+                                            <!-- LogoutDate -->
+                                            <Text id="AuthCellLogoutId" text="{path:'UserAuthLogData>LogoutDate', formatter: '.formatter.formatISODate'}" />
+
+                                            <!-- LogoutTime -->
+                                            <Text id="AuthCellLogoutTimeId" text="{path:'UserAuthLogData>LogoutTime', formatter: '.formatter.formatLogoutTime'}" />
+                                        </cells>
+                                    </ColumnListItem>
+                                </items>
+                            </Table>
+                        </VBox>
+                    </f:ObjectPageSubSection>
+                </f:subSections>
+            </f:ObjectPageSection>
+
+            <!-- ACTIVITY -->
+            <f:ObjectPageSection id="UserDetailSectionActivity" title="{i18n>activity}">
+                <f:subSections>
+                    <f:ObjectPageSubSection id="UserDetailSubSectionActivity">
+                        <VBox id="ActivityVBoxId" class="sapUiMediumMargin sapUiContentPadding">
+                            <!-- ACTIVITY TABLE -->
+                            <Table id="ActivityTableId" items="{path: 'UserActivityLogData>/'}" growing="true" growingThreshold="10">
+                                <!-- TITLE -->
+                                <headerToolbar>
+                                    <Toolbar id="ActToolbarId">
+                                        <Title id="ActTitleId" text="{i18n>activity}" level="H2"/>
+                                    </Toolbar>
+                                </headerToolbar>
+
+                                <!-- COLUMNS -->
+                                <columns>
+                                    <!-- LOG ID -->
+                                    <Column id="ActivityColLogId">
+                                        <Text id="ActivityColLogTextId" text="{i18n>logId}"/>
+                                    </Column>
+
+                                    <!-- ACTIVITY TYPE -->
+                                    <Column id="ActivityColTypeId">
+                                        <Text id="ActivityColTypeTextId" text="{i18n>activityType}"/>
+                                    </Column>
+
+                                    <!-- TCODE -->
+                                    <Column id="ActivityColTCodeId">
+                                        <Text id="ActivityColTCodeTextId" text="{i18n>tCode}"/>
+                                    </Column>
+
+                                    <!-- TCODE NAME -->
+                                    <Column id="ActivityColTCodeNameId">
+                                        <Text id="ActivityColTCodeNameTextId" text="{i18n>tCodeName}"/>
+                                    </Column>
+
+                                    <!-- MESSAGE -->
+                                    <Column id="ActivityColMessageId">
+                                        <Text id="ActivityColMessageTextId" text="{i18n>activityMessage}"/>
+                                    </Column>
+
+                                    <!-- TIME -->
+                                    <Column id="ActivityColTimeId">
+                                        <Text id="ActivityColTimeTextId" text="{i18n>activityTime}"/>
+                                    </Column>
+                                </columns>
+
+                                <!-- ITEMS -->
+                                <items>
+                                    <ColumnListItem id="ActivityTableItemId">
+                                        <cells>
+                                            <Text id="ActivityCellLogId" text="{UserActivityLogData>LogId}"/>
+                                            <Text id="ActivityCellTypeId" text="{UserActivityLogData>ActivityType}"/>
+                                            <Text id="ActivityCellTCodeId" text="{UserActivityLogData>TCode}"/>
+                                            <Text id="ActivityCellTCodeNameId" text="{UserActivityLogData>TCodeName}"/>
+                                            <Text id="ActivityCellMessageId" text="{UserActivityLogData>ActivityMessage}"/>
+                                            <Text id="ActivityCellTimeId" text="{UserActivityLogData>ActivityTime}"/>
                                         </cells>
                                     </ColumnListItem>
                                 </items>
