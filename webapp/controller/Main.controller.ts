@@ -264,54 +264,54 @@ export default class Main extends Controller {
    * based on the current OData V4 list binding.
    */
   public onExportExcel(): void {
-    // Get table and its OData list binding
-    const oTable = this.byId("maiTableId");
-    const oBinding = oTable?.getBinding("rows") as ODataListBinding;
+    MessageBox.confirm("Bạn có muốn xuất file Excel không?", {
+      title: "Xác nhận",
+      actions: ["YES", "NO"],
+      emphasizedAction: "YES",
 
-    // Format in Excel
-    const aCols = [
-      {
-        label: "User Session",
-        property: "SessionId",
-        width: 25,
+      onClose: (oAction: string | null) => {
+        if (oAction === "YES") {
+          // Get table and its OData list binding
+          const oTable = this.byId("maiTableId");
+          const oBinding = oTable?.getBinding("rows") as ODataListBinding;
+          // Format in Excel
+          const aCols = [
+            { label: "User Session", property: "SessionId", width: 25 },
+            { label: "User Name", property: "Username", width: 15 },
+            { label: "Login Result", property: "LoginResult", width: 10 },
+            { label: "Login Date", property: "LoginDate", width: 15 },
+            { label: "Login Time", property: "LoginTime", width: 15 },
+            { label: "Login Message", property: "LoginMessage", width: 150 },
+            { label: "Logout Date", property: "LogoutDate", width: 15 },
+            { label: "Logout Time", property: "LogoutTime", width: 15 },
+            { label: "Event ID", property: "EventId", width: 10 },
+          ];
+
+          // Spreadsheet config
+          const oSettings = {
+            workbook: { columns: aCols },
+            dataSource: oBinding,
+            fileName: "UserAuthenticationLogs.xlsx",
+            worker: false,
+          };
+
+          // Spreadsheet config
+          const oSheet = new Spreadsheet(oSettings);
+          // Create Excel file and download it
+          oSheet
+            .build()
+            .then(() => {
+              MessageToast.show("Export successful!", { duration: 3000 });
+            })
+            .catch(() => {
+              MessageBox.error("Export failed.");
+            })
+            .finally(() => {
+              oSheet.destroy();
+            });
+        }
       },
-      { label: "User Name", property: "Username", width: 15 },
-      {
-        label: "Login Result",
-        property: "LoginResult",
-        width: 10,
-      },
-      { label: "Login Date", property: "LoginDate", width: 15 },
-      { label: "Login Time", property: "LoginTime", width: 15 },
-      { label: "Login Message", property: "LoginMessage", width: 150 },
-      { label: "Logout Date", property: "LogoutDate", width: 15 },
-      { label: "Logout Time", property: "LogoutTime", width: 15 },
-      { label: "Event ID", property: "EventId", width: 10 },
-    ];
-
-    // Spreadsheet config
-    const oSettings = {
-      workbook: { columns: aCols },
-      dataSource: oBinding,
-      fileName: "UserAuthenticationLogs.xlsx",
-      worker: false,
-    };
-
-    // Spreadsheet config
-    const oSheet = new Spreadsheet(oSettings);
-
-    // Create Excel file and download it
-    oSheet
-      .build()
-      .then(() => {
-        MessageToast.show("Export successful!", { duration: 3000 });
-      })
-      .catch(() => {
-        MessageBox.error("Export failed.");
-      })
-      .finally(() => {
-        oSheet.destroy();
-      });
+    });
   }
 
   /**
