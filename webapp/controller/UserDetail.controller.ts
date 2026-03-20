@@ -41,6 +41,7 @@ export default class UserDetail extends Controller {
       await Promise.all([
         this._loadUserDetail(sUsername),
         this._loadUserLogs(sUsername),
+        this._loadUserActivity(sUsername),
       ]);
     } catch (oError) {
       MessageBox.error("Failed to load user data. Please try again.");
@@ -112,5 +113,65 @@ export default class UserDetail extends Controller {
 
     const oTableModel = new JSONModel(aDataTable);
     this.getView()?.setModel(oTableModel, "UserAuthLogData");
+  }
+
+  /**
+   * Load user activity information
+   **/
+  private async _loadUserActivity(sUsername: string): Promise<void> {
+    const oModel = (this as any).getAppComponent().getModel() as ODataModel;
+
+    // // Create a list binding to /UserActivityLog with $filter
+    // const oUserAuthChart = oModel.bindList(
+    //   "/UserActivityLog",
+    //   undefined,
+    //   undefined,
+    //   [new Filter("Username", FilterOperator.EQ, sUsername)],
+    // ) as ODataListBinding;
+
+    // // Executes the OData call
+    // const aContextsChart = await oUserAuthChart.requestContexts();
+
+    // const aDataChart = aContextsChart.map((oContext) => oContext.getObject());
+
+    // const oJsonModel = new JSONModel(aDataChart);
+
+    // // Set data into Model AuthLogChartByUser
+    // this.getView()?.setModel(oJsonModel, "AuthLogChartByUserData");
+
+    // Create a list binding to /UserActivityLog with $filter
+    const oUserActTable = oModel.bindList(
+      "/UserActivityLog",
+      undefined,
+      undefined,
+      [new Filter("Username", FilterOperator.EQ, sUsername)],
+    ) as ODataListBinding;
+
+    const aContextsTable = await oUserActTable.requestContexts();
+    const aDataTable = aContextsTable.map((oContext) => oContext.getObject());
+
+    const oTableModel = new JSONModel(aDataTable);
+    this.getView()?.setModel(oTableModel, "UserActivityLogData");
+  }
+
+  /**
+   * Navigate to AuthDetail page
+   **/
+  public onNavigationToAuthDetail(oEvent: any): void {
+    // Get control and BindingContext of line
+    const oItem = oEvent.getSource();
+    const oContext = oItem.getBindingContext("UserAuthLogData");
+
+    if (oContext) {
+      const sSessionId = oContext.getProperty("SessionId");
+
+      // Navigate with parameter session_id
+      const oRouter = (this as any).getAppComponent().getRouter();
+      if (oRouter) {
+        oRouter.navTo("AuthDetail", {
+          key: sSessionId,
+        });
+      }
+    }
   }
 }
