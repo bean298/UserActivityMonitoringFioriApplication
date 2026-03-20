@@ -264,8 +264,8 @@ export default class Main extends Controller {
    * based on the current OData V4 list binding.
    */
   public onExportExcel(): void {
-    MessageBox.confirm("Bạn có muốn xuất file Excel không?", {
-      title: "Xác nhận",
+    MessageBox.confirm("Do you want to export this data to Excel?", {
+      title: "Confirm Export",
       actions: ["YES", "NO"],
       emphasizedAction: "YES",
 

@@ -235,14 +235,14 @@
                                 </HBox>
                             </ui:template>
                         </ui:Column>
-                        <!-- CLIENT COLUMN -->
+                        <!-- CLIENT COLUMN
                         <ui:Column id="columnClient" width="6rem">
                             <Label text="{i18n>client}" />
 
                             <ui:template>
                                 <Text text="{clientModel>/Client}" />
                             </ui:template>
-                        </ui:Column>
+                        </ui:Column> -->
 
                         <!-- LOGIN RESULT COLUMN -->
                         <ui:Column id="columnLoginResult" width="9rem">
