@@ -140,76 +140,113 @@
             <f:ObjectPageSection id="SectionActivity" title="{i18n>activityLog}">
                 <f:subSections>
                     <f:ObjectPageSubSection id="SubSectionActivity">
-                        <!-- TABLE -->
-                        <ui:Table
-                            id="ActivityTable"
-                            rows="{detailData>/_Activity}"
-                            visibleRowCount="12"
-                            selectionMode="None"
-                            alternateRowColors="true">
+                        <VBox>
 
-                            <ui:columns>
-                                <!-- LOGID COLUMN -->
-                                <ui:Column id="ColumnLogId" width="18rem">
-                                    <Label text="{i18n>logId}" />
-                                    <ui:template>
-                                        <Text text="{detailData>LogId}" wrapping="false" />
-                                    </ui:template>
-                                </ui:Column>
-                                <!-- ACTIVITY TYPE COLUMN -->
-                                <ui:Column id="ColumnActivityTypeId" width="8rem">
-                                    <Label text="{i18n>activityType}" />
-                                    <ui:template>
-                                        <Text text="{detailData>ActivityType}" wrapping="false" />
-                                    </ui:template>
-                                </ui:Column>
-                                <!-- TCODE COLUMN -->
-                                <ui:Column id="ColumnTCodeId" width="6rem">
-                                    <Label text="{i18n>tCode}" />
-                                    <ui:template>
-                                        <HBox alignItems="Center" renderType="Bare">
-                                            <core:Icon src="sap-icon://customer-and-contacts"
-                                                size="0.9rem" class="sapUiTinyMarginEnd" />
-                                            <Text text="{detailData>TCode}" wrapping="false" />
-                                        </HBox>
-                                    </ui:template>
-                                </ui:Column>
-                                <!-- TCODE NAME COLUMN -->
-                                <ui:Column id="ColumnTCodeNameId" width="8rem">
-                                    <Label text="{i18n>tCodeName}" />
-                                    <ui:template>
-                                        <Text text="{detailData>TCodeName}" wrapping="false" />
-                                    </ui:template>
-                                </ui:Column>
-                                <!-- ACTIVITY MESSAGE COLUMN -->
-                                <ui:Column id="ColumnMsgId">
-                                    <Label text="{i18n>activityMessage}" />
-                                    <ui:template>
-                                        <ObjectStatus
-                                            text="{detailData>ActivityMessage}"
-                                            state="Information" />
-                                    </ui:template>
-                                </ui:Column>
-                                <!-- TIME COLUMN -->
-                                <ui:Column id="ColumnTieId" width="8rem">
-                                    <Label text="{i18n>activityTime}" />
-                                    <ui:template>
-                                        <Text text="{detailData>ActivityTime}" wrapping="false" />
-                                    </ui:template>
-                                </ui:Column>
+                            <!-- FILTER TOOLBAR -->
+                            <Toolbar class="sapUiSmallMarginBottom" design="Transparent">
+                                <ToolbarSpacer />
 
-                                <ui:Column width="4rem" hAlign="Center">
-                                    <ui:template>
+                                <Label text="Activity Type" class="sapUiTinyMarginEnd" />
+
+                                <Select id="activityTypeFilter"
+                                    width="180px"
+                                    change="onFilterActivityType">
+                                    <core:Item key="" text="All" />
+                                    <core:Item key="TCODE" text="TCODE" />
+                                    <core:Item key="DUMP" text="DUMP" />
+                                </Select>
+                            </Toolbar>
+                            <!-- TABLE -->
+                            <ui:Table
+                                id="ActivityTable"
+                                rows="{detailData>/_Activity}"
+                                visibleRowCount="12"
+                                selectionMode="None"
+                                alternateRowColors="true">
+                                <ui:extension>
+                                    <OverflowToolbar>
+
+                                        <!-- TITLE -->
+                                        <Title text="Activity Log" level="H6" />
+
+                                        <ToolbarSpacer />
+
+                                        <!-- EXPORT -->
                                         <Button
-                                            id="btnActivityNavigator"
-                                            icon="sap-icon://navigation-right-arrow"
-                                            type="Transparent"
-                                            press="onPressActivityDetail" />
-                                    </ui:template>
-                                </ui:Column>
-                            </ui:columns>
-                        </ui:Table>
+                                            icon="sap-icon://excel-attachment"
+                                            tooltip="Export Excel"
+                                            press="onExportActivityExcel" />
 
+                                        <!-- SETTINGS -->
+                                        <Button
+                                            icon="sap-icon://action-settings"
+                                            tooltip="Settings"
+                                            press="onOpenActivitySettings" />
+
+                                    </OverflowToolbar>
+                                </ui:extension>
+                                <ui:columns>
+                                    <!-- LOGID COLUMN -->
+                                    <ui:Column id="ColumnLogId" width="18rem">
+                                        <Label text="{i18n>logId}" />
+                                        <ui:template>
+                                            <Text text="{detailData>LogId}" wrapping="false" />
+                                        </ui:template>
+                                    </ui:Column>
+                                    <!-- ACTIVITY TYPE COLUMN -->
+                                    <ui:Column id="ColumnActivityTypeId" width="8rem">
+                                        <Label text="{i18n>activityType}" />
+                                        <ui:template>
+                                            <Text text="{detailData>ActivityType}" wrapping="false" />
+                                        </ui:template>
+                                    </ui:Column>
+                                    <!-- TCODE COLUMN -->
+                                    <ui:Column id="ColumnTCodeId" width="6rem">
+                                        <Label text="{i18n>tCode}" />
+                                        <ui:template>
+                                            <HBox alignItems="Center" renderType="Bare">
+                                                <core:Icon src="sap-icon://customer-and-contacts"
+                                                    size="0.9rem" class="sapUiTinyMarginEnd" />
+                                                <Text text="{detailData>TCode}" wrapping="false" />
+                                            </HBox>
+                                        </ui:template>
+                                    </ui:Column>
+                                    <!-- TCODE NAME COLUMN -->
+                                    <ui:Column id="ColumnTCodeNameId" width="8rem">
+                                        <Label text="{i18n>tCodeName}" />
+                                        <ui:template>
+                                            <Text text="{detailData>TCodeName}" wrapping="false" />
+                                        </ui:template>
+                                    </ui:Column>
+                                    <!-- ACTIVITY MESSAGE COLUMN -->
+                                    <ui:Column id="ColumnMsgId">
+                                        <Label text="{i18n>activityMessage}" />
+                                        <ui:template>
+                                            <ObjectStatus
+                                                text="{detailData>ActivityMessage}"
+                                                state="Information" />
+                                        </ui:template>
+                                    </ui:Column>
+                                    <!-- TIME COLUMN -->
+                                    <ui:Column id="ColumnTieId" width="8rem">
+                                        <Label text="{i18n>activityTime}" />
+                                        <ui:template>
+                                            <Text text="{detailData>ActivityTime}" wrapping="false" />
+                                        </ui:template>
+                                    </ui:Column>
+
+                                    <ui:Column width="4rem" hAlign="Center">
+                                        <ui:template>
+                                            <Button
+                                                id="btnActivityNavigator"
+                                                icon="sap-icon://navigation-right-arrow"
+                                                type="Transparent"
+                                                press="onPressActivityDetail" />
+                                        </ui:template>
+                                    </ui:Column>
+                                </ui:columns>
+                            </ui:Table>
+                        </VBox>
                     </f:ObjectPageSubSection>
                 </f:subSections>
             </f:ObjectPageSection>

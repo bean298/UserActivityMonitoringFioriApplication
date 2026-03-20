@@ -6,6 +6,8 @@ import Filter from "sap/ui/model/Filter";
 import FilterOperator from "sap/ui/model/FilterOperator";
 import Formatter from "useraudit/formatter/Formatter";
 import MessageBox from "sap/m/MessageBox";
+import MessageToast from "sap/m/MessageToast";
+import Spreadsheet from "sap/ui/export/Spreadsheet";
 
 export default class AuthDetail extends Controller {
   public formatter = Formatter;
@@ -24,6 +26,67 @@ export default class AuthDetail extends Controller {
     }
   }
 
+  public onFilterActivityType(oEvent: any): void {
+    const sKey = oEvent.getSource().getSelectedKey();
+
+    const oTable = this.byId("ActivityTable") as any;
+    const oBinding = oTable?.getBinding("rows");
+
+    if (!oBinding) return;
+
+    const aFilters: Filter[] = [];
+
+    if (sKey) {
+      aFilters.push(new Filter("ActivityType", FilterOperator.EQ, sKey));
+    }
+
+    oBinding.filter(aFilters);
+  }
+  public onExportActivityExcel(): void {
+    MessageBox.confirm("Do you want to export this data to Excel?", {
+      title: "Confirm Export",
+      actions: ["YES", "NO"],
+      emphasizedAction: "YES",
+
+      onClose: (oAction: string | null) => {
+        if (oAction === "YES") {
+          const oTable = this.byId("ActivityTable") as any;
+
+          const aData = oTable.getModel("detailData").getProperty("/_Activity");
+
+          const aCols = [
+            { label: "Log ID", property: "LogId", width: 20 },
+            { label: "Activity Type", property: "ActivityType", width: 15 },
+            { label: "TCode", property: "TCode", width: 10 },
+            { label: "TCode Name", property: "TCodeName", width: 20 },
+            { label: "Message", property: "ActivityMessage", width: 40 },
+            { label: "Time", property: "ActivityTime", width: 15 },
+          ];
+
+          const oSettings = {
+            workbook: { columns: aCols },
+            dataSource: aData,
+            fileName: "ActivityLogs.xlsx",
+            worker: false,
+          };
+
+          const oSheet = new Spreadsheet(oSettings);
+
+          oSheet
+            .build()
+            .then(() => {
+              MessageToast.show("Export successful!");
+            })
+            .catch(() => {
+              MessageBox.error("Export failed.");
+            })
+            .finally(() => {
+              oSheet.destroy();
+            });
+        }
+      },
+    });
+  }
   /**
    * Handles route matching for AuthDetail page
    * and loads detail data based on the navigation key.
