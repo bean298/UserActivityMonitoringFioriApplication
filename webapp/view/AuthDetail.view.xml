@@ -146,14 +146,14 @@
                             <Toolbar class="sapUiSmallMarginBottom" design="Transparent">
                                 <ToolbarSpacer />
 
-                                <Label text="Activity Type" class="sapUiTinyMarginEnd" />
+                                <Label text="{i18n>activityType}" class="sapUiTinyMarginEnd" />
 
                                 <Select id="activityTypeFilter"
                                     width="180px"
                                     change="onFilterActivityType">
-                                    <core:Item key="" text="All" />
-                                    <core:Item key="TCODE" text="TCODE" />
-                                    <core:Item key="DUMP" text="DUMP" />
+                                    <core:Item key="" text="{i18n>itemAll}" />
+                                    <core:Item key="TCODE" text="{i18n>itemTcode}" />
+                                    <core:Item key="DUMP" text="{i18n>itemDump}" />
                                 </Select>
                             </Toolbar>
                             <!-- TABLE -->
@@ -166,8 +166,8 @@
                                 <ui:extension>
                                     <OverflowToolbar>
 
-                                        <!-- TITLE -->
-                                        <Title text="Activity Log" level="H6" />
+                                        <!-- TITLE
+                                        <Title text="{i18n>activityLog}" level="H6" /> -->
 
                                         <ToolbarSpacer />
 
