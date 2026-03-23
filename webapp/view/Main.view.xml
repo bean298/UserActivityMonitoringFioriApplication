@@ -25,56 +25,59 @@
         <!-- MAIN CONTENT -->
         <f:content>
             <VBox id="vBoxMainContent">
-<!-- ================= KPI + OVERVIEW ================= -->
-<VBox class="sapUiSmallMarginTop sapUiSmallMarginBottom">
+                <!-- ================= KPI + OVERVIEW ================= -->
+                <VBox id="kpiContainer" class="sapUiSmallMarginTop sapUiSmallMarginBottom">
+                    <!-- TITLE + DESCRIPTION -->
+                    <VBox id="kpiHeaderBox" class="sapUiSmallMarginBottom">
+                        <Title id="kpiTitle" text="{i18n>kpiTitle}" level="H4"/>
+                        <Text id="kpiDescription" text="{i18n>kpiDescription}" wrapping="true"/>
+                    </VBox>
 
-    <!-- TITLE + DESCRIPTION -->
-    <VBox class="sapUiSmallMarginBottom">
-        <Title text="User Audit Monitoring Dashboard" level="H4"/>
-        <Text text="Real-time monitoring of user login/logout activities. Analyze behavior, detect anomalies, and ensure system security." wrapping="true"/>
-    </VBox>
+                    <!-- KPI BAR -->
+                    <HBox id="kpiHBox" justifyContent="Center" wrap="Wrap" class="sapUiSmallMarginTop">
+                        <!-- TOTAL USERS -->
+                        <VBox id="kpiTotalUsersBox" class="kpiBox kpiBlue">
+                            <core:Icon id="kpiTotalUsersIcon" src="sap-icon://group" size="1.5rem"/>
+                            <Text id="kpiTotalUsersLabel" text="{i18n>kpiTotalUsersLabel}"/>
+                            <ObjectNumber id="kpiTotalUsersValue" number="{Overview>/totalUsers}" textAlign="Center" class="sapUiSmallMarginTop"/>
+                        </VBox>
 
-    <!-- KPI BAR -->
-    <HBox justifyContent="SpaceAround" wrap="Wrap" class="sapUiSmallMarginTop">
+                        <!-- TOTAL LOG -->
+                        <VBox id="kpiTotalLogBox" class="kpiBox kpiPurple">
+                            <core:Icon id="kpiTotalLogIcon" src="sap-icon://activity-items" size="1.5rem"/>
+                            <Text id="kpiTotalLogLabel" text="{i18n>kpiTotalLogLabel}"/>
+                            <ObjectNumber id="kpiTotalLogValue" number="{Overview>/totalLogs}" textAlign="Center" class="sapUiSmallMarginTop"/>
+                        </VBox>
 
-        <!-- TOTAL USERS -->
-        <VBox class="kpiBox">
-            <core:Icon src="sap-icon://group" size="1.5rem"/>
-            <Text text="Total Users"/>
-            <ObjectNumber number="{view>/totalUsers}" state="Information"/>
-        </VBox>
+                        <!-- SUCCESS LOGIN -->
+                        <VBox id="kpiSuccessBox" class="kpiBox kpiGreen">
+                            <core:Icon id="kpiSuccessIcon" src="sap-icon://accept" size="1.5rem"/>
+                            <Text id="kpiSuccessLabel" text="{i18n>kpiSuccessLabel}"/>
+                            <ObjectNumber id="kpiSuccessValue" number="{Overview>/successLogin}" textAlign="Center" class="sapUiSmallMarginTop"/>
+                        </VBox>
 
-        <!-- SUCCESS LOGIN -->
-        <VBox class="kpiBox">
-            <core:Icon src="sap-icon://accept" size="1.5rem"/>
-            <Text text="Success Login"/>
-            <ObjectNumber number="{view>/successLogin}" state="Success"/>
-        </VBox>
+                        <!-- FAILED LOGIN -->
+                        <VBox id="kpiFailedBox" class="kpiBox kpiRed">
+                            <core:Icon id="kpiFailedIcon" src="sap-icon://decline" size="1.5rem"/>
+                            <Text id="kpiFailedLabel" text="{i18n>kpiFailedLabel}"/>
+                            <ObjectNumber id="kpiFailedValue" number="{Overview>/failedLogin}" textAlign="Center" class="sapUiSmallMarginTop"/>
+                        </VBox>
 
-        <!-- FAILED LOGIN -->
-        <VBox class="kpiBox">
-            <core:Icon src="sap-icon://decline" size="1.5rem"/>
-            <Text text="Failed Login"/>
-            <ObjectNumber number="{view>/failedLogin}" state="Error"/>
-        </VBox>
+                        <!-- DUMP COUNT -->
+                        <VBox id="kpiDumpBox" class="kpiBox kpiOrange">
+                            <core:Icon id="kpiDumpIcon" src="sap-icon://alert" size="1.5rem"/>
+                            <Text id="kpiDumpLabel" text="{i18n>kpiDumpLabel}"/>
+                            <ObjectNumber id="kpiDumpValue" number="{Overview>/dumpCount}" textAlign="Center" class="sapUiSmallMarginTop"/>
+                        </VBox>
 
-        <!-- DUMP COUNT -->
-        <VBox class="kpiBox">
-            <core:Icon src="sap-icon://alert" size="1.5rem"/>
-            <Text text="Dumps"/>
-            <ObjectNumber number="{view>/dumpCount}" state="Warning"/>
-        </VBox>
-
-        <!-- CLIENT -->
-        <VBox class="kpiBox">
-            <core:Icon src="sap-icon://cloud" size="1.5rem"/>
-            <Text text="Client"/>
-            <ObjectNumber number="{view>/client}" state="None"/>
-        </VBox>
-
-    </HBox>
-
-</VBox>
+                        <!-- CLIENT -->
+                        <VBox id="kpiClientBox" class="kpiBox kpiGray">
+                            <core:Icon id="kpiClientIcon" src="sap-icon://cloud" size="1.5rem"/>
+                            <Text id="kpiClientLabel" text="{i18n>client}"/>
+                            <ObjectNumber id="kpiClientValue" number="{Overview>/client}" textAlign="Center" class="sapUiSmallMarginTop"/>
+                        </VBox>
+                    </HBox>
+                </VBox>
 
                 <HBox id="hBoxChartContent" class="sapUiSmallMarginBottom" justifyContent="SpaceAround">
                     <!-- LOGIN RESULT - COLUMN CHART -->
@@ -96,7 +99,7 @@
                                 ]
                             }
                         }
-                    }" id="loginChart" vizType="column" width="300px" height="280px">
+                    }" id="loginChart" vizType="column" width="300px" height="300px">
 
                         <!-- Define data of chart -->
                         <viz:dataset>
@@ -129,7 +132,7 @@
                                 type: 'percentage'
                             }
                         }
-                    }" id="tcodeChart" vizType="pie" width="500px" height="280px">
+                    }" id="tcodeChart" vizType="pie" width="500px" height="300px">
                         <!-- Define data of chart -->
                         <viz:dataset>
                             <viz.data:FlattenedDataset id="pieDataset" data="{tCodeChart>/}">
@@ -160,7 +163,7 @@
                             dataLabel: { visible: true },
                             colorPalette: ['#fa8c16']
                         }
-                    }" vizType="bar" width="300px" height="280px">
+                    }" vizType="bar" width="300px" height="300px">
                         <!-- Define data of chart -->
                         <viz:dataset>
                             <viz.data:FlattenedDataset id="barDataset" data="{dumpChart>/}">

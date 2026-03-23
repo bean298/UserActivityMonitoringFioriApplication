@@ -93,7 +93,7 @@
     "resources": {
       "css": [
         {
-          "uri": "style.css"
+          "uri": "style/main.css"
         }
       ]
     },

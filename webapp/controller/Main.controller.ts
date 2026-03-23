@@ -28,10 +28,21 @@ export default class Main extends Controller {
   public onInit(): void {
     super.onInit();
 
+    // Create view model
+    const oOverviewModel = new JSONModel({
+      totalUsers: 0,
+      totalLogs: 0,
+      successLogin: 0,
+      failedLogin: 0,
+      dumpCount: 0,
+    });
+    this.getView()?.setModel(oOverviewModel, "Overview");
+
     this.onInitCount();
     this.onInitLogCount();
     this.onInitTcodeCount();
     this.onInitDumpCount();
+    this.onInitOverviewData();
   }
 
   /**
@@ -47,6 +58,9 @@ export default class Main extends Controller {
 
       // Get OData V4 model from the App Component
       const oModel = this.getAppComponent().getModel() as ODataModel;
+
+      // Get model Overview
+      const oOverviewModel = this.getView()?.getModel("Overview") as JSONModel;
 
       // Create a list binding to /UserAuthLog with $count enabled
       const oBinding = oModel.bindList(
@@ -64,8 +78,63 @@ export default class Main extends Controller {
 
       // Create property of view model
       oViewModel.setProperty("/count", iCount);
+
+      oOverviewModel.setProperty("/totalLogs", iCount);
     } catch (error) {
       MessageBox.error("Failed to load chart data.");
+    }
+  }
+
+  /**
+   * Fetches the data for Overview Data
+   **/
+  public async onInitOverviewData(): Promise<void> {
+    try {
+      // Get OData V4 model from the App Component
+      const oModel = this.getAppComponent().getModel() as ODataModel;
+
+      // Get model Overview
+      const oOverviewModel = this.getView()?.getModel("Overview") as JSONModel;
+
+      // Create a list binding to /UserSearchHelp
+      const oBindingTotalUser = oModel.bindList(
+        "/UserSearchHelp",
+        undefined,
+        undefined,
+        undefined,
+        {
+          $count: true,
+        },
+      ) as ODataListBinding;
+
+      // Executes the OData call
+      await oBindingTotalUser.requestContexts(0, 1);
+
+      const iTotalUsers = oBindingTotalUser.getLength();
+
+      // Create property of view model
+      oOverviewModel.setProperty("/totalUsers", iTotalUsers);
+
+      // Create a list binding to /UserActivityLog
+      const oBindingTotalDump = oModel.bindList(
+        "/UserActivityLog",
+        undefined,
+        undefined,
+        [new Filter("ActivityType", FilterOperator.EQ, "DUMP")],
+        {
+          $count: true,
+        },
+      ) as ODataListBinding;
+
+      // Executes the OData call
+      await oBindingTotalDump.requestContexts();
+
+      const iDumpCount = oBindingTotalDump.getLength();
+
+      // Create property of view model
+      oOverviewModel.setProperty("/dumpCount", iDumpCount);
+    } catch (error) {
+      MessageBox.error("Failed to load overview data.");
     }
   }
 
@@ -77,6 +146,9 @@ export default class Main extends Controller {
       // Get OData V4 model from the App Component
       const oModel = this.getAppComponent().getModel() as ODataModel;
 
+      // Get model Overview
+      const oOverviewModel = this.getView()?.getModel("Overview") as JSONModel;
+
       // Create a list binding to /UserAuthLogChart
       const oBinding = oModel.bindList("/UserAuthLogChart") as ODataListBinding;
 
@@ -86,6 +158,15 @@ export default class Main extends Controller {
       const aData = aContexts.map((oContext) => oContext.getObject());
 
       const oJsonModel = new JSONModel(aData);
+
+      // Set data for overview
+      aData.forEach((item) => {
+        if (item.LoginResult === "SUCCESS") {
+          oOverviewModel.setProperty("/successLogin", item.CountLoginLog);
+        } else if (item.LoginResult === "FAIL") {
+          oOverviewModel.setProperty("/failedLogin", item.CountLoginLog);
+        }
+      });
 
       // Set data into Model authLogChart
       this.getView()?.setModel(oJsonModel, "authLogChart");
