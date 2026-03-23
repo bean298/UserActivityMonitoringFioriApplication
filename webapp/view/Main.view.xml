@@ -25,11 +25,60 @@
         <!-- MAIN CONTENT -->
         <f:content>
             <VBox id="vBoxMainContent">
-                <HBox id="hBoxChartContent" class="sapUiSmallMarginBottom"
-                    justifyContent="SpaceAround">
+<!-- ================= KPI + OVERVIEW ================= -->
+<VBox class="sapUiSmallMarginTop sapUiSmallMarginBottom">
+
+    <!-- TITLE + DESCRIPTION -->
+    <VBox class="sapUiSmallMarginBottom">
+        <Title text="User Audit Monitoring Dashboard" level="H4"/>
+        <Text text="Real-time monitoring of user login/logout activities. Analyze behavior, detect anomalies, and ensure system security." wrapping="true"/>
+    </VBox>
+
+    <!-- KPI BAR -->
+    <HBox justifyContent="SpaceAround" wrap="Wrap" class="sapUiSmallMarginTop">
+
+        <!-- TOTAL USERS -->
+        <VBox class="kpiBox">
+            <core:Icon src="sap-icon://group" size="1.5rem"/>
+            <Text text="Total Users"/>
+            <ObjectNumber number="{view>/totalUsers}" state="Information"/>
+        </VBox>
+
+        <!-- SUCCESS LOGIN -->
+        <VBox class="kpiBox">
+            <core:Icon src="sap-icon://accept" size="1.5rem"/>
+            <Text text="Success Login"/>
+            <ObjectNumber number="{view>/successLogin}" state="Success"/>
+        </VBox>
+
+        <!-- FAILED LOGIN -->
+        <VBox class="kpiBox">
+            <core:Icon src="sap-icon://decline" size="1.5rem"/>
+            <Text text="Failed Login"/>
+            <ObjectNumber number="{view>/failedLogin}" state="Error"/>
+        </VBox>
+
+        <!-- DUMP COUNT -->
+        <VBox class="kpiBox">
+            <core:Icon src="sap-icon://alert" size="1.5rem"/>
+            <Text text="Dumps"/>
+            <ObjectNumber number="{view>/dumpCount}" state="Warning"/>
+        </VBox>
+
+        <!-- CLIENT -->
+        <VBox class="kpiBox">
+            <core:Icon src="sap-icon://cloud" size="1.5rem"/>
+            <Text text="Client"/>
+            <ObjectNumber number="{view>/client}" state="None"/>
+        </VBox>
+
+    </HBox>
+
+</VBox>
+
+                <HBox id="hBoxChartContent" class="sapUiSmallMarginBottom" justifyContent="SpaceAround">
                     <!-- LOGIN RESULT - COLUMN CHART -->
-                    <viz:VizFrame
-                        vizProperties="{
+                    <viz:VizFrame vizProperties="{
                         title: { visible: true, text: 'User Login Result Overview' },
                         legend: { visible: false },
                         plotArea: {
@@ -47,38 +96,32 @@
                                 ]
                             }
                         }
-                    }"
-                        id="loginChart" vizType="column" width="300px" height="280px">
+                    }" id="loginChart" vizType="column" width="300px" height="280px">
 
                         <!-- Define data of chart -->
                         <viz:dataset>
                             <viz.data:FlattenedDataset id="colmunDataset" data="{authLogChart>/}">
                                 <!-- Category  -->
                                 <viz.data:dimensions>
-                                    <viz.data:DimensionDefinition id="colmunDimensionStatus"
-                                        name="Status" value="{LoginResult}" />
+                                    <viz.data:DimensionDefinition id="colmunDimensionStatus" name="Status" value="{LoginResult}" />
                                 </viz.data:dimensions>
 
                                 <!-- Value -->
                                 <viz.data:measures>
-                                    <viz.data:MeasureDefinition id="colmunMeasureCount" name="Count"
-                                        value="{CountLoginLog}" />
+                                    <viz.data:MeasureDefinition id="colmunMeasureCount" name="Count" value="{CountLoginLog}" />
                                 </viz.data:measures>
                             </viz.data:FlattenedDataset>
                         </viz:dataset>
 
                         <!-- Mapping dimension/measure into chart -->
                         <viz:feeds>
-                            <viz.feeds:FeedItem id="colmunFeedCategory" uid="categoryAxis"
-                                type="Dimension" values="Status" />
-                            <viz.feeds:FeedItem id="colmunFeedValue" uid="valueAxis" type="Measure"
-                                values="Count" />
+                            <viz.feeds:FeedItem id="colmunFeedCategory" uid="categoryAxis" type="Dimension" values="Status" />
+                            <viz.feeds:FeedItem id="colmunFeedValue" uid="valueAxis" type="Measure" values="Count" />
                         </viz:feeds>
                     </viz:VizFrame>
 
                     <!-- TCODE USAGE - PIE CHART -->
-                    <viz:VizFrame
-                        vizProperties="{
+                    <viz:VizFrame vizProperties="{
                         title: { visible: true, text: 'Top 5 TCode Usage' },
                         plotArea: {
                             dataLabel: {
@@ -86,69 +129,58 @@
                                 type: 'percentage'
                             }
                         }
-                    }"
-                        id="tcodeChart" vizType="pie" width="500px" height="280px">
+                    }" id="tcodeChart" vizType="pie" width="500px" height="280px">
                         <!-- Define data of chart -->
                         <viz:dataset>
                             <viz.data:FlattenedDataset id="pieDataset" data="{tCodeChart>/}">
                                 <!-- Category -->
                                 <viz.data:dimensions>
-                                    <viz.data:DimensionDefinition id="pieDimension" name="Label"
-                                        value="{Label}" />
+                                    <viz.data:DimensionDefinition id="pieDimension" name="Label" value="{Label}" />
                                 </viz.data:dimensions>
 
                                 <!-- Value  -->
                                 <viz.data:measures>
-                                    <viz.data:MeasureDefinition id="pieMeasureCount" name="Usage"
-                                        value="{TCodeCount}" />
+                                    <viz.data:MeasureDefinition id="pieMeasureCount" name="Usage" value="{TCodeCount}" />
                                 </viz.data:measures>
                             </viz.data:FlattenedDataset>
                         </viz:dataset>
 
                         <!-- Mapping dimension/measure into chart -->
                         <viz:feeds>
-                            <viz.feeds:FeedItem id="pieFeedMeasure" uid="size" type="Measure"
-                                values="Usage" />
-                            <viz.feeds:FeedItem id="pieFeedValue" uid="color" type="Dimension"
-                                values="Label" />
+                            <viz.feeds:FeedItem id="pieFeedMeasure" uid="size" type="Measure" values="Usage" />
+                            <viz.feeds:FeedItem id="pieFeedValue" uid="color" type="Dimension" values="Label" />
                         </viz:feeds>
                     </viz:VizFrame>
 
                     <!-- DUMP - BAR CHART -->
-                    <viz:VizFrame id="dumpChart"
-                        vizProperties="{
+                    <viz:VizFrame id="dumpChart" vizProperties="{
                         title: { visible: true, text: 'User Dump Activity' },
                         legend: { visible: false },
                         plotArea: {
                             dataLabel: { visible: true },
                             colorPalette: ['#fa8c16']
                         }
-                    }"
-                        vizType="bar" width="300px" height="280px">
+                    }" vizType="bar" width="300px" height="280px">
                         <!-- Define data of chart -->
                         <viz:dataset>
                             <viz.data:FlattenedDataset id="barDataset" data="{dumpChart>/}">
                                 <!-- Category -->
                                 <viz.data:dimensions>
-                                    <viz.data:DimensionDefinition id="barDimension"
-                                        name="{i18n>user}" value="{dumpChart>Username}" />
+                                    <viz.data:DimensionDefinition id="barDimension" name="{i18n>user}" value="{dumpChart>Username}" />
                                 </viz.data:dimensions>
 
                                 <!-- Value  -->
                                 <viz.data:measures>
-                                    <viz.data:MeasureDefinition id="barMeasureCount"
-                                        name="{i18n>dumpCount}" value="{dumpChart>DumpCount}" />
+                                    <viz.data:MeasureDefinition id="barMeasureCount" name="{i18n>dumpCount}" value="{dumpChart>DumpCount}" />
                                 </viz.data:measures>
                             </viz.data:FlattenedDataset>
                         </viz:dataset>
 
                         <!-- Mapping dimension/measure into chart -->
                         <viz:feeds>
-                            <viz.feeds:FeedItem id="barFeedMeasure" uid="categoryAxis"
-                                type="Dimension" values="User" />
+                            <viz.feeds:FeedItem id="barFeedMeasure" uid="categoryAxis" type="Dimension" values="User" />
 
-                            <viz.feeds:FeedItem id="barFeedValue" uid="valueAxis" type="Measure"
-                                values="Dump Count" />
+                            <viz.feeds:FeedItem id="barFeedValue" uid="valueAxis" type="Measure" values="Dump Count" />
                         </viz:feeds>
 
                     </viz:VizFrame>
@@ -156,57 +188,45 @@
 
                 <!-- FILTER + SEARCH -->
                 <Toolbar id="toolbarId" class="sapUiMediumMarginBottom" design="Transparent">
-                    <Title id="filterTitleId" text="{i18n>filter}" level="H5"
-                        class="sapUiSmallMarginEnd" />
+                    <Title id="filterTitleId" text="{i18n>filter}" level="H5" class="sapUiSmallMarginEnd" />
 
                     <ToolbarSpacer id="filterToolbarSpacerId" />
 
-                    <Input id="userSearchId" width="400px" placeholder="{i18n>searchUser}"
-                        showValueHelp="true" liveChange="onSearchUserName"
-                        valueHelpRequest="onUserSearchHelp" showClearIcon="true"
-                        class="sapUiSmallMarginEnd" />
+                    <Input id="userSearchId" width="400px" placeholder="{i18n>searchUser}" showValueHelp="true" liveChange="onSearchUserName" valueHelpRequest="onUserSearchHelp" showClearIcon="true" class="sapUiSmallMarginEnd" />
 
-                    <Select id="mainHeaderSelectId" width="300px" change="onFilterStatus"
-                        class="sapUiSmallMarginEnd">
+                    <Select id="mainHeaderSelectId" width="300px" change="onFilterStatus" class="sapUiSmallMarginEnd">
                         <core:Item id="itemId1" key="" text="{i18n>all}" />
                         <core:Item id="itemId2" key="SUCCESS" text="{i18n>success}" />
                         <core:Item id="itemId3" key="FAIL" text="{i18n>failed}" />
                     </Select>
 
-                    <DatePicker id="mainDatePickerId" width="200px" placeholder="{i18n>selectDate}"
-                        change="onFilterLoginDate" />
+                    <DatePicker id="mainDatePickerId" width="200px" placeholder="{i18n>selectDate}" change="onFilterLoginDate" />
                 </Toolbar>
 
                 <!-- TABLE -->
-                <ui:Table id="maiTableId"
-                    rows="{
+                <ui:Table id="maiTableId" rows="{
                     path: '/UserAuthLog',
                     parameters: {
                         $count: true
                     },
                     sorter: { path: 'LoginDate', descending: true }
-                }"
-                    selectionMode="Single" class="sapUiLargeMarginBottom">
+                }" selectionMode="Single" class="sapUiLargeMarginBottom" visibleRowCount="10">
+
                     <!-- HEADER TOOLBAR | BUTTON -->
                     <ui:extension>
                         <OverflowToolbar id="mainToolbarId">
-                            <Title id="mainTitleTableId"
-                                text="{= ${i18n>headerTitleTable} + ' (' + ${view>/count} + ')' }"
-                                level="H2" />
+                            <Title id="mainTitleTableId" text="{= ${i18n>headerTitleTable} + ' (' + ${view>/count} + ')' }" level="H2" />
 
                             <ToolbarSpacer id="mainToolSpace" />
 
                             <!-- REFRESH BTN -->
-                            <Button id="btnRefreshData" icon="sap-icon://refresh"
-                                tooltip="{i18n>refreshData}" press="onRefreshTable" />
+                            <Button id="btnRefreshData" icon="sap-icon://refresh" tooltip="{i18n>refreshData}" press="onRefreshTable" />
 
                             <!-- EXPORT BTN -->
-                            <Button id="btnExportExcel" icon="sap-icon://excel-attachment"
-                                tooltip="{i18n>exportExcel}" press="onExportExcel" />
+                            <Button id="btnExportExcel" icon="sap-icon://excel-attachment" tooltip="{i18n>exportExcel}" press="onExportExcel" />
 
                             <!-- VIEW SETTINGS BTN -->
-                            <Button id="btnViewSettings" icon="sap-icon://action-settings"
-                                tooltip="{i18n>viewSettings}" press="onOpenViewSettings" />
+                            <Button id="btnViewSettings" icon="sap-icon://action-settings" tooltip="{i18n>viewSettings}" press="onOpenViewSettings" />
                         </OverflowToolbar>
                     </ui:extension>
 
@@ -225,33 +245,19 @@
                             <Label id="labelName" text="{i18n>username}" />
 
                             <ui:template>
-                                <HBox id="hBoxUser" alignItems="Center" renderType="Bare"
-                                    class="sapUiTinyMarginBeginEnd">
-                                    <core:Icon id="userIcon" src="sap-icon://employee" size="0.9rem"
-                                        class="sapUiTinyMarginEnd" />
-                                    <Link id="textName" tooltip="{i18n>userInfoDetail}"
-                                        text="{Username}" wrapping="false"
-                                        press="onNavigateUserDetail" />
+                                <HBox id="hBoxUser" alignItems="Center" renderType="Bare" class="sapUiTinyMarginBeginEnd">
+                                    <core:Icon id="userIcon" src="sap-icon://employee" size="0.9rem" class="sapUiTinyMarginEnd" />
+                                    <Link id="textName" tooltip="{i18n>userInfoDetail}" text="{Username}" wrapping="false" press="onNavigateUserDetail" />
                                 </HBox>
                             </ui:template>
                         </ui:Column>
-                        <!-- CLIENT COLUMN
-                        <ui:Column id="columnClient" width="6rem">
-                            <Label text="{i18n>client}" />
-
-                            <ui:template>
-                                <Text text="{clientModel>/Client}" />
-                            </ui:template>
-                        </ui:Column> -->
 
                         <!-- LOGIN RESULT COLUMN -->
                         <ui:Column id="columnLoginResult" width="9rem">
                             <Label id="labelLoginResult" text="{i18n>loginResult}" />
 
                             <ui:template>
-                                <ObjectStatus id="textLoginResult" text="{LoginResult}"
-                                    icon="{path: 'LoginResult', formatter: '.formatter.formatLoginResultIcon'}"
-                                    state="{path: 'LoginResult', formatter: '.formatter.formatLoginResultState'}" />
+                                <ObjectStatus id="textLoginResult" text="{LoginResult}" icon="{path: 'LoginResult', formatter: '.formatter.formatLoginResultIcon'}" state="{path: 'LoginResult', formatter: '.formatter.formatLoginResultState'}" />
                             </ui:template>
                         </ui:Column>
 
@@ -260,8 +266,7 @@
                             <Label id="labelLoginDate" text="{i18n>loginDate}" />
 
                             <ui:template>
-                                <Text id="textLoginDate"
-                                    text="{path:'LoginDate', formatter: '.formatter.formatISODate'}" />
+                                <Text id="textLoginDate" text="{path:'LoginDate', formatter: '.formatter.formatISODate'}" />
                             </ui:template>
                         </ui:Column>
 
@@ -279,9 +284,7 @@
                             <Label id="labelLoginMessage" text="{i18n>loginMessage}" />
 
                             <ui:template>
-                                <ObjectStatus id="textLoginMessage" text="{LoginMessage}"
-                                    icon="{path: 'EventId', formatter: '.formatter.formatLoginMessageIcon'}"
-                                    state="{path: 'EventId', formatter: '.formatter.formatLoginMessageState'}" />
+                                <ObjectStatus id="textLoginMessage" text="{LoginMessage}" icon="{path: 'EventId', formatter: '.formatter.formatLoginMessageIcon'}" state="{path: 'EventId', formatter: '.formatter.formatLoginMessageState'}" />
                             </ui:template>
                         </ui:Column>
 
@@ -290,8 +293,7 @@
                             <Label id="labelLogoutDate" text="{i18n>logoutDate}" />
 
                             <ui:template>
-                                <Text id="textLogoutDate"
-                                    text="{path:'LogoutDate', formatter: '.formatter.formatISODate'}" />
+                                <Text id="textLogoutDate" text="{path:'LogoutDate', formatter: '.formatter.formatISODate'}" />
                             </ui:template>
                         </ui:Column>
 
@@ -300,17 +302,14 @@
                             <Label id="labelLogoutTime" text="{i18n>logoutTime}" />
 
                             <ui:template>
-                                <Text id="textLogoutTime"
-                                    text="{path:'LogoutTime', formatter: '.formatter.formatLogoutTime'}" />
+                                <Text id="textLogoutTime" text="{path:'LogoutTime', formatter: '.formatter.formatLogoutTime'}" />
                             </ui:template>
                         </ui:Column>
 
                         <!-- NAVIGATOR COLUMN -->
                         <ui:Column id="columnNavigator" width="4rem" hAlign="Center">
                             <ui:template>
-                                <Button id="btnNavigator" tooltip="{i18n>navigateAuth}"
-                                    icon="sap-icon://navigation-right-arrow" type="Transparent"
-                                    press="onPressNavigate" />
+                                <Button id="btnNavigator" tooltip="{i18n>navigateAuth}" icon="sap-icon://navigation-right-arrow" type="Transparent" press="onPressNavigate" />
                             </ui:template>
                         </ui:Column>
                     </ui:columns>

@@ -27,33 +27,6 @@ export default class Main extends Controller {
    **/
   public onInit(): void {
     super.onInit();
-    // ===== ADD CLIENT =====
-    let sClient = "";
-
-    try {
-      const oUser = (sap as any).ushell?.Container?.getUser();
-      sClient = oUser?.getParameter?.("sap-client");
-    } catch (e) {
-      console.warn("Cannot get client");
-    }
-
-    const oClientModel = new JSONModel({
-      Client: sClient || "324",
-    });
-
-    this.getView()?.setModel(oClientModel, "clientModel");
-    // ===== Pagination Model =====
-    // const oPagination = new JSONModel({
-    //   page: 1,
-    //   pageSize: 20,
-    //   total: 0,
-    //   totalPages: 1,
-    // });
-
-    // this.getView()?.setModel(oPagination, "pagination");
-
-    // Load first page
-    // this.loadPage();
 
     this.onInitCount();
     this.onInitLogCount();
