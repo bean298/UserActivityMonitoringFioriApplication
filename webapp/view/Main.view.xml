@@ -7,7 +7,6 @@
     xmlns:viz="sap.viz.ui5.controls"
     xmlns:viz.feeds="sap.viz.ui5.controls.common.feeds"
     xmlns:viz.data="sap.viz.ui5.data">
-
     <f:DynamicPage id="mainDynamicPageId">
         <!-- TITLE | SUBTITLE -->
         <f:title>
@@ -25,186 +24,199 @@
         <!-- MAIN CONTENT -->
         <f:content>
             <VBox id="vBoxMainContent">
-                <!-- ================= KPI + OVERVIEW ================= -->
-                <VBox id="kpiContainer" class="sapUiSmallMarginTop sapUiSmallMarginBottom">
-                    <!-- TITLE + DESCRIPTION -->
-                    <VBox id="kpiHeaderBox" class="sapUiSmallMarginBottom">
-                        <Title id="kpiTitle" text="{i18n>kpiTitle}" level="H4"/>
-                        <Text id="kpiDescription" text="{i18n>kpiDescription}" wrapping="true"/>
-                    </VBox>
+                <Panel id="overviewPanel" headerText="{i18n>overviewDashboard}" expandable="true" expanded="true" class="customOverviewPanel sapUiMediumMarginBottom">
+                    <content>
+                        <!-- ================= KPI + OVERVIEW ================= -->
+                        <VBox id="kpiContainer" class="sapUiSmallMarginTop sapUiMediumMarginBottom">
+                            <!-- TITLE + DESCRIPTION -->
+                            <VBox id="kpiHeaderBox" class="sapUiSmallMarginBottom">
+                                <Title id="kpiTitle" text="{i18n>kpiTitle}" level="H4"/>
+                                <Text id="kpiDescription" text="{i18n>kpiDescription}" wrapping="true"/>
+                            </VBox>
 
-                    <!-- KPI BAR -->
-                    <HBox id="kpiHBox" justifyContent="Center" wrap="Wrap" class="sapUiSmallMarginTop">
-                        <!-- TOTAL USERS -->
-                        <VBox id="kpiTotalUsersBox" class="kpiBox kpiBlue">
-                            <core:Icon id="kpiTotalUsersIcon" src="sap-icon://group" size="1.5rem"/>
-                            <Text id="kpiTotalUsersLabel" text="{i18n>kpiTotalUsersLabel}"/>
-                            <ObjectNumber id="kpiTotalUsersValue" number="{Overview>/totalUsers}" textAlign="Center" class="sapUiSmallMarginTop"/>
+                            <!-- KPI BAR -->
+                            <HBox id="kpiHBox" justifyContent="Center" wrap="Wrap" class="sapUiSmallMarginTop">
+                                <!-- TOTAL USERS -->
+                                <VBox id="kpiTotalUsersBox" class="kpiBox kpiBlue">
+                                    <core:Icon id="kpiTotalUsersIcon" src="sap-icon://group" size="1.5rem"/>
+                                    <Text id="kpiTotalUsersLabel" text="{i18n>kpiTotalUsersLabel}"/>
+                                    <ObjectNumber id="kpiTotalUsersValue" number="{Overview>/totalUsers}" textAlign="Center" class="sapUiSmallMarginTop"/>
+                                </VBox>
+
+                                <!-- TOTAL LOG -->
+                                <VBox id="kpiTotalLogBox" class="kpiBox kpiPurple">
+                                    <core:Icon id="kpiTotalLogIcon" src="sap-icon://activity-items" size="1.5rem"/>
+                                    <Text id="kpiTotalLogLabel" text="{i18n>kpiTotalLogLabel}"/>
+                                    <ObjectNumber id="kpiTotalLogValue" number="{Overview>/totalLogs}" textAlign="Center" class="sapUiSmallMarginTop"/>
+                                </VBox>
+
+                                <!-- SUCCESS LOGIN -->
+                                <VBox id="kpiSuccessBox" class="kpiBox kpiGreen">
+                                    <core:Icon id="kpiSuccessIcon" src="sap-icon://accept" size="1.5rem"/>
+                                    <Text id="kpiSuccessLabel" text="{i18n>kpiSuccessLabel}"/>
+                                    <ObjectNumber id="kpiSuccessValue" number="{Overview>/successLogin}" textAlign="Center" class="sapUiSmallMarginTop"/>
+                                </VBox>
+
+                                <!-- FAILED LOGIN -->
+                                <VBox id="kpiFailedBox" class="kpiBox kpiRed">
+                                    <core:Icon id="kpiFailedIcon" src="sap-icon://decline" size="1.5rem"/>
+                                    <Text id="kpiFailedLabel" text="{i18n>kpiFailedLabel}"/>
+                                    <ObjectNumber id="kpiFailedValue" number="{Overview>/failedLogin}" textAlign="Center" class="sapUiSmallMarginTop"/>
+                                </VBox>
+
+                                <!-- LOCKED USERS -->
+                                <VBox id="kpiLockedBox" class="kpiBox kpiDarkRed">
+                                    <core:Icon id="kpiLockedIcon" src="sap-icon://locked" size="1.5rem"/>
+                                    <Text id="kpiLockedLabel" text="{i18n>kpiLockedUsersLabel}"/>
+                                    <ObjectNumber id="kpiLockedValue" number="{Overview>/lockedUsers}" textAlign="Center" class="sapUiSmallMarginTop"/>
+                                </VBox>
+
+                                <!-- DUMP COUNT -->
+                                <VBox id="kpiDumpBox" class="kpiBox kpiOrange">
+                                    <core:Icon id="kpiDumpIcon" src="sap-icon://alert" size="1.5rem"/>
+                                    <Text id="kpiDumpLabel" text="{i18n>kpiDumpLabel}"/>
+                                    <ObjectNumber id="kpiDumpValue" number="{Overview>/dumpCount}" textAlign="Center" class="sapUiSmallMarginTop"/>
+                                </VBox>
+
+                                <!-- CLIENT -->
+                                <VBox id="kpiClientBox" class="kpiBox kpiGray">
+                                    <core:Icon id="kpiClientIcon" src="sap-icon://cloud" size="1.5rem"/>
+                                    <Text id="kpiClientLabel" text="{i18n>client}"/>
+                                    <ObjectNumber id="kpiClientValue" number="{Overview>/client}" textAlign="Center" class="sapUiSmallMarginTop"/>
+                                </VBox>
+                            </HBox>
                         </VBox>
 
-                        <!-- TOTAL LOG -->
-                        <VBox id="kpiTotalLogBox" class="kpiBox kpiPurple">
-                            <core:Icon id="kpiTotalLogIcon" src="sap-icon://activity-items" size="1.5rem"/>
-                            <Text id="kpiTotalLogLabel" text="{i18n>kpiTotalLogLabel}"/>
-                            <ObjectNumber id="kpiTotalLogValue" number="{Overview>/totalLogs}" textAlign="Center" class="sapUiSmallMarginTop"/>
-                        </VBox>
-
-                        <!-- SUCCESS LOGIN -->
-                        <VBox id="kpiSuccessBox" class="kpiBox kpiGreen">
-                            <core:Icon id="kpiSuccessIcon" src="sap-icon://accept" size="1.5rem"/>
-                            <Text id="kpiSuccessLabel" text="{i18n>kpiSuccessLabel}"/>
-                            <ObjectNumber id="kpiSuccessValue" number="{Overview>/successLogin}" textAlign="Center" class="sapUiSmallMarginTop"/>
-                        </VBox>
-
-                        <!-- FAILED LOGIN -->
-                        <VBox id="kpiFailedBox" class="kpiBox kpiRed">
-                            <core:Icon id="kpiFailedIcon" src="sap-icon://decline" size="1.5rem"/>
-                            <Text id="kpiFailedLabel" text="{i18n>kpiFailedLabel}"/>
-                            <ObjectNumber id="kpiFailedValue" number="{Overview>/failedLogin}" textAlign="Center" class="sapUiSmallMarginTop"/>
-                        </VBox>
-
-                        <!-- DUMP COUNT -->
-                        <VBox id="kpiDumpBox" class="kpiBox kpiOrange">
-                            <core:Icon id="kpiDumpIcon" src="sap-icon://alert" size="1.5rem"/>
-                            <Text id="kpiDumpLabel" text="{i18n>kpiDumpLabel}"/>
-                            <ObjectNumber id="kpiDumpValue" number="{Overview>/dumpCount}" textAlign="Center" class="sapUiSmallMarginTop"/>
-                        </VBox>
-
-                        <!-- CLIENT -->
-                        <VBox id="kpiClientBox" class="kpiBox kpiGray">
-                            <core:Icon id="kpiClientIcon" src="sap-icon://cloud" size="1.5rem"/>
-                            <Text id="kpiClientLabel" text="{i18n>client}"/>
-                            <ObjectNumber id="kpiClientValue" number="{Overview>/client}" textAlign="Center" class="sapUiSmallMarginTop"/>
-                        </VBox>
-                    </HBox>
-                </VBox>
-
-                <HBox id="hBoxChartContent" class="sapUiSmallMarginBottom" justifyContent="SpaceAround">
-                    <!-- LOGIN RESULT - COLUMN CHART -->
-                    <viz:VizFrame vizProperties="{
-                        title: { visible: true, text: 'User Login Result Overview' },
-                        legend: { visible: false },
-                        plotArea: {
-                            dataLabel: { visible: true },
-                            dataPointStyle: {
-                                rules: [
-                                    {
-                                        dataContext: { Status: 'FAIL' },
-                                        properties: { color: '#ff4d4f' }
-                                    },
-                                    {
-                                        dataContext: { Status: 'SUCCESS' },
-                                        properties: { color: '#52c41a' }
+                        <HBox id="hBoxChartContent" class="sapUiSmallMarginBottom" justifyContent="SpaceAround">
+                            <!-- LOGIN RESULT - COLUMN CHART -->
+                            <viz:VizFrame vizProperties="{
+                                title: { visible: true, text: 'User Login Result Overview' },
+                                legend: { visible: false },
+                                plotArea: {
+                                    dataLabel: { visible: true },
+                                    dataPointStyle: {
+                                        rules: [
+                                            {
+                                                dataContext: { Status: 'FAIL' },
+                                                properties: { color: '#ff4d4f' }
+                                            },
+                                            {
+                                                dataContext: { Status: 'SUCCESS' },
+                                                properties: { color: '#52c41a' }
+                                            }
+                                        ]
                                     }
-                                ]
-                            }
-                        }
-                    }" id="loginChart" vizType="column" width="300px" height="300px">
+                                }
+                            }" id="loginChart" vizType="column" width="300px" height="300px">
+                                <!-- Define data of chart -->
+                                <viz:dataset>
+                                    <viz.data:FlattenedDataset id="colmunDataset" data="{authLogChart>/}">
+                                        <!-- Category  -->
+                                        <viz.data:dimensions>
+                                            <viz.data:DimensionDefinition id="colmunDimensionStatus" name="Status" value="{LoginResult}" />
+                                        </viz.data:dimensions>
 
-                        <!-- Define data of chart -->
-                        <viz:dataset>
-                            <viz.data:FlattenedDataset id="colmunDataset" data="{authLogChart>/}">
-                                <!-- Category  -->
-                                <viz.data:dimensions>
-                                    <viz.data:DimensionDefinition id="colmunDimensionStatus" name="Status" value="{LoginResult}" />
-                                </viz.data:dimensions>
+                                        <!-- Value -->
+                                        <viz.data:measures>
+                                            <viz.data:MeasureDefinition id="colmunMeasureCount" name="Count" value="{CountLoginLog}" />
+                                        </viz.data:measures>
+                                    </viz.data:FlattenedDataset>
+                                </viz:dataset>
 
-                                <!-- Value -->
-                                <viz.data:measures>
-                                    <viz.data:MeasureDefinition id="colmunMeasureCount" name="Count" value="{CountLoginLog}" />
-                                </viz.data:measures>
-                            </viz.data:FlattenedDataset>
-                        </viz:dataset>
+                                <!-- Mapping dimension/measure into chart -->
+                                <viz:feeds>
+                                    <viz.feeds:FeedItem id="colmunFeedCategory" uid="categoryAxis" type="Dimension" values="Status" />
+                                    <viz.feeds:FeedItem id="colmunFeedValue" uid="valueAxis" type="Measure" values="Count" />
+                                </viz:feeds>
+                            </viz:VizFrame>
 
-                        <!-- Mapping dimension/measure into chart -->
-                        <viz:feeds>
-                            <viz.feeds:FeedItem id="colmunFeedCategory" uid="categoryAxis" type="Dimension" values="Status" />
-                            <viz.feeds:FeedItem id="colmunFeedValue" uid="valueAxis" type="Measure" values="Count" />
-                        </viz:feeds>
-                    </viz:VizFrame>
+                            <!-- TCODE USAGE - PIE CHART -->
+                            <viz:VizFrame vizProperties="{
+                                title: { visible: true, text: 'Top 5 TCode Usage' },
+                                plotArea: {
+                                    dataLabel: {
+                                        visible: true,
+                                        type: 'percentage'
+                                    }
+                                }
+                            }" id="tcodeChart" vizType="pie" width="500px" height="300px">
+                                <!-- Define data of chart -->
+                                <viz:dataset>
+                                    <viz.data:FlattenedDataset id="pieDataset" data="{tCodeChart>/}">
+                                        <!-- Category -->
+                                        <viz.data:dimensions>
+                                            <viz.data:DimensionDefinition id="pieDimension" name="Label" value="{Label}" />
+                                        </viz.data:dimensions>
 
-                    <!-- TCODE USAGE - PIE CHART -->
-                    <viz:VizFrame vizProperties="{
-                        title: { visible: true, text: 'Top 5 TCode Usage' },
-                        plotArea: {
-                            dataLabel: {
-                                visible: true,
-                                type: 'percentage'
-                            }
-                        }
-                    }" id="tcodeChart" vizType="pie" width="500px" height="300px">
-                        <!-- Define data of chart -->
-                        <viz:dataset>
-                            <viz.data:FlattenedDataset id="pieDataset" data="{tCodeChart>/}">
-                                <!-- Category -->
-                                <viz.data:dimensions>
-                                    <viz.data:DimensionDefinition id="pieDimension" name="Label" value="{Label}" />
-                                </viz.data:dimensions>
+                                        <!-- Value  -->
+                                        <viz.data:measures>
+                                            <viz.data:MeasureDefinition id="pieMeasureCount" name="Usage" value="{TCodeCount}" />
+                                        </viz.data:measures>
+                                    </viz.data:FlattenedDataset>
+                                </viz:dataset>
 
-                                <!-- Value  -->
-                                <viz.data:measures>
-                                    <viz.data:MeasureDefinition id="pieMeasureCount" name="Usage" value="{TCodeCount}" />
-                                </viz.data:measures>
-                            </viz.data:FlattenedDataset>
-                        </viz:dataset>
+                                <!-- Mapping dimension/measure into chart -->
+                                <viz:feeds>
+                                    <viz.feeds:FeedItem id="pieFeedMeasure" uid="size" type="Measure" values="Usage" />
+                                    <viz.feeds:FeedItem id="pieFeedValue" uid="color" type="Dimension" values="Label" />
+                                </viz:feeds>
+                            </viz:VizFrame>
 
-                        <!-- Mapping dimension/measure into chart -->
-                        <viz:feeds>
-                            <viz.feeds:FeedItem id="pieFeedMeasure" uid="size" type="Measure" values="Usage" />
-                            <viz.feeds:FeedItem id="pieFeedValue" uid="color" type="Dimension" values="Label" />
-                        </viz:feeds>
-                    </viz:VizFrame>
+                            <!-- DUMP - BAR CHART -->
+                            <viz:VizFrame id="dumpChart" vizProperties="{
+                                title: { visible: true, text: 'User Dump Activity' },
+                                legend: { visible: false },
+                                plotArea: {
+                                    dataLabel: { visible: true },
+                                    colorPalette: ['#fa8c16']
+                                }
+                            }" vizType="bar" width="300px" height="300px">
+                                <!-- Define data of chart -->
+                                <viz:dataset>
+                                    <viz.data:FlattenedDataset id="barDataset" data="{dumpChart>/}">
+                                        <!-- Category -->
+                                        <viz.data:dimensions>
+                                            <viz.data:DimensionDefinition id="barDimension" name="{i18n>user}" value="{dumpChart>Username}" />
+                                        </viz.data:dimensions>
 
-                    <!-- DUMP - BAR CHART -->
-                    <viz:VizFrame id="dumpChart" vizProperties="{
-                        title: { visible: true, text: 'User Dump Activity' },
-                        legend: { visible: false },
-                        plotArea: {
-                            dataLabel: { visible: true },
-                            colorPalette: ['#fa8c16']
-                        }
-                    }" vizType="bar" width="300px" height="300px">
-                        <!-- Define data of chart -->
-                        <viz:dataset>
-                            <viz.data:FlattenedDataset id="barDataset" data="{dumpChart>/}">
-                                <!-- Category -->
-                                <viz.data:dimensions>
-                                    <viz.data:DimensionDefinition id="barDimension" name="{i18n>user}" value="{dumpChart>Username}" />
-                                </viz.data:dimensions>
+                                        <!-- Value  -->
+                                        <viz.data:measures>
+                                            <viz.data:MeasureDefinition id="barMeasureCount" name="{i18n>dumpCount}" value="{dumpChart>DumpCount}" />
+                                        </viz.data:measures>
+                                    </viz.data:FlattenedDataset>
+                                </viz:dataset>
 
-                                <!-- Value  -->
-                                <viz.data:measures>
-                                    <viz.data:MeasureDefinition id="barMeasureCount" name="{i18n>dumpCount}" value="{dumpChart>DumpCount}" />
-                                </viz.data:measures>
-                            </viz.data:FlattenedDataset>
-                        </viz:dataset>
+                                <!-- Mapping dimension/measure into chart -->
+                                <viz:feeds>
+                                    <viz.feeds:FeedItem id="barFeedMeasure" uid="categoryAxis" type="Dimension" values="User" />
 
-                        <!-- Mapping dimension/measure into chart -->
-                        <viz:feeds>
-                            <viz.feeds:FeedItem id="barFeedMeasure" uid="categoryAxis" type="Dimension" values="User" />
-
-                            <viz.feeds:FeedItem id="barFeedValue" uid="valueAxis" type="Measure" values="Dump Count" />
-                        </viz:feeds>
-
-                    </viz:VizFrame>
-                </HBox>
+                                    <viz.feeds:FeedItem id="barFeedValue" uid="valueAxis" type="Measure" values="Dump Count" />
+                                </viz:feeds>
+                            </viz:VizFrame>
+                        </HBox>
+                    </content>
+                </Panel>
 
                 <!-- FILTER + SEARCH -->
-                <Toolbar id="toolbarId" class="sapUiMediumMarginBottom" design="Transparent">
-                    <Title id="filterTitleId" text="{i18n>filter}" level="H5" class="sapUiSmallMarginEnd" />
+                <Panel id="filterPanel" width="100%" headerText="{i18n>filter}" expandable="true" expanded="true" class="customFilterPanel sapUiSmallMarginBottom">
+                    <Toolbar id="filterToolbarMain" design="Transparent">
+                        <!-- USER -->
+                        <Label id="filterLabelUser" text="{i18n>user}" class="sapUiSmallMarginEnd" />
+                        <Input id="userSearchId" width="250px" placeholder="{i18n>searchUser}" showValueHelp="true" liveChange="onSearchUserName" valueHelpRequest="onUserSearchHelp" showClearIcon="true" class="sapUiSmallMarginEnd" />
 
-                    <ToolbarSpacer id="filterToolbarSpacerId" />
+                        <!-- STATUS -->
+                        <Label id="filterLabelStatus" text="{i18n>status}" class="sapUiSmallMarginBegin sapUiSmallMarginEnd"/>
+                        <Select id="mainHeaderSelectId" width="180px" change="onFilterStatus" class="sapUiSmallMarginEnd">
+                            <core:Item id="filterStatusItemAll" key="" text="{i18n>all}" />
+                            <core:Item id="filterStatusItemSuccess" key="SUCCESS" text="{i18n>success}" />
+                            <core:Item id="filterStatusItemFail" key="FAIL" text="{i18n>failed}" />
+                        </Select>
 
-                    <Input id="userSearchId" width="400px" placeholder="{i18n>searchUser}" showValueHelp="true" liveChange="onSearchUserName" valueHelpRequest="onUserSearchHelp" showClearIcon="true" class="sapUiSmallMarginEnd" />
-
-                    <Select id="mainHeaderSelectId" width="300px" change="onFilterStatus" class="sapUiSmallMarginEnd">
-                        <core:Item id="itemId1" key="" text="{i18n>all}" />
-                        <core:Item id="itemId2" key="SUCCESS" text="{i18n>success}" />
-                        <core:Item id="itemId3" key="FAIL" text="{i18n>failed}" />
-                    </Select>
-
-                    <DatePicker id="mainDatePickerId" width="200px" placeholder="{i18n>selectDate}" change="onFilterLoginDate" />
-                </Toolbar>
+                        <!-- DATE -->
+                        <Label id="filterLabelDate" text="{i18n>filterDate}" class="sapUiSmallMarginBegin sapUiSmallMarginEnd"/>
+                        <DatePicker id="mainDatePickerId" width="180px" placeholder="{i18n>selectDate}" change="onFilterLoginDate" />
+                    </Toolbar>
+                </Panel>
 
                 <!-- TABLE -->
                 <ui:Table id="maiTableId" rows="{

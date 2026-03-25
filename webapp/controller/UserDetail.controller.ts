@@ -42,6 +42,7 @@ export default class UserDetail extends Controller {
         this._loadUserDetail(sUsername),
         this._loadUserLogs(sUsername),
         this._loadUserActivity(sUsername),
+        this._loadUserAuthLogPerDay(sUsername),
       ]);
     } catch (oError) {
       MessageBox.error("Failed to load user data. Please try again.");
@@ -116,28 +117,75 @@ export default class UserDetail extends Controller {
   }
 
   /**
+   * Load User Auth Log Per Day
+   **/
+  private async _loadUserAuthLogPerDay(sUsername: string): Promise<void> {
+    const oModel = (this as any).getAppComponent().getModel() as ODataModel;
+
+    const oToday = new Date();
+
+    // Take a last 6 days
+    const o7DaysAgo = new Date();
+    o7DaysAgo.setDate(oToday.getDate() - 5);
+
+    const formatDate = (oDate: Date) => {
+      return oDate.toISOString().split("T")[0];
+    };
+
+    const sFromDate = formatDate(o7DaysAgo);
+    const sToDate = formatDate(oToday);
+
+    // Create a list binding to /UserAuthLogPerDay with $filter
+    const oUserAuthLogPerDay = oModel.bindList(
+      "/UserAuthLogPerDay",
+      undefined,
+      undefined,
+      [
+        new Filter("UserName", FilterOperator.EQ, sUsername),
+        new Filter("login_result", FilterOperator.EQ, "SUCCESS"),
+        new Filter("LoginDate", FilterOperator.BT, sFromDate, sToDate),
+      ],
+    ) as ODataListBinding;
+
+    const aContextsLogPerDay = await oUserAuthLogPerDay.requestContexts();
+    const aDataLogPerDa = aContextsLogPerDay.map((oContext) =>
+      oContext.getObject(),
+    );
+
+    const oLogPerDaModel = new JSONModel(aDataLogPerDa);
+    this.getView()?.setModel(oLogPerDaModel, "UserAuthLogPerDayData");
+  }
+
+  /**
    * Load user activity information
    **/
   private async _loadUserActivity(sUsername: string): Promise<void> {
     const oModel = (this as any).getAppComponent().getModel() as ODataModel;
 
-    // // Create a list binding to /UserActivityLog with $filter
-    // const oUserAuthChart = oModel.bindList(
-    //   "/UserActivityLog",
-    //   undefined,
-    //   undefined,
-    //   [new Filter("Username", FilterOperator.EQ, sUsername)],
-    // ) as ODataListBinding;
+    // Create a list binding to /ActivityTCodeByUser with $filter
+    const oActivityTCodeByUser = oModel.bindList(
+      "/ActivityTCodeByUser",
+      undefined,
+      undefined,
+      [new Filter("Username", FilterOperator.EQ, sUsername)],
+    ) as ODataListBinding;
 
-    // // Executes the OData call
-    // const aContextsChart = await oUserAuthChart.requestContexts();
+    // Executes the OData call
+    const aContextsActivityTCodeByUser =
+      await oActivityTCodeByUser.requestContexts(0, 5);
 
-    // const aDataChart = aContextsChart.map((oContext) => oContext.getObject());
+    const ActTcodeData = aContextsActivityTCodeByUser.map((oContext) => {
+      // Create label field
+      const oObj = oContext.getObject();
+      oObj.Label = `${oObj.TCode} - ${oObj.TCodeName}`;
 
-    // const oJsonModel = new JSONModel(aDataChart);
+      return oObj;
+    });
 
-    // // Set data into Model AuthLogChartByUser
-    // this.getView()?.setModel(oJsonModel, "AuthLogChartByUserData");
+    const oJsonModelActTcode = new JSONModel(ActTcodeData);
+
+    // Set data into Model ActivityTCodeByUser
+    this.getView()?.setModel(oJsonModelActTcode, "TCodeByUserData");
 
     // Create a list binding to /UserActivityLog with $filter
     const oUserActTable = oModel.bindList(

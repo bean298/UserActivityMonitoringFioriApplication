@@ -34,6 +34,7 @@ export default class Main extends Controller {
       totalLogs: 0,
       successLogin: 0,
       failedLogin: 0,
+      lockedUsers: 0,
       dumpCount: 0,
     });
     this.getView()?.setModel(oOverviewModel, "Overview");
@@ -96,12 +97,12 @@ export default class Main extends Controller {
       // Get model Overview
       const oOverviewModel = this.getView()?.getModel("Overview") as JSONModel;
 
-      // Create a list binding to /UserSearchHelp
+      // Create a list binding to /UserDetail
       const oBindingTotalUser = oModel.bindList(
-        "/UserSearchHelp",
+        "/UserDetail",
         undefined,
         undefined,
-        undefined,
+        [new Filter("UserName", FilterOperator.StartsWith, "DEV")],
         {
           $count: true,
         },
@@ -133,6 +134,33 @@ export default class Main extends Controller {
 
       // Create property of view model
       oOverviewModel.setProperty("/dumpCount", iDumpCount);
+
+      const oFilterUser = new Filter({
+        filters: [
+          new Filter("UserName", FilterOperator.StartsWith, "DEV"),
+          new Filter("LockStatus", FilterOperator.NE, "0"),
+        ],
+        and: true,
+      });
+
+      // Create a list binding to /UserDetail
+      const oBindingTotalLockUser = oModel.bindList(
+        "/UserDetail",
+        undefined,
+        undefined,
+        [oFilterUser],
+        {
+          $count: true,
+        },
+      ) as ODataListBinding;
+
+      // Executes the OData call
+      await oBindingTotalLockUser.requestContexts(0, 1);
+
+      const iTotalLockUsers = oBindingTotalLockUser.getLength();
+
+      // Create property of view model
+      oOverviewModel.setProperty("/lockedUsers", iTotalLockUsers);
     } catch (error) {
       MessageBox.error("Failed to load overview data.");
     }

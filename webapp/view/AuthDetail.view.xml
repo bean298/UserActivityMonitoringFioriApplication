@@ -132,7 +132,7 @@
                             </Toolbar>
 
                             <!-- TABLE -->
-                            <ui:Table id="ActivityTable" rows="{detailData>/_Activity}" visibleRowCount="10" selectionMode="None" alternateRowColors="true">
+                            <ui:Table id="ActivityTable" rows="{detailData>/_Activity}" selectionMode="None" alternateRowColors="true">
                                 <ui:extension>
                                     <OverflowToolbar id="ActivityTableToolbar">
 
@@ -164,7 +164,7 @@
                                         <Label id="LabelActivityType" text="{i18n>activityType}" />
 
                                         <ui:template>
-                                            <Text id="TextActivityType" text="{detailData>ActivityType}" wrapping="false" />
+                                            <ObjectStatus id="ObjectStatusActivityType" text="{detailData>ActivityType}" icon="{path:'detailData>ActivityType', formatter: '.formatter.formatActivityType'}" state="{path:'detailData>ActivityType', formatter: '.formatter.formatActivityState'}"/>
                                         </ui:template>
                                     </ui:Column>
 
@@ -173,10 +173,7 @@
                                         <Label id="LabelTCode" text="{i18n>tCode}" />
 
                                         <ui:template>
-                                            <HBox id="HBoxTCode" alignItems="Center" renderType="Bare">
-                                                <core:Icon id="IconTCode" src="sap-icon://customer-and-contacts" size="0.9rem" class="sapUiTinyMarginEnd" />
-                                                <Text id="TextTCode" text="{detailData>TCode}" wrapping="false" />
-                                            </HBox>
+                                            <ObjectStatus id="ObjectStatusTCode" text="{detailData>TCode}" icon="{path:'detailData>TCode', formatter: '.formatter.formatTCodeIcon'}" />
                                         </ui:template>
                                     </ui:Column>
 
@@ -195,6 +192,15 @@
 
                                         <ui:template>
                                             <ObjectStatus id="StatusActivityMessage" text="{detailData>ActivityMessage}" state="Information" />
+                                        </ui:template>
+                                    </ui:Column>
+
+                                    <!-- DATE COLUMN -->
+                                    <ui:Column id="ColumnDateId" width="8rem">
+                                        <Label id="LabelActivityDate" text="{i18n>ActivityDate}" />
+
+                                        <ui:template>
+                                            <Text id="TextActivityDate" text="{detailData>ActivityDate}" wrapping="false" />
                                         </ui:template>
                                     </ui:Column>
 
