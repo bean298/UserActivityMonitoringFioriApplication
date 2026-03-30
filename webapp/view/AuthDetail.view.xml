@@ -38,7 +38,10 @@
                     }" class="sapUiSmallMarginBottom" />
 
                     <Label id="LabelClient" text="{i18n>client}" design="Bold" />
-                    <Text id="TextClient" text="{i18n>clientNum}" />
+                    <Text id="TextClient" text="{detailData>/UserClient}" />
+
+                    <Label id="LabelSystem" text="{i18n>system}" design="Bold" class="sapUiSmallMarginTop"/>
+                    <Text id="TextSyste" text="{detailData>/UserSystem}" />
                 </VBox>
             </HBox>
         </f:headerContent>

@@ -14,13 +14,22 @@ import MessageToast from "sap/m/MessageToast";
 import Fragment from "sap/ui/core/Fragment";
 import DateFormat from "sap/ui/core/format/DateFormat";
 import DatePicker from "sap/m/DatePicker";
+import Table from "sap/ui/table/Table";
+import Sorter from "sap/ui/model/Sorter";
 
 export default class Main extends Controller {
   public formatter = Formatter;
 
-  // ===== View Settings Feature =====
+  // Default variable
   private _oViewSettingsDialog: Dialog | null = null;
   private _oUserSearchHelpDialog: Dialog | null = null;
+
+  private _sFromDate!: string;
+  private _sToDate!: string;
+
+  private _aDefaultFilters: Filter[] = [];
+  private _aUserFilters: Filter[] = [];
+  private _aUserDateFilters: Filter[] = [];
 
   /**
    * Called when the controller is initialized.
@@ -39,11 +48,72 @@ export default class Main extends Controller {
     });
     this.getView()?.setModel(oOverviewModel, "Overview");
 
+    // Take a last 6 days
+    const oToday = new Date();
+    const o7DaysAgo = new Date();
+    o7DaysAgo.setDate(oToday.getDate() - 1);
+
+    const formatDate = (oDate: Date) => {
+      return oDate.toISOString().split("T")[0];
+    };
+
+    this._sFromDate = formatDate(o7DaysAgo);
+    this._sToDate = formatDate(oToday);
+
+    this._aDefaultFilters = [
+      new Filter({
+        path: "LoginDate",
+        operator: FilterOperator.BT,
+        value1: this._sFromDate,
+        value2: this._sToDate,
+      }),
+    ];
+    this._rebindTable();
+
     this.onInitCount();
     this.onInitLogCount();
     this.onInitTcodeCount();
     this.onInitDumpCount();
     this.onInitOverviewData();
+  }
+
+  /**
+   * Called when the View has been rendered (so its HTML is part of the document). Post-rendering manipulations of the HTML could be done here.
+   * This hook is the same one that SAPUI5 controls get after being rendered.
+   * @memberOf useraudit.ext.main.Main
+   */
+  public onAfterRendering(): void {
+    // Set range in date picker
+    const oDatePicker = this.byId("mainDatePickerId") as DatePicker;
+
+    if (!oDatePicker) return;
+
+    oDatePicker.setMinDate(new Date(this._sFromDate));
+    oDatePicker.setMaxDate(new Date(this._sToDate));
+  }
+
+  /**
+   * Apply custom filter request to avoid default request
+   * When user user filter date, remove default filter
+   * When user search, filter status alaway use default filter
+   **/
+  private _rebindTable(): void {
+    const oTable = this.byId("maiTableId") as Table;
+
+    // date filter: user or default
+    const aDateFilters =
+      this._aUserDateFilters.length > 0
+        ? this._aUserDateFilters
+        : this._aDefaultFilters;
+
+    const aAllFilters = [...aDateFilters, ...this._aUserFilters];
+
+    oTable.bindRows({
+      path: "/UserAuthLog",
+      filters: aAllFilters,
+      parameters: { $count: true },
+      sorter: [new Sorter("LoginDate", true)],
+    });
   }
 
   /**
@@ -63,12 +133,14 @@ export default class Main extends Controller {
       // Get model Overview
       const oOverviewModel = this.getView()?.getModel("Overview") as JSONModel;
 
+      const aFilters = [...this._aDefaultFilters];
+
       // Create a list binding to /UserAuthLog with $count enabled
       const oBinding = oModel.bindList(
         "/UserAuthLog",
         undefined,
         undefined,
-        undefined,
+        aFilters,
         { $count: true },
       ) as ODataListBinding;
 
@@ -91,37 +163,61 @@ export default class Main extends Controller {
    **/
   public async onInitOverviewData(): Promise<void> {
     try {
+      const oUserSearchHelpData = {} as any;
+
       // Get OData V4 model from the App Component
       const oModel = this.getAppComponent().getModel() as ODataModel;
 
       // Get model Overview
       const oOverviewModel = this.getView()?.getModel("Overview") as JSONModel;
 
-      // Create a list binding to /UserDetail
+      const aFilters = [...this._aDefaultFilters];
+
+      // Create a list binding to /UserSearchHelp
       const oBindingTotalUser = oModel.bindList(
-        "/UserDetail",
+        "/UserSearchHelp",
         undefined,
         undefined,
-        [new Filter("UserName", FilterOperator.StartsWith, "DEV")],
+        aFilters,
         {
           $count: true,
         },
       ) as ODataListBinding;
 
       // Executes the OData call
-      await oBindingTotalUser.requestContexts(0, 1);
+      const aContexts = await oBindingTotalUser.requestContexts();
 
-      const iTotalUsers = oBindingTotalUser.getLength();
+      aContexts.forEach((oContext) => {
+        const oObj = oContext.getObject();
+        const key = oObj.Username;
+
+        if (!oUserSearchHelpData[key]) {
+          oUserSearchHelpData[key] = {
+            Username: oObj.Username,
+          };
+        }
+      });
+
+      //  Convert into array
+      let aUserSearchHelpData = Object.values(oUserSearchHelpData);
 
       // Create property of view model
-      oOverviewModel.setProperty("/totalUsers", iTotalUsers);
+      oOverviewModel.setProperty("/totalUsers", aUserSearchHelpData?.length);
 
       // Create a list binding to /UserActivityLog
       const oBindingTotalDump = oModel.bindList(
         "/UserActivityLog",
         undefined,
         undefined,
-        [new Filter("ActivityType", FilterOperator.EQ, "DUMP")],
+        [
+          new Filter("ActivityType", FilterOperator.EQ, "DUMP"),
+          new Filter({
+            path: "ActivityDate",
+            operator: FilterOperator.BT,
+            value1: this._sFromDate,
+            value2: this._sToDate,
+          }),
+        ],
         {
           $count: true,
         },
@@ -137,15 +233,15 @@ export default class Main extends Controller {
 
       const oFilterUser = new Filter({
         filters: [
-          new Filter("UserName", FilterOperator.StartsWith, "DEV"),
-          new Filter("LockStatus", FilterOperator.NE, "0"),
+          new Filter("EventId", FilterOperator.EQ, "AUC"),
+          ...this._aDefaultFilters,
         ],
         and: true,
       });
 
-      // Create a list binding to /UserDetail
+      // Create a list binding to /UserAuthLog
       const oBindingTotalLockUser = oModel.bindList(
-        "/UserDetail",
+        "/UserAuthLog",
         undefined,
         undefined,
         [oFilterUser],
@@ -177,24 +273,41 @@ export default class Main extends Controller {
       // Get model Overview
       const oOverviewModel = this.getView()?.getModel("Overview") as JSONModel;
 
+      const aFilters = [...this._aDefaultFilters];
+
       // Create a list binding to /UserAuthLogChart
-      const oBinding = oModel.bindList("/UserAuthLogChart") as ODataListBinding;
+      const oBinding = oModel.bindList(
+        "/UserAuthLogChart",
+        undefined,
+        undefined,
+        aFilters,
+        {
+          $count: true,
+        },
+      ) as ODataListBinding;
 
       // Executes the OData call
       const aContexts = await oBinding.requestContexts();
 
       const aData = aContexts.map((oContext) => oContext.getObject());
 
-      const oJsonModel = new JSONModel(aData);
+      // Set data for overview
+      const objData = aData.reduce((acc, cur) => {
+        acc[cur.LoginResult] = (acc[cur.LoginResult] || 0) + cur.CountLoginLog;
+
+        return acc;
+      }, {});
+
+      // Set data for chart
+      const arrayData = Object.keys(objData).map((key) => ({
+        LoginResult: key,
+        CountLoginLog: objData[key],
+      }));
+      const oJsonModel = new JSONModel(arrayData);
 
       // Set data for overview
-      aData.forEach((item) => {
-        if (item.LoginResult === "SUCCESS") {
-          oOverviewModel.setProperty("/successLogin", item.CountLoginLog);
-        } else if (item.LoginResult === "FAIL") {
-          oOverviewModel.setProperty("/failedLogin", item.CountLoginLog);
-        }
-      });
+      oOverviewModel.setProperty("/successLogin", objData.SUCCESS);
+      oOverviewModel.setProperty("/failedLogin", objData.FAIL);
 
       // Set data into Model authLogChart
       this.getView()?.setModel(oJsonModel, "authLogChart");
@@ -208,6 +321,8 @@ export default class Main extends Controller {
    **/
   public async onInitTcodeCount(): Promise<void> {
     try {
+      const oTCodeChartData = {} as any;
+
       // Get OData V4 model from the App Component
       const oModel = this.getAppComponent().getModel() as ODataModel;
 
@@ -216,26 +331,54 @@ export default class Main extends Controller {
         "/ActivityLogChart",
         undefined,
         undefined,
-        undefined,
+        new Filter(
+          "ActivityDate",
+          FilterOperator.BT,
+          this._sFromDate,
+          this._sToDate,
+        ),
         {
           $orderby: "TCodeCount desc",
         },
       ) as ODataListBinding;
 
       // Executes the OData call
-      const aContexts = await oBinding.requestContexts(0, 5);
+      const aContexts = await oBinding.requestContexts();
 
-      const aData = aContexts.map((oContext) => {
-        // Create label field
+      // Group by + SUM data
+      aContexts.forEach((oContext) => {
         const oObj = oContext.getObject();
-        oObj.Label = `${oObj.TCode} - ${oObj.TCodeName}`;
 
-        return oObj;
+        const key = oObj.TCode;
+
+        // If TCode is exist, plus TCodeCount, else create new obj
+        if (!oTCodeChartData[key]) {
+          oTCodeChartData[key] = {
+            TCode: oObj.TCode,
+            TCodeName: oObj.TCodeName,
+            TCodeCount: 0,
+          };
+        }
+
+        oTCodeChartData[key].TCodeCount += oObj.TCodeCount;
       });
 
-      const oJsonModel = new JSONModel(aData);
+      //  Convert into array
+      let aTCodeChartData = Object.values(oTCodeChartData);
+
+      // Sort data
+      aTCodeChartData.sort((a: any, b: any) => b.TCodeCount - a.TCodeCount);
+
+      //  Top 5
+      aTCodeChartData = aTCodeChartData.slice(0, 5);
+
+      //  Add label
+      aTCodeChartData.forEach((item: any) => {
+        item.Label = `${item.TCode} - ${item.TCodeName}`;
+      });
 
       // Set data into Model tCodeChart
+      const oJsonModel = new JSONModel(aTCodeChartData);
       this.getView()?.setModel(oJsonModel, "tCodeChart");
     } catch (error) {
       MessageBox.error("Failed to load TCode data.");
@@ -247,6 +390,8 @@ export default class Main extends Controller {
    **/
   public async onInitDumpCount(): Promise<void> {
     try {
+      const oDumpChartData = {} as any;
+
       // Get OData V4 model from the App Component
       const oModel = this.getAppComponent().getModel() as ODataModel;
 
@@ -255,20 +400,46 @@ export default class Main extends Controller {
         "/DumpActivityChart",
         undefined,
         undefined,
-        undefined,
+        new Filter(
+          "ActivityDate",
+          FilterOperator.BT,
+          this._sFromDate,
+          this._sToDate,
+        ),
         {
           $orderby: "DumpCount desc",
         },
       ) as ODataListBinding;
 
       // Executes the OData call
-      const aContexts = await oBinding.requestContexts(0, 10);
+      const aContexts = await oBinding.requestContexts();
 
-      const aData = aContexts.map((oContext) => oContext.getObject());
+      aContexts.forEach((oContext) => {
+        const oObj = oContext.getObject();
+        const key = oObj.Username;
 
-      const oJsonModel = new JSONModel(aData);
+        if (!oDumpChartData[key]) {
+          oDumpChartData[key] = {
+            Username: oObj.Username,
+            DumpCount: 0,
+          };
+        }
 
-      // Set data into Model tCodeChart
+        oDumpChartData[key].DumpCount += oObj.DumpCount;
+      });
+
+      //  Convert into array
+      let aDumpChartData = Object.values(oDumpChartData);
+
+      // Sort data
+      aDumpChartData.sort((a: any, b: any) => b.DumpCount - a.DumpCount);
+
+      //  Top 10
+      aDumpChartData = aDumpChartData.slice(0, 10);
+
+      const oJsonModel = new JSONModel(aDumpChartData);
+
+      // // Set data into Model dumpChart
       this.getView()?.setModel(oJsonModel, "dumpChart");
     } catch (error) {
       MessageBox.error("Failed to load Dump data.");
@@ -301,10 +472,7 @@ export default class Main extends Controller {
    **/
   public applyFilters(): void {
     const aFilters: Filter[] = [];
-
-    // Get table and its OData list binding
-    const oTable = this.byId("maiTableId");
-    const oBinding = oTable?.getBinding("rows") as ODataListBinding;
+    this._aUserDateFilters = [];
 
     // Get value from search and select
     const sSearch = (this.byId("userSearchId") as Input).getValue();
@@ -333,11 +501,14 @@ export default class Main extends Controller {
 
         const sDate = oFormatter.format(oDate);
 
-        aFilters.push(new Filter("LoginDate", FilterOperator.EQ, sDate));
+        this._aUserDateFilters = [
+          new Filter("LoginDate", FilterOperator.EQ, sDate),
+        ];
       }
     }
 
-    oBinding.filter(aFilters);
+    this._aUserFilters = aFilters;
+    this._rebindTable();
   }
 
   /**
@@ -346,6 +517,8 @@ export default class Main extends Controller {
    * based on the current OData V4 list binding.
    */
   public onExportExcel(): void {
+    const sFileName = `UserAuthenticationLogs_${this._sFromDate}_to_${this._sToDate}.xlsx`;
+
     MessageBox.confirm("Do you want to export this data to Excel?", {
       title: "Confirm Export",
       actions: ["YES", "NO"],
@@ -373,7 +546,7 @@ export default class Main extends Controller {
           const oSettings = {
             workbook: { columns: aCols },
             dataSource: oBinding,
-            fileName: "UserAuthenticationLogs.xlsx",
+            fileName: sFileName,
             worker: false,
           };
 
@@ -402,17 +575,42 @@ export default class Main extends Controller {
    **/
   public async onUserSearchHelp(): Promise<void> {
     try {
+      const oUserSearchHelpData = {} as any;
+
       // Get OData V4 model from the App Component
       const oModel = this.getAppComponent().getModel() as ODataModel;
 
       // Create a list binding to /UserSearchHelp
-      const oBinding = oModel.bindList("/UserSearchHelp") as ODataListBinding;
+      const oBinding = oModel.bindList(
+        "/UserSearchHelp",
+        undefined,
+        undefined,
+        new Filter({
+          path: "LoginDate",
+          operator: FilterOperator.BT,
+          value1: this._sFromDate,
+          value2: this._sToDate,
+        }),
+      ) as ODataListBinding;
 
       // Executes the OData call and load data
       const aContexts = await oBinding.requestContexts();
-      const aData = aContexts.map((oContent) => oContent.getObject());
 
-      const oJsonModel = new JSONModel(aData);
+      aContexts.forEach((oContext) => {
+        const oObj = oContext.getObject();
+        const key = oObj.Username;
+
+        if (!oUserSearchHelpData[key]) {
+          oUserSearchHelpData[key] = {
+            Username: oObj.Username,
+          };
+        }
+      });
+
+      //  Convert into array
+      let aUserSearchHelpData = Object.values(oUserSearchHelpData);
+
+      const oJsonModel = new JSONModel(aUserSearchHelpData);
 
       this.getView()?.setModel(oJsonModel, "userSeachHelp");
 

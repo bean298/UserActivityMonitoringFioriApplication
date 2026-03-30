@@ -219,14 +219,7 @@
                 </Panel>
 
                 <!-- TABLE -->
-                <ui:Table id="maiTableId" rows="{
-                    path: '/UserAuthLog',
-                    parameters: {
-                        $count: true
-                    },
-                    sorter: { path: 'LoginDate', descending: true }
-                }" selectionMode="Single" class="sapUiLargeMarginBottom" visibleRowCount="10">
-
+                <ui:Table id="maiTableId" selectionMode="Single" class="sapUiLargeMarginBottom" visibleRowCount="10">
                     <!-- HEADER TOOLBAR | BUTTON -->
                     <ui:extension>
                         <OverflowToolbar id="mainToolbarId">
@@ -247,8 +240,8 @@
 
                     <ui:columns>
                         <!-- SESSION ID COLUMN -->
-                        <ui:Column id="columnSession" width="12rem">
-                            <Label id="labelSession" text="{i18n>sessionId}" />
+                        <ui:Column id="columnSession" width="12rem" >
+                            <Label id="labelSession" text="{i18n>sessionId}"/>
 
                             <ui:template>
                                 <Text id="textSession" text="{SessionId}" wrapping="false" />
@@ -268,7 +261,7 @@
                         </ui:Column>
 
                         <!-- LOGIN RESULT COLUMN -->
-                        <ui:Column id="columnLoginResult" width="9rem">
+                        <ui:Column id="columnLoginResult" width="9rem" sortProperty="LoginResult" filterProperty="LoginResult"  tooltip="{i18n>introSort}">
                             <Label id="labelLoginResult" text="{i18n>loginResult}" />
 
                             <ui:template>
@@ -277,7 +270,7 @@
                         </ui:Column>
 
                         <!-- LOGIN DATE COLUMN -->
-                        <ui:Column id="columnLoginDate" width="9rem">
+                        <ui:Column id="columnLoginDate" width="9rem" sortProperty="LoginDate" filterProperty="LoginDate" tooltip="{i18n>introSort}">
                             <Label id="labelLoginDate" text="{i18n>loginDate}" />
 
                             <ui:template>
@@ -286,7 +279,7 @@
                         </ui:Column>
 
                         <!-- LOGIN TIME COLUMN -->
-                        <ui:Column id="columnLoginTime" width="7rem">
+                        <ui:Column id="columnLoginTime" width="7rem" sortProperty="LoginTime">
                             <Label id="labelLoginTime" text="{i18n>loginTime}" />
 
                             <ui:template>
