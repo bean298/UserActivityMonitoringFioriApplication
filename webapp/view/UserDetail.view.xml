@@ -7,152 +7,121 @@
     xmlns:viz.feeds="sap.viz.ui5.controls.common.feeds"
     xmlns:viz.data="sap.viz.ui5.data">
 
-    <f:ObjectPageLayout id="UserDetailObjectPageLayoutId" showTitleInHeaderContent="true" upperCaseAnchorBar="false">
+    <f:ObjectPageLayout id="UserDetailObjectPageLayoutId" showTitleInHeaderContent="true"
+        upperCaseAnchorBar="false">
         <!-- HEADER TITLE -->
         <f:headerTitle>
             <f:ObjectPageDynamicHeaderTitle id="UserDetailHeaderTitleId">
                 <f:expandedHeading>
-                    <Title id="UserDetailExpandedTitleId" text="{i18n>userDetailTitle}" level="H2"/>
+                    <Title id="UserDetailExpandedTitleId" text="{i18n>userDetailTitle}" level="H2" />
                 </f:expandedHeading>
 
                 <f:snappedHeading>
-                    <Title id="UserDetailSnappedTitleId" text="{UserDetailData>/UserName}" level="H3"/>
+                    <Title id="UserDetailSnappedTitleId" text="{UserDetailData>/UserName}"
+                        level="H3" />
                 </f:snappedHeading>
             </f:ObjectPageDynamicHeaderTitle>
         </f:headerTitle>
 
         <!-- HEADER CONTENT -->
         <f:headerContent>
-            <FlexBox id="UserDetailHeaderFlexId" alignItems="Center" wrap="Wrap" class="sapUiMediumMargin">
+            <FlexBox id="UserDetailHeaderFlexId" alignItems="Center" wrap="Wrap"
+                class="sapUiMediumMargin">
                 <!-- AVATAR -->
-                <Avatar id="UserDetailAvatarId" displaySize="XL" displayShape="Circle" initials="{UserDetailData>/UserName}" backgroundColor="Accent6" class="sapUiMediumMarginEnd"/>
+                <Avatar id="UserDetailAvatarId" displaySize="XL" displayShape="Circle"
+                    initials="{UserDetailData>/UserName}" backgroundColor="Accent6"
+                    class="sapUiMediumMarginEnd" />
 
                 <!-- USER INFO -->
                 <VBox id="UserDetailHeaderInfoBoxId" width="300px">
-                    <Title id="UserDetailHeaderUserNameId" text="{UserDetailData>/UserName}" level="H3"/>
+                    <Title id="UserDetailHeaderUserNameId" text="{UserDetailData>/UserName}"
+                        level="H3" />
 
-                    <Text id="UserDetailHeaderFullNameId" text="{UserDetailData>/FullName}" class="sapUiTinyMarginBottom"/>
+                    <Text id="UserDetailHeaderFullNameId" text="{UserDetailData>/FullName}"
+                        class="sapUiTinyMarginBottom" />
 
                     <!-- USER STATUS -->
-                    <ObjectStatus id="UserDetailHeaderStatusId" text="{
+                    <ObjectStatus id="UserDetailHeaderStatusId"
+                        text="{
                         path:'UserDetailData>/LockStatus',
                         formatter:'.formatter.formatTextLockStatus'
-                    }" state="{
+                    }"
+                        state="{
                         path:'UserDetailData>/LockStatus',
                         formatter:'.formatter.formatTextLockState'
-                    }" icon="{
+                    }"
+                        icon="{
                         path:'UserDetailData>/LockStatus',
                         formatter:'.formatter.formatTextLockIcon'
-                    }"/>
+                    }" />
                 </VBox>
             </FlexBox>
         </f:headerContent>
-
         <!-- SECTIONS -->
         <f:sections>
             <!-- USER INFORMATION -->
-            <f:ObjectPageSection id="UserDetailSectionUserInfoId" title="{i18n>userDetailTitle}">
+            <f:ObjectPageSection id="UserDetailSectionCombinedId" title="{i18n>userDetailTitle}">
                 <f:subSections>
-                    <f:ObjectPageSubSection id="UserDetailSubSectionUserInfoId">
-                        <layout:Grid id="UserDetailGridUserInfoId" defaultSpan="L3 M6 S12">
-                            <!-- ================= USER NAME ================= -->
-                            <VBox id="UserDetailBoxUserNameId">
-                                <Label id="UserDetailLabelUserNameId" text="{i18n>username}" design="Bold"/>
-                                <Text id="UserDetailTextUserNameId" text="{UserDetailData>/UserName}"/>
+                    <f:ObjectPageSubSection id="UserDetailSubSectionCombinedId">
+                        <layout:Grid id="UserDetailGridCombinedId" defaultSpan="L2 M4 S12">
+
+                            <VBox id="BoxUserInfo">
+                                <Label text="{i18n>username}" design="Bold" />
+                                <Text text="{UserDetailData>/UserName}" />
+
+                                <Label text="{i18n>fullName}" design="Bold"
+                                    class="sapUiSmallMarginTop" />
+                                <Text text="{UserDetailData>/FullName}" />
                             </VBox>
 
-                            <!-- ================= FULL NAME ================= -->
-                            <VBox id="UserDetailBoxFullNameId">
-                                <Label id="UserDetailLabelFullNameId" text="{i18n>fullName}" design="Bold"/>
-                                <Text id="UserDetailTextFullNameId" text="{UserDetailData>/FullName}"/>
+                            <VBox id="BoxGroupInfo">
+                                <Label text="{i18n>userGroup}" design="Bold" />
+                                <ObjectStatus text="{UserDetailData>/UserGroup}" state="Information"
+                                    icon="sap-icon://group" />
+
+                                <Label text="{i18n>email}" design="Bold" class="sapUiSmallMarginTop" />
+                                <Link text="{UserDetailData>/EmailAddress}"
+                                    href="mailto:{UserDetailData>/EmailAddress}" />
                             </VBox>
 
-                            <!-- ================= USER GROUP ================= -->
-                            <VBox id="UserDetailBoxUserGroupId">
-                                <Label id="UserDetailLabelUserGroupId" text="{i18n>userGroup}" design="Bold"/>
-                                <ObjectStatus id="UserDetailStatusUserGroupId" text="{UserDetailData>/UserGroup}" state="Information" icon="sap-icon://group"/>
+                            <VBox id="BoxAddressGeneral">
+                                <Label text="{i18n>addressName}" design="Bold" />
+                                <Text text="{UserDetailData>/AddressName}" />
+
+                                <Label text="{i18n>city}" design="Bold" class="sapUiSmallMarginTop" />
+                                <Text text="{UserDetailData>/City}" />
                             </VBox>
 
-                            <!-- ================= EMAIL ================= -->
-                            <VBox id="UserDetailBoxEmailId">
-                                <Label id="UserDetailLabelEmailId" text="{i18n>email}" design="Bold"/>
-                                <Link id="UserDetailLinkEmailId" text="{UserDetailData>/EmailAddress}" href="mailto:{UserDetailData>/EmailAddress}"/>
-                            </VBox>
-                        </layout:Grid>
-                    </f:ObjectPageSubSection>
-                </f:subSections>
-            </f:ObjectPageSection>
+                            <VBox id="BoxAddressDetail">
+                                <Label text="{i18n>street}" design="Bold" />
+                                <Text text="{UserDetailData>/Street}" />
 
-            <!-- ADDRESS INFORMATION -->
-            <f:ObjectPageSection id="UserDetailSectionAddressId" title="{i18n>addressInformation}">
-                <f:subSections>
-                    <f:ObjectPageSubSection id="UserDetailSubSectionAddressId">
-                        <layout:Grid id="UserDetailGridAddressId" defaultSpan="L3 M6 S12" hSpacing="1" vSpacing="1">
-                            <!-- ================= ADDRESS NAME ================= -->
-                            <VBox id="UserDetailBoxAddressNameId">
-                                <Label id="UserDetailLabelAddressNameId" text="{i18n>addressName}" design="Bold"/>
-                                <Text id="UserDetailTextAddressNameId" text="{UserDetailData>/AddressName}"/>
+                                <Label text="{i18n>postalCode}" design="Bold"
+                                    class="sapUiSmallMarginTop" />
+                                <Text text="{UserDetailData>/PostalCode}" />
                             </VBox>
 
-                            <!-- ================= STREET ================= -->
-                            <VBox id="UserDetailBoxStreetId">
-                                <Label id="UserDetailLabelStreetId" text="{i18n>street}" design="Bold"/>
-                                <Text id="UserDetailTextStreetId" text="{UserDetailData>/Street}"/>
+                            <VBox id="BoxValidity">
+                                <Label text="{i18n>validFrom}" design="Bold" />
+                                <Text
+                                    text="{path:'UserDetailData>/ValidFrom', formatter:'.formatter.formatISODate'}" />
+
+                                <Label text="{i18n>validTo}" design="Bold"
+                                    class="sapUiSmallMarginTop" />
+                                <Text
+                                    text="{path:'UserDetailData>/ValidTo', formatter:'.formatter.formatISODate'}" />
                             </VBox>
 
-                            <!-- ================= CITY ================= -->
-                            <VBox id="UserDetailBoxCityId">
-                                <Label id="UserDetailLabelCityId" text="{i18n>city}" design="Bold"/>
-                                <Text id="UserDetailTextCityId" text="{UserDetailData>/City}"/>
+                            <VBox id="BoxCreationInfo">
+                                <Label text="{i18n>createdBy}" design="Bold" />
+                                <Text text="{UserDetailData>/Creator}" />
+
+                                <Label text="{i18n>createdOn}" design="Bold"
+                                    class="sapUiSmallMarginTop" />
+                                <Text
+                                    text="{path:'UserDetailData>/CreateOn', formatter:'.formatter.formatISODate'}" />
                             </VBox>
 
-                            <!-- ================= POSTAL CODE ================= -->
-                            <VBox id="UserDetailBoxPostalCodeId">
-                                <Label id="UserDetailLabelPostalCodeId" text="{i18n>postalCode}" design="Bold"/>
-                                <Text id="UserDetailTextPostalCodeId" text="{UserDetailData>/PostalCode}"/>
-                            </VBox>
-                        </layout:Grid>
-                    </f:ObjectPageSubSection>
-                </f:subSections>
-            </f:ObjectPageSection>
-
-            <!-- ACCOUNT VALID -->
-            <f:ObjectPageSection id="UserDetailSectionAccountValidId" title="{i18n>accountValid}">
-                <f:subSections>
-                    <f:ObjectPageSubSection id="UserDetailSubSectionAccountValidId">
-                        <layout:Grid id="UserDetailGridAccountValidId" defaultSpan="L3 M6 S12" hSpacing="1" vSpacing="1">
-                            <!-- ================= VALID FROM ================= -->
-                            <VBox id="UserDetailBoxValidFromId">
-                                <Label id="UserDetailLabelValidFromId" text="{i18n>validFrom}" design="Bold"/>
-                                <Text id="UserDetailTextValidFromId" text="{
-                                    path:'UserDetailData>/ValidFrom',
-                                    formatter:'.formatter.formatISODate'
-                                }"/>
-                            </VBox>
-
-                            <!-- ================= VALID TO ================= -->
-                            <VBox id="UserDetailBoxValidToId">
-                                <Label id="UserDetailLabelValidToId" text="{i18n>validTo}" design="Bold"/>
-                                <Text id="UserDetailTextValidToId" text="{
-                                    path:'UserDetailData>/ValidTo',
-                                    formatter:'.formatter.formatISODate'
-                                }"/>
-                            </VBox>
-
-                            <!-- ================= CREATED BY ================= -->
-                            <VBox id="UserDetailBoxCreatorId">
-                                <Label id="UserDetailLabelCreatorId" text="{i18n>createdBy}" design="Bold"/>
-                                <Text id="UserDetailTextCreatorId" text="{UserDetailData>/Creator}"/>
-                            </VBox>
-
-                            <!-- ================= CREATED ON ================= -->
-                            <VBox id="UserDetailBoxCreateOnId">
-                                <Label id="UserDetailLabelCreateOnId" text="{i18n>createdOn}" design="Bold"/>
-                                <Text id="UserDetailTextCreateOnId" text="{
-                                    path:'UserDetailData>/CreateOn',
-                                    formatter:'.formatter.formatISODate'
-                                }"/>
-                            </VBox>
                         </layout:Grid>
                     </f:ObjectPageSubSection>
                 </f:subSections>
@@ -164,8 +133,11 @@
                     <f:ObjectPageSubSection id="UserDetailSubSectionAuth">
                         <VBox id="AuthBoxId" class="sapUiMediumMargin sapUiContentPadding">
                             <!-- AUTH - DONUT CHART -->
-                            <HBox id="hBoxChart" class="sapUiSmallMarginBottom" justifyContent="SpaceAround">
-                                <viz:VizFrame id="AuthVizFrameId" height="300px" width="400px" vizType="donut" vizProperties="{
+                            <HBox id="hBoxChart" class="sapUiSmallMarginBottom"
+                                justifyContent="SpaceAround">
+                                <viz:VizFrame id="AuthVizFrameId" height="300px" width="400px"
+                                    vizType="donut"
+                                    vizProperties="{
                                     title: {
                                         text: 'User Authentication Result'
                                     },
@@ -181,28 +153,37 @@
                                 }">
                                     <!-- Define data of chart -->
                                     <viz:dataset>
-                                        <viz.data:FlattenedDataset id="AuthDatasetId" data="{AuthLogChartByUserData>/}">
+                                        <viz.data:FlattenedDataset id="AuthDatasetId"
+                                            data="{AuthLogChartByUserData>/}">
                                             <!-- Category -->
                                             <viz.data:dimensions>
-                                                <viz.data:DimensionDefinition id="AuthDimLoginResultId" name="Login Result" value="{AuthLogChartByUserData>LoginResult}" />
+                                                <viz.data:DimensionDefinition
+                                                    id="AuthDimLoginResultId" name="Login Result"
+                                                    value="{AuthLogChartByUserData>LoginResult}" />
                                             </viz.data:dimensions>
 
                                             <!-- Value  -->
                                             <viz.data:measures>
-                                                <viz.data:MeasureDefinition id="AuthMeasureCountId" name="Count" value="{AuthLogChartByUserData>CountLoginLog}" />
+                                                <viz.data:MeasureDefinition id="AuthMeasureCountId"
+                                                    name="Count"
+                                                    value="{AuthLogChartByUserData>CountLoginLog}" />
                                             </viz.data:measures>
                                         </viz.data:FlattenedDataset>
                                     </viz:dataset>
 
                                     <!-- Mapping dimension/measure into chart -->
                                     <viz:feeds>
-                                        <viz.feeds:FeedItem id="AuthFeedSizeId" uid="size" type="Measure" values="Count" />
-                                        <viz.feeds:FeedItem id="AuthFeedColorId" uid="color" type="Dimension" values="Login Result" />
+                                        <viz.feeds:FeedItem id="AuthFeedSizeId" uid="size"
+                                            type="Measure" values="Count" />
+                                        <viz.feeds:FeedItem id="AuthFeedColorId" uid="color"
+                                            type="Dimension" values="Login Result" />
                                     </viz:feeds>
                                 </viz:VizFrame>
 
                                 <!-- AUTH PER DAY - COLUMN CHART -->
-                                <viz:VizFrame id="AuthPerDayVizFrameId" height="300px" width="500px" vizType="column" vizProperties="{
+                                <viz:VizFrame id="AuthPerDayVizFrameId" height="300px" width="500px"
+                                    vizType="column"
+                                    vizProperties="{
                                     title: {
                                         text: 'User Log (Last 6 Days)'
                                     },
@@ -223,110 +204,134 @@
                                 }">
                                     <!-- Define data of chart -->
                                     <viz:dataset>
-                                        <viz.data:FlattenedDataset id="AuthPerDayDatasetId" data="{UserAuthLogPerDayData>/}">
+                                        <viz.data:FlattenedDataset id="AuthPerDayDatasetId"
+                                            data="{UserAuthLogPerDayData>/}">
                                             <!-- DIMENSION -->
                                             <viz.data:dimensions>
-                                                <viz.data:DimensionDefinition id="AuthPerDayDimLoginResultId" name="Date" value="{UserAuthLogPerDayData>LoginDate}" />
+                                                <viz.data:DimensionDefinition
+                                                    id="AuthPerDayDimLoginResultId" name="Date"
+                                                    value="{UserAuthLogPerDayData>LoginDate}" />
                                             </viz.data:dimensions>
 
                                             <!-- MEASURE -->
                                             <viz.data:measures>
-                                                <viz.data:MeasureDefinition id="AuthPerDayMeasureCountId" name="Login Count" value="{UserAuthLogPerDayData>TotalLoginCount}" />
+                                                <viz.data:MeasureDefinition
+                                                    id="AuthPerDayMeasureCountId" name="Login Count"
+                                                    value="{UserAuthLogPerDayData>TotalLoginCount}" />
                                             </viz.data:measures>
                                         </viz.data:FlattenedDataset>
                                     </viz:dataset>
 
                                     <!-- Mapping dimension/measure into chart -->
                                     <viz:feeds>
-                                        <viz.feeds:FeedItem id="AuthPerDayFeedSizeId" uid="categoryAxis" type="Dimension" values="Date" />
-                                        <viz.feeds:FeedItem id="AuthPerDayFeedColorId" uid="valueAxis" type="Measure" values="Login Count" />
+                                        <viz.feeds:FeedItem id="AuthPerDayFeedSizeId"
+                                            uid="categoryAxis" type="Dimension" values="Date" />
+                                        <viz.feeds:FeedItem id="AuthPerDayFeedColorId"
+                                            uid="valueAxis" type="Measure" values="Login Count" />
                                     </viz:feeds>
                                 </viz:VizFrame>
                             </HBox>
 
                             <!-- AUTHENTICATION TABLE -->
-                            <Table id="AuthTableId" items="{
+                            <Table id="AuthTableId"
+                                items="{
                                 path: 'UserAuthLogData>/',
                                 sorter: {
                                     path: 'LoginDate',
                                     descending: true
                                 }
-                            }" growing="true" growingThreshold="5">
+                            }"
+                                growing="true" growingThreshold="5">
                                 <!-- TITLE -->
                                 <headerToolbar>
                                     <Toolbar id="AuthToolbarId">
-                                        <Title id="AuthTitleId" text="{i18n>headerTitleTable}" level="H2"/>
+                                        <Title id="AuthTitleId" text="{i18n>headerTitleTable}"
+                                            level="H2" />
                                     </Toolbar>
                                 </headerToolbar>
 
                                 <columns>
                                     <!-- SESSION ID COLUMN -->
                                     <Column id="AuthColSessionId">
-                                        <Text id="AuthColSessionTextId" text="{i18n>sessionId}"/>
+                                        <Text id="AuthColSessionTextId" text="{i18n>sessionId}" />
                                     </Column>
 
                                     <!-- LOGIN RESULT COLUMN -->
                                     <Column id="AuthColResultId">
-                                        <Text id="AuthColResultTextId" text="{i18n>loginResult}"/>
+                                        <Text id="AuthColResultTextId" text="{i18n>loginResult}" />
                                     </Column>
 
                                     <!-- LOGIN DATE COLUMN -->
                                     <Column id="AuthColLoginDateId">
-                                        <Text id="AuthColLoginDateTextId" text="{i18n>loginDate}"/>
+                                        <Text id="AuthColLoginDateTextId" text="{i18n>loginDate}" />
                                     </Column>
 
                                     <!-- LOGIN TIME COLUMN -->
                                     <Column id="AuthColLoginTimeId">
-                                        <Text id="AuthColLoginTimeTextId" text="{i18n>loginTime}"/>
+                                        <Text id="AuthColLoginTimeTextId" text="{i18n>loginTime}" />
                                     </Column>
 
                                     <!-- LOGIN MESSAGE COLUMN -->
                                     <Column id="AuthColMsgId" width="">
-                                        <Text id="AuthColMsgTextId" text="{i18n>loginMessage}"/>
+                                        <Text id="AuthColMsgTextId" text="{i18n>loginMessage}" />
                                     </Column>
 
                                     <!-- LOGOUT DATE COLUMN -->
                                     <Column id="AuthColLoginOutDateId">
-                                        <Text id="AuthColLoginOutDateTextId" text="{i18n>logoutDate}"/>
+                                        <Text id="AuthColLoginOutDateTextId"
+                                            text="{i18n>logoutDate}" />
                                     </Column>
 
                                     <!-- LOGOUT TIME COLUMN -->
                                     <Column id="AuthColLoginOutTimeId">
-                                        <Text id="AuthColLoginOutTimeTextId" text="{i18n>logoutTime}"/>
+                                        <Text id="AuthColLoginOutTimeTextId"
+                                            text="{i18n>logoutTime}" />
                                     </Column>
                                 </columns>
 
                                 <items>
-                                    <ColumnListItem id="AuthTableItemId" type="Navigation" press="onNavigationToAuthDetail">
+                                    <ColumnListItem id="AuthTableItemId" type="Navigation"
+                                        press="onNavigationToAuthDetail">
                                         <cells>
                                             <!-- SessionId -->
-                                            <Text id="AuthCellSessionId" text="{UserAuthLogData>SessionId}"/>
+                                            <Text id="AuthCellSessionId"
+                                                text="{UserAuthLogData>SessionId}" />
 
                                             <!-- LoginResult -->
-                                            <ObjectStatus id="AuthCellResultId" text="{UserAuthLogData>LoginResult}" icon="{
+                                            <ObjectStatus id="AuthCellResultId"
+                                                text="{UserAuthLogData>LoginResult}"
+                                                icon="{
                                                 path: 'UserAuthLogData>LoginResult',
-                                                formatter: '.formatter.formatLoginResultIcon'}" state="{
+                                                formatter: '.formatter.formatLoginResultIcon'}"
+                                                state="{
                                                 path: 'UserAuthLogData>LoginResult',
-                                                formatter: '.formatter.formatLoginResultState'}"/>
+                                                formatter: '.formatter.formatLoginResultState'}" />
 
                                             <!-- LoginDate -->
-                                            <Text id="AuthCellLoginDateId" text="{path:'UserAuthLogData>LoginDate', formatter: '.formatter.formatISODate'}"/>
+                                            <Text id="AuthCellLoginDateId"
+                                                text="{path:'UserAuthLogData>LoginDate', formatter: '.formatter.formatISODate'}" />
 
                                             <!-- LoginTime -->
-                                            <Text id="AuthCellLoginTimeId" text="{UserAuthLogData>LoginTime}"/>
+                                            <Text id="AuthCellLoginTimeId"
+                                                text="{UserAuthLogData>LoginTime}" />
 
                                             <!-- LoginMessage -->
-                                            <ObjectStatus id="AuthCellLoginMsgId" text="{UserAuthLogData>LoginMessage}" icon="{
+                                            <ObjectStatus id="AuthCellLoginMsgId"
+                                                text="{UserAuthLogData>LoginMessage}"
+                                                icon="{
                                                 path: 'UserAuthLogData>EventId',
-                                                formatter: '.formatter.formatLoginMessageIcon'}" state="{
+                                                formatter: '.formatter.formatLoginMessageIcon'}"
+                                                state="{
                                                 path: 'UserAuthLogData>EventId',
                                                 formatter: '.formatter.formatLoginMessageState'}" />
 
                                             <!-- LogoutDate -->
-                                            <Text id="AuthCellLogoutId" text="{path:'UserAuthLogData>LogoutDate', formatter: '.formatter.formatISODate'}" />
+                                            <Text id="AuthCellLogoutId"
+                                                text="{path:'UserAuthLogData>LogoutDate', formatter: '.formatter.formatISODate'}" />
 
                                             <!-- LogoutTime -->
-                                            <Text id="AuthCellLogoutTimeId" text="{path:'UserAuthLogData>LogoutTime', formatter: '.formatter.formatLogoutTime'}" />
+                                            <Text id="AuthCellLogoutTimeId"
+                                                text="{path:'UserAuthLogData>LogoutTime', formatter: '.formatter.formatLogoutTime'}" />
                                         </cells>
                                     </ColumnListItem>
                                 </items>
@@ -342,7 +347,8 @@
                     <f:ObjectPageSubSection id="UserDetailSubSectionActivity">
                         <VBox id="ActivityVBoxId" class="sapUiMediumMargin sapUiContentPadding">
                             <!-- TCODE USAGE - PIE CHART -->
-                            <viz:VizFrame vizProperties="{
+                            <viz:VizFrame
+                                vizProperties="{
                                 title: { visible: true, text: 'Top 5 TCode Usage By User' },
                                 plotArea: {
                                     dataLabel: {
@@ -350,42 +356,51 @@
                                         type: 'percentage'
                                     }
                                 }
-                            }" id="tcodeChartByUser" vizType="pie" width="500px" height="300px">
+                            }"
+                                id="tcodeChartByUser" vizType="pie" width="500px" height="300px">
                                 <!-- Define data of chart -->
-                                    <!-- Define data of chart -->
-                                    <viz:dataset>
-                                        <viz.data:FlattenedDataset id="TCodeByUserDatasetId" data="{TCodeByUserData>/}">
-                                            <!-- DIMENSION -->
-                                            <viz.data:dimensions>
-                                                <viz.data:DimensionDefinition id="TCodeByUserDimId" name="Label" value="{TCodeByUserData>Label}" />
-                                            </viz.data:dimensions>
+                                <!-- Define data of chart -->
+                                <viz:dataset>
+                                    <viz.data:FlattenedDataset id="TCodeByUserDatasetId"
+                                        data="{TCodeByUserData>/}">
+                                        <!-- DIMENSION -->
+                                        <viz.data:dimensions>
+                                            <viz.data:DimensionDefinition id="TCodeByUserDimId"
+                                                name="Label" value="{TCodeByUserData>Label}" />
+                                        </viz.data:dimensions>
 
-                                            <!-- MEASURE -->
-                                            <viz.data:measures>
-                                                <viz.data:MeasureDefinition id="TCodeByUserMeasureCountId" name="Usage" value="{TCodeByUserData>TCodeCount}" />
-                                            </viz.data:measures>
-                                        </viz.data:FlattenedDataset>
-                                    </viz:dataset>
+                                        <!-- MEASURE -->
+                                        <viz.data:measures>
+                                            <viz.data:MeasureDefinition
+                                                id="TCodeByUserMeasureCountId" name="Usage"
+                                                value="{TCodeByUserData>TCodeCount}" />
+                                        </viz.data:measures>
+                                    </viz.data:FlattenedDataset>
+                                </viz:dataset>
 
                                 <!-- Mapping dimension/measure into chart -->
                                 <viz:feeds>
-                                    <viz.feeds:FeedItem id="ActTcodeMeasure" uid="size" type="Measure" values="Usage" />
-                                    <viz.feeds:FeedItem id="ActTcodeValue" uid="color" type="Dimension" values="Label" />
+                                    <viz.feeds:FeedItem id="ActTcodeMeasure" uid="size"
+                                        type="Measure" values="Usage" />
+                                    <viz.feeds:FeedItem id="ActTcodeValue" uid="color"
+                                        type="Dimension" values="Label" />
                                 </viz:feeds>
                             </viz:VizFrame>
 
                             <!-- ACTIVITY TABLE -->
-                            <Table id="ActivityTableId" items="{
+                            <Table id="ActivityTableId"
+                                items="{
                                 path: 'UserActivityLogData>/',
                                 sorter: {
                                     path: 'ActivityDate',
                                     descending: true
                                 }
-                            }" growing="true" growingThreshold="10">
+                            }"
+                                growing="true" growingThreshold="10">
                                 <!-- TITLE -->
                                 <headerToolbar>
                                     <Toolbar id="ActToolbarId">
-                                        <Title id="ActTitleId" text="{i18n>activity}" level="H2"/>
+                                        <Title id="ActTitleId" text="{i18n>activity}" level="H2" />
                                     </Toolbar>
                                 </headerToolbar>
 
@@ -393,37 +408,39 @@
                                 <columns>
                                     <!-- LOG ID -->
                                     <Column id="ActivityColLogId">
-                                        <Text id="ActivityColLogTextId" text="{i18n>logId}"/>
+                                        <Text id="ActivityColLogTextId" text="{i18n>logId}" />
                                     </Column>
 
                                     <!-- ACTIVITY TYPE -->
                                     <Column id="ActivityColTypeId">
-                                        <Text id="ActivityColTypeTextId" text="{i18n>activityType}"/>
+                                        <Text id="ActivityColTypeTextId" text="{i18n>activityType}" />
                                     </Column>
 
                                     <!-- TCODE -->
                                     <Column id="ActivityColTCodeId">
-                                        <Text id="ActivityColTCodeTextId" text="{i18n>tCode}"/>
+                                        <Text id="ActivityColTCodeTextId" text="{i18n>tCode}" />
                                     </Column>
 
                                     <!-- TCODE NAME -->
                                     <Column id="ActivityColTCodeNameId">
-                                        <Text id="ActivityColTCodeNameTextId" text="{i18n>tCodeName}"/>
+                                        <Text id="ActivityColTCodeNameTextId"
+                                            text="{i18n>tCodeName}" />
                                     </Column>
 
                                     <!-- MESSAGE -->
                                     <Column id="ActivityColMessageId">
-                                        <Text id="ActivityColMessageTextId" text="{i18n>activityMessage}"/>
+                                        <Text id="ActivityColMessageTextId"
+                                            text="{i18n>activityMessage}" />
                                     </Column>
 
-                                                                        <!-- TIME -->
+                                    <!-- TIME -->
                                     <Column id="ActivityColDateId">
-                                        <Text id="ActivityColDateTextId" text="{i18n>activityDate}"/>
+                                        <Text id="ActivityColDateTextId" text="{i18n>activityDate}" />
                                     </Column>
 
                                     <!-- TIME -->
                                     <Column id="ActivityColTimeId">
-                                        <Text id="ActivityColTimeTextId" text="{i18n>activityTime}"/>
+                                        <Text id="ActivityColTimeTextId" text="{i18n>activityTime}" />
                                     </Column>
                                 </columns>
 
@@ -431,13 +448,20 @@
                                 <items>
                                     <ColumnListItem id="ActivityTableItemId">
                                         <cells>
-                                            <Text id="ActivityCellLogId" text="{UserActivityLogData>LogId}"/>
-                                            <Text id="ActivityCellTypeId" text="{UserActivityLogData>ActivityType}"/>
-                                            <Text id="ActivityCellTCodeId" text="{UserActivityLogData>TCode}"/>
-                                            <Text id="ActivityCellTCodeNameId" text="{UserActivityLogData>TCodeName}"/>
-                                            <Text id="ActivityCellMessageId" text="{UserActivityLogData>ActivityMessage}"/>
-                                            <Text id="ActivityCellDateId" text="{path:'UserActivityLogData>ActivityDate', formatter: '.formatter.formatISODate'}"/>
-                                            <Text id="ActivityCellTimeId" text="{UserActivityLogData>ActivityTime}"/>
+                                            <Text id="ActivityCellLogId"
+                                                text="{UserActivityLogData>LogId}" />
+                                            <Text id="ActivityCellTypeId"
+                                                text="{UserActivityLogData>ActivityType}" />
+                                            <Text id="ActivityCellTCodeId"
+                                                text="{UserActivityLogData>TCode}" />
+                                            <Text id="ActivityCellTCodeNameId"
+                                                text="{UserActivityLogData>TCodeName}" />
+                                            <Text id="ActivityCellMessageId"
+                                                text="{UserActivityLogData>ActivityMessage}" />
+                                            <Text id="ActivityCellDateId"
+                                                text="{path:'UserActivityLogData>ActivityDate', formatter: '.formatter.formatISODate'}" />
+                                            <Text id="ActivityCellTimeId"
+                                                text="{UserActivityLogData>ActivityTime}" />
                                         </cells>
                                     </ColumnListItem>
                                 </items>
