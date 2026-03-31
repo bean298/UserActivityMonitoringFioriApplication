@@ -204,7 +204,7 @@
                                 <!-- AUTH PER DAY - COLUMN CHART -->
                                 <viz:VizFrame id="AuthPerDayVizFrameId" height="300px" width="500px" vizType="column" vizProperties="{
                                     title: {
-                                        text: 'User Log (Last 6 Days)'
+                                        text: 'User Log'
                                     },
                                     plotArea: {
                                         dataLabel: {
