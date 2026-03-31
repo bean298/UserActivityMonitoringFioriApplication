@@ -45,6 +45,7 @@ export default class Main extends Controller {
       failedLogin: 0,
       lockedUsers: 0,
       dumpCount: 0,
+      systemInformation: "",
     });
     this.getView()?.setModel(oOverviewModel, "Overview");
 
@@ -257,6 +258,26 @@ export default class Main extends Controller {
 
       // Create property of view model
       oOverviewModel.setProperty("/lockedUsers", iTotalLockUsers);
+
+      // Create a list binding to /SystemInformation
+      const oBindingSystemInformation = oModel.bindList(
+        "/SystemInformation",
+      ) as ODataListBinding;
+
+      // Executes the OData call
+      const aSystemContexts = await oBindingSystemInformation.requestContexts();
+
+      //  Add label
+      const aDataSystem = aSystemContexts.map((oContext) => {
+        const obj = oContext.getObject();
+        return {
+          ...obj,
+          Label: `${obj.userCient} - ${obj.system_id}`,
+        };
+      });
+
+      // Create property of view model
+      oOverviewModel.setProperty("/systemInformation", aDataSystem[0].Label);
     } catch (error) {
       MessageBox.error("Failed to load overview data.");
     }

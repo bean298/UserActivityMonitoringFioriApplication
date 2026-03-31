@@ -78,11 +78,11 @@
                                     <ObjectNumber id="kpiDumpValue" number="{Overview>/dumpCount}" textAlign="Center" class="sapUiSmallMarginTop"/>
                                 </VBox>
 
-                                <!-- CLIENT -->
+                                <!-- CLIENT + SYSTEM -->
                                 <VBox id="kpiClientBox" class="kpiBox kpiGray">
                                     <core:Icon id="kpiClientIcon" src="sap-icon://cloud" size="1.5rem"/>
-                                    <Text id="kpiClientLabel" text="{i18n>client}"/>
-                                    <ObjectNumber id="kpiClientValue" number="{Overview>/client}" textAlign="Center" class="sapUiSmallMarginTop"/>
+                                    <Text id="kpiClientLabel" text="{i18n>clientSystem}"/>
+                                    <ObjectStatus id="kpiClientValue" text="{Overview>/systemInformation}"  class="sapUiSmallMarginTop"/>
                                 </VBox>
                             </HBox>
                         </VBox>
