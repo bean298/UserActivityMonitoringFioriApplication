@@ -233,22 +233,25 @@
                                 </viz:VizFrame>
                             </HBox>
                             <!-- AUTHENTICATION -->
-                            <!-- FILTER PANEL -->
-                            <Toolbar class="sapUiSmallMarginBottom" design="Transparent">
+                            <Toolbar id="AuthToolbarId" class="sapUiSmallMarginBottom"
+                                design="Transparent">
 
-                                <Title text="{i18n>userAuthentication}" level="H2" />
+                                <Title id="AuthTitleId" text="{i18n>userAuthentication}" level="H2" />
 
                                 <ToolbarSpacer />
 
                                 <!-- STATUS -->
                                 <Label
+                                    id="AuthStatusLabelId"
                                     text="{i18n>status}"
                                     class="sapUiSmallMarginBegin sapUiSmallMarginEnd" />
 
                                 <Select
+                                    id="AuthStatusSelectId"
                                     width="180px"
                                     change="onFilterAuth"
                                     class="sapUiSmallMarginEnd">
+
                                     <core:Item key="" text="{i18n>all}" />
                                     <core:Item key="SUCCESS" text="{i18n>success}" />
                                     <core:Item key="FAILED" text="{i18n>failed}" />
@@ -256,10 +259,12 @@
 
                                 <!-- DATE -->
                                 <Label
+                                    id="AuthDateLabelId"
                                     text="{i18n>filterDate}"
                                     class="sapUiSmallMarginBegin sapUiSmallMarginEnd" />
 
                                 <DatePicker
+                                    id="AuthDatePickerId"
                                     width="180px"
                                     change="onFilterAuth"
                                     class="sapUiSmallMarginEnd" />
@@ -270,33 +275,36 @@
                             <ui:Table
                                 id="AuthTableId"
                                 rows="{
-        path: 'UserAuthLogData>/',
-        sorter: {
-            path: 'LoginDate',
-            descending: true
-        }
-    }"
-                                visibleRowCount="6"
+                                path: 'UserAuthLogData>/',
+                                sorter: {
+                                    path: 'LoginDate',
+                                    descending: true
+                                }
+                            }"
+                                visibleRowCount="8"
                                 selectionMode="Single"
                                 alternateRowColors="true"
                                 class="sapUiLargeMarginBottom">
 
                                 <!-- HEADER -->
                                 <ui:extension>
-                                    <OverflowToolbar>
+                                    <OverflowToolbar id="AuthTableToolbarId">
 
                                         <Title
+                                            id="AuthTableTitleId"
                                             text="{= ${i18n>headerTitleTable} + ' (' + ${view>/count} + ')' }"
                                             level="H2" />
 
                                         <ToolbarSpacer />
 
                                         <Button
+                                            id="AuthRefreshButtonId"
                                             icon="sap-icon://refresh"
                                             tooltip="{i18n>refreshData}"
                                             press="onRefreshTable" />
 
                                         <Button
+                                            id="AuthExportButtonId"
                                             icon="sap-icon://excel-attachment"
                                             tooltip="{i18n>exportExcel}"
                                             press="onExportExcel" />
@@ -306,22 +314,21 @@
 
                                 <!-- COLUMNS -->
                                 <ui:columns>
-
                                     <!-- SESSION ID -->
-                                    <ui:Column width="14rem">
-                                        <Label text="{i18n>sessionId}" />
+                                    <ui:Column id="AuthSessionIdColumnId" width="14rem">
+                                        <Label id="AuthSessionIdLabelId" text="{i18n>sessionId}" />
                                         <ui:template>
-                                            <Text text="{UserAuthLogData>SessionId}"
-                                                wrapping="false" />
+                                            <Text id="AuthSessionIdTextId"
+                                                text="{UserAuthLogData>SessionId}" wrapping="false" />
                                         </ui:template>
                                     </ui:Column>
 
                                     <!-- LOGIN RESULT -->
-                                    <ui:Column width="9rem">
-                                        <Label text="{i18n>loginResult}" />
-
+                                    <ui:Column id="AuthLoginResultColumnId" width="9rem">
+                                        <Label id="AuthLoginResultLabelId" text="{i18n>loginResult}" />
                                         <ui:template>
                                             <ObjectStatus
+                                                id="AuthLoginResultStatusId"
                                                 text="{UserAuthLogData>LoginResult}"
                                                 icon="{path:'UserAuthLogData>LoginResult', formatter:'.formatter.formatLoginResultIcon'}"
                                                 state="{path:'UserAuthLogData>LoginResult', formatter:'.formatter.formatLoginResultState'}" />
@@ -329,27 +336,31 @@
                                     </ui:Column>
 
                                     <!-- LOGIN DATE -->
-                                    <ui:Column width="10rem">
-                                        <Label text="{i18n>loginDate}" />
+                                    <ui:Column id="AuthLoginDateColumnId" width="10rem">
+                                        <Label id="AuthLoginDateLabelId" text="{i18n>loginDate}" />
                                         <ui:template>
                                             <Text
+                                                id="AuthLoginDateTextId"
                                                 text="{path:'UserAuthLogData>LoginDate', formatter:'.formatter.formatISODate'}" />
                                         </ui:template>
                                     </ui:Column>
 
                                     <!-- LOGIN TIME -->
-                                    <ui:Column width="8rem">
-                                        <Label text="{i18n>loginTime}" />
+                                    <ui:Column id="AuthLoginTimeColumnId" width="8rem">
+                                        <Label id="AuthLoginTimeLabelId" text="{i18n>loginTime}" />
                                         <ui:template>
-                                            <Text text="{UserAuthLogData>LoginTime}" />
+                                            <Text id="AuthLoginTimeTextId"
+                                                text="{UserAuthLogData>LoginTime}" />
                                         </ui:template>
                                     </ui:Column>
 
                                     <!-- LOGIN MESSAGE -->
-                                    <ui:Column>
-                                        <Label text="{i18n>loginMessage}" />
+                                    <ui:Column id="AuthLoginMessageColumnId">
+                                        <Label id="AuthLoginMessageLabelId"
+                                            text="{i18n>loginMessage}" />
                                         <ui:template>
                                             <ObjectStatus
+                                                id="AuthLoginMessageStatusId"
                                                 text="{UserAuthLogData>LoginMessage}"
                                                 icon="{path:'UserAuthLogData>EventId', formatter:'.formatter.formatLoginMessageIcon'}"
                                                 state="{path:'UserAuthLogData>EventId', formatter:'.formatter.formatLoginMessageState'}" />
@@ -357,33 +368,36 @@
                                     </ui:Column>
 
                                     <!-- LOGOUT DATE -->
-                                    <ui:Column width="10rem">
-                                        <Label text="{i18n>logoutDate}" />
+                                    <ui:Column id="AuthLogoutDateColumnId" width="10rem">
+                                        <Label id="AuthLogoutDateLabelId" text="{i18n>logoutDate}" />
                                         <ui:template>
                                             <Text
+                                                id="AuthLogoutDateTextId"
                                                 text="{path:'UserAuthLogData>LogoutDate', formatter:'.formatter.formatISODate'}" />
                                         </ui:template>
                                     </ui:Column>
 
                                     <!-- LOGOUT TIME -->
-                                    <ui:Column width="8rem">
-                                        <Label text="{i18n>logoutTime}" />
+                                    <ui:Column id="AuthLogoutTimeColumnId" width="8rem">
+                                        <Label id="AuthLogoutTimeLabelId" text="{i18n>logoutTime}" />
                                         <ui:template>
                                             <Text
+                                                id="AuthLogoutTimeTextId"
                                                 text="{path:'UserAuthLogData>LogoutTime', formatter:'.formatter.formatLogoutTime'}" />
                                         </ui:template>
                                     </ui:Column>
 
                                     <!-- NAVIGATE -->
-                                    <ui:Column width="5rem" hAlign="Center">
+                                    <ui:Column id="AuthNavigateColumnId" width="5rem"
+                                        hAlign="Center">
                                         <ui:template>
                                             <Button
+                                                id="AuthNavigateButtonId"
                                                 icon="sap-icon://navigation-right-arrow"
                                                 type="Transparent"
                                                 press="onNavigationToAuthDetail" />
                                         </ui:template>
                                     </ui:Column>
-
                                 </ui:columns>
                             </ui:Table>
                         </VBox>
@@ -437,33 +451,41 @@
                                 </viz:feeds>
                             </viz:VizFrame>
                             <!-- ACTIVITY -->
-                            <VBox class="sapUiMediumMarginTop">
+                            <VBox id="ActivityVBoxContentId" class="sapUiMediumMarginTop">
 
                                 <!-- FILTER BAR -->
-                                <Toolbar class="sapUiSmallMarginBottom" design="Transparent">
+                                <Toolbar id="ActivityToolbarId" class="sapUiSmallMarginBottom"
+                                    design="Transparent">
 
-                                    <Title text="{i18n>activity}" level="H2" />
+                                    <Title id="ActivityTitleId" text="{i18n>activity}" level="H2" />
 
-                                    <ToolbarSpacer />
+                                    <ToolbarSpacer id="ActivityToolbarSpacerId" />
 
                                     <!-- Activity Type -->
-                                    <Label text="{i18n>activityType}" class="sapUiTinyMarginEnd" />
-                                    <Select width="140px" change="onFilterActivity">
-                                        <core:Item key="" text="All" />
-                                        <core:Item key="TCODE" text="TCODE" />
-                                        <core:Item key="DUMP" text="DUMP" />
+                                    <Label id="ActivityTypeLabelId" text="{i18n>activityType}"
+                                        class="sapUiTinyMarginEnd" />
+
+                                    <Select id="ActivityTypeSelectId" width="140px"
+                                        change="onFilterActivity">
+                                        <core:Item key="" text="{i18n>all}" />
+                                        <core:Item key="TCODE" text="{i18n>itemTcode}" />
+                                        <core:Item key="DUMP" text="{i18n>itemDump}" />
                                     </Select>
 
-                                    <!-- TCode -->
-                                    <Label text="TCode"
-                                        class="sapUiTinyMarginBegin sapUiTinyMarginEnd" />
-                                    <Input width="120px" placeholder="TCode"
+
+                                    <Input id="ActivityTCodeInputId"
+                                        width="120px"
+                                        placeholder="{i18n>tCode}"
                                         liveChange="onFilterActivity" />
 
                                     <!-- Date -->
-                                    <Label text="{i18n>activityDate}"
+                                    <Label id="ActivityDateLabelId"
+                                        text="{i18n>activityDate}"
                                         class="sapUiTinyMarginBegin sapUiTinyMarginEnd" />
-                                    <DatePicker width="150px" change="onFilterActivity" />
+
+                                    <DatePicker id="ActivityDatePickerId"
+                                        width="150px"
+                                        change="onFilterActivity" />
 
                                 </Toolbar>
 
@@ -471,12 +493,12 @@
                                 <ui:Table
                                     id="ActivityTableId"
                                     rows="{
-        path: 'UserActivityLogData>/',
-        sorter: {
-            path: 'ActivityDate',
-            descending: true
-        }
-    }"
+            path: 'UserActivityLogData>/',
+            sorter: {
+                path: 'ActivityDate',
+                descending: true
+            }
+        }"
                                     visibleRowCount="8"
                                     selectionMode="None"
                                     alternateRowColors="true"
@@ -484,24 +506,27 @@
 
                                     <!-- HEADER TOOLBAR -->
                                     <ui:extension>
-                                        <OverflowToolbar>
+                                        <OverflowToolbar id="ActivityTableToolbarId">
 
                                             <Title
+                                                id="ActivityTableTitleId"
                                                 text="{= ${i18n>activity} + ' (' + ${view>/count} + ')' }"
                                                 level="H2" />
 
-                                            <ToolbarSpacer />
+                                            <ToolbarSpacer id="ActivityTableSpacerId" />
 
                                             <!-- EXPORT -->
                                             <Button
+                                                id="ActivityExportButtonId"
                                                 icon="sap-icon://excel-attachment"
                                                 tooltip="{i18n>exportExcel}"
                                                 press="onExportActivityExcel" />
 
                                             <!-- SETTINGS -->
                                             <Button
+                                                id="ActivitySettingsButtonId"
                                                 icon="sap-icon://action-settings"
-                                                tooltip="{i18n>settings}"
+                                                tooltip="{i18n>viewSettings}"
                                                 press="onOpenActivitySettings" />
 
                                         </OverflowToolbar>
@@ -511,8 +536,8 @@
                                     <ui:columns>
 
                                         <!-- LOG ID -->
-                                        <ui:Column width="14rem">
-                                            <Label text="{i18n>logId}" />
+                                        <ui:Column id="ActivityLogIdColumnId" width="14rem">
+                                            <Label id="ActivityLogIdLabelId" text="{i18n>logId}" />
                                             <ui:template>
                                                 <Text text="{UserActivityLogData>LogId}"
                                                     wrapping="false" />
@@ -520,8 +545,10 @@
                                         </ui:Column>
 
                                         <!-- ACTIVITY TYPE -->
-                                        <ui:Column width="10rem" hAlign="Center">
-                                            <Label text="{i18n>activityType}" />
+                                        <ui:Column id="ActivityTypeColumnId" width="10rem"
+                                            hAlign="Center">
+                                            <Label id="ActivityTypeColumnLabelId"
+                                                text="{i18n>activityType}" />
                                             <ui:template>
                                                 <ObjectStatus
                                                     text="{UserActivityLogData>ActivityType}"
@@ -531,8 +558,9 @@
                                         </ui:Column>
 
                                         <!-- TCODE -->
-                                        <ui:Column width="8rem">
-                                            <Label text="{i18n>tCode}" />
+                                        <ui:Column id="ActivityTCodeColumnId" width="8rem">
+                                            <Label id="ActivityTCodeColumnLabelId"
+                                                text="{i18n>tCode}" />
                                             <ui:template>
                                                 <ObjectStatus
                                                     text="{UserActivityLogData>TCode}"
@@ -541,8 +569,9 @@
                                         </ui:Column>
 
                                         <!-- TCODE NAME -->
-                                        <ui:Column width="12rem">
-                                            <Label text="{i18n>tCodeName}" />
+                                        <ui:Column id="ActivityTCodeNameColumnId" width="12rem">
+                                            <Label id="ActivityTCodeNameLabelId"
+                                                text="{i18n>tCodeName}" />
                                             <ui:template>
                                                 <Text text="{UserActivityLogData>TCodeName}"
                                                     wrapping="false" />
@@ -550,8 +579,9 @@
                                         </ui:Column>
 
                                         <!-- MESSAGE -->
-                                        <ui:Column>
-                                            <Label text="{i18n>activityMessage}" />
+                                        <ui:Column id="ActivityMessageColumnId">
+                                            <Label id="ActivityMessageLabelId"
+                                                text="{i18n>activityMessage}" />
                                             <ui:template>
                                                 <ObjectStatus
                                                     text="{UserActivityLogData>ActivityMessage}"
@@ -560,8 +590,9 @@
                                         </ui:Column>
 
                                         <!-- DATE -->
-                                        <ui:Column width="10rem">
-                                            <Label text="{i18n>activityDate}" />
+                                        <ui:Column id="ActivityDateColumnId" width="10rem">
+                                            <Label id="ActivityDateColumnLabelId"
+                                                text="{i18n>activityDate}" />
                                             <ui:template>
                                                 <Text
                                                     text="{path:'UserActivityLogData>ActivityDate', formatter: '.formatter.formatISODate'}" />
@@ -569,20 +600,24 @@
                                         </ui:Column>
 
                                         <!-- TIME -->
-                                        <ui:Column width="8rem">
-                                            <Label text="{i18n>activityTime}" />
+                                        <ui:Column id="ActivityTimeColumnId" width="8rem">
+                                            <Label id="ActivityTimeColumnLabelId"
+                                                text="{i18n>activityTime}" />
                                             <ui:template>
                                                 <Text text="{UserActivityLogData>ActivityTime}" />
                                             </ui:template>
                                         </ui:Column>
 
                                         <!-- NAVIGATION -->
-                                        <ui:Column width="4rem" hAlign="Center">
+                                        <ui:Column id="ActivityNavigateColumnId" width="4rem"
+                                            hAlign="Center">
                                             <ui:template>
                                                 <Button
+                                                    id="ActivityNavigateButtonId"
                                                     icon="sap-icon://navigation-right-arrow"
                                                     type="Transparent"
-                                                    press="onPressActivityDetail" />
+                                                    press="onPressActivityDetail"
+                                                    tooltip="{i18n>navigateAuth}" />
                                             </ui:template>
                                         </ui:Column>
 
