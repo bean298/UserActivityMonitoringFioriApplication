@@ -5,7 +5,8 @@
     xmlns:layout="sap.ui.layout" controllerName="useraudit.controller.UserDetail" height="100%"
     xmlns:viz="sap.viz.ui5.controls"
     xmlns:viz.feeds="sap.viz.ui5.controls.common.feeds"
-    xmlns:viz.data="sap.viz.ui5.data">
+    xmlns:viz.data="sap.viz.ui5.data"
+    xmlns:ui="sap.ui.table">
 
     <f:ObjectPageLayout id="UserDetailObjectPageLayoutId" showTitleInHeaderContent="true"
         upperCaseAnchorBar="false">
@@ -231,111 +232,160 @@
                                     </viz:feeds>
                                 </viz:VizFrame>
                             </HBox>
+                            <!-- AUTHENTICATION -->
+                            <!-- FILTER PANEL -->
+                            <Toolbar class="sapUiSmallMarginBottom" design="Transparent">
 
-                            <!-- AUTHENTICATION TABLE -->
-                            <Table id="AuthTableId"
-                                items="{
-                                path: 'UserAuthLogData>/',
-                                sorter: {
-                                    path: 'LoginDate',
-                                    descending: true
-                                }
-                            }"
-                                growing="true" growingThreshold="5">
-                                <!-- TITLE -->
-                                <headerToolbar>
-                                    <Toolbar id="AuthToolbarId">
-                                        <Title id="AuthTitleId" text="{i18n>headerTitleTable}"
+                                <Title text="{i18n>userAuthentication}" level="H2" />
+
+                                <ToolbarSpacer />
+
+                                <!-- STATUS -->
+                                <Label
+                                    text="{i18n>status}"
+                                    class="sapUiSmallMarginBegin sapUiSmallMarginEnd" />
+
+                                <Select
+                                    width="180px"
+                                    change="onFilterAuth"
+                                    class="sapUiSmallMarginEnd">
+                                    <core:Item key="" text="{i18n>all}" />
+                                    <core:Item key="SUCCESS" text="{i18n>success}" />
+                                    <core:Item key="FAILED" text="{i18n>failed}" />
+                                </Select>
+
+                                <!-- DATE -->
+                                <Label
+                                    text="{i18n>filterDate}"
+                                    class="sapUiSmallMarginBegin sapUiSmallMarginEnd" />
+
+                                <DatePicker
+                                    width="180px"
+                                    change="onFilterAuth"
+                                    class="sapUiSmallMarginEnd" />
+
+                            </Toolbar>
+
+                            <!-- AUTH TABLE -->
+                            <ui:Table
+                                id="AuthTableId"
+                                rows="{
+        path: 'UserAuthLogData>/',
+        sorter: {
+            path: 'LoginDate',
+            descending: true
+        }
+    }"
+                                visibleRowCount="6"
+                                selectionMode="Single"
+                                alternateRowColors="true"
+                                class="sapUiLargeMarginBottom">
+
+                                <!-- HEADER -->
+                                <ui:extension>
+                                    <OverflowToolbar>
+
+                                        <Title
+                                            text="{= ${i18n>headerTitleTable} + ' (' + ${view>/count} + ')' }"
                                             level="H2" />
-                                    </Toolbar>
-                                </headerToolbar>
 
-                                <columns>
-                                    <!-- SESSION ID COLUMN -->
-                                    <Column id="AuthColSessionId">
-                                        <Text id="AuthColSessionTextId" text="{i18n>sessionId}" />
-                                    </Column>
+                                        <ToolbarSpacer />
 
-                                    <!-- LOGIN RESULT COLUMN -->
-                                    <Column id="AuthColResultId">
-                                        <Text id="AuthColResultTextId" text="{i18n>loginResult}" />
-                                    </Column>
+                                        <Button
+                                            icon="sap-icon://refresh"
+                                            tooltip="{i18n>refreshData}"
+                                            press="onRefreshTable" />
 
-                                    <!-- LOGIN DATE COLUMN -->
-                                    <Column id="AuthColLoginDateId">
-                                        <Text id="AuthColLoginDateTextId" text="{i18n>loginDate}" />
-                                    </Column>
+                                        <Button
+                                            icon="sap-icon://excel-attachment"
+                                            tooltip="{i18n>exportExcel}"
+                                            press="onExportExcel" />
 
-                                    <!-- LOGIN TIME COLUMN -->
-                                    <Column id="AuthColLoginTimeId">
-                                        <Text id="AuthColLoginTimeTextId" text="{i18n>loginTime}" />
-                                    </Column>
+                                    </OverflowToolbar>
+                                </ui:extension>
 
-                                    <!-- LOGIN MESSAGE COLUMN -->
-                                    <Column id="AuthColMsgId" width="">
-                                        <Text id="AuthColMsgTextId" text="{i18n>loginMessage}" />
-                                    </Column>
+                                <!-- COLUMNS -->
+                                <ui:columns>
 
-                                    <!-- LOGOUT DATE COLUMN -->
-                                    <Column id="AuthColLoginOutDateId">
-                                        <Text id="AuthColLoginOutDateTextId"
-                                            text="{i18n>logoutDate}" />
-                                    </Column>
+                                    <!-- SESSION ID -->
+                                    <ui:Column width="14rem">
+                                        <Label text="{i18n>sessionId}" />
+                                        <ui:template>
+                                            <Text text="{UserAuthLogData>SessionId}"
+                                                wrapping="false" />
+                                        </ui:template>
+                                    </ui:Column>
 
-                                    <!-- LOGOUT TIME COLUMN -->
-                                    <Column id="AuthColLoginOutTimeId">
-                                        <Text id="AuthColLoginOutTimeTextId"
-                                            text="{i18n>logoutTime}" />
-                                    </Column>
-                                </columns>
+                                    <!-- LOGIN RESULT -->
+                                    <ui:Column width="9rem">
+                                        <Label text="{i18n>loginResult}" />
 
-                                <items>
-                                    <ColumnListItem id="AuthTableItemId" type="Navigation"
-                                        press="onNavigationToAuthDetail">
-                                        <cells>
-                                            <!-- SessionId -->
-                                            <Text id="AuthCellSessionId"
-                                                text="{UserAuthLogData>SessionId}" />
-
-                                            <!-- LoginResult -->
-                                            <ObjectStatus id="AuthCellResultId"
+                                        <ui:template>
+                                            <ObjectStatus
                                                 text="{UserAuthLogData>LoginResult}"
-                                                icon="{
-                                                path: 'UserAuthLogData>LoginResult',
-                                                formatter: '.formatter.formatLoginResultIcon'}"
-                                                state="{
-                                                path: 'UserAuthLogData>LoginResult',
-                                                formatter: '.formatter.formatLoginResultState'}" />
+                                                icon="{path:'UserAuthLogData>LoginResult', formatter:'.formatter.formatLoginResultIcon'}"
+                                                state="{path:'UserAuthLogData>LoginResult', formatter:'.formatter.formatLoginResultState'}" />
+                                        </ui:template>
+                                    </ui:Column>
 
-                                            <!-- LoginDate -->
-                                            <Text id="AuthCellLoginDateId"
-                                                text="{path:'UserAuthLogData>LoginDate', formatter: '.formatter.formatISODate'}" />
+                                    <!-- LOGIN DATE -->
+                                    <ui:Column width="10rem">
+                                        <Label text="{i18n>loginDate}" />
+                                        <ui:template>
+                                            <Text
+                                                text="{path:'UserAuthLogData>LoginDate', formatter:'.formatter.formatISODate'}" />
+                                        </ui:template>
+                                    </ui:Column>
 
-                                            <!-- LoginTime -->
-                                            <Text id="AuthCellLoginTimeId"
-                                                text="{UserAuthLogData>LoginTime}" />
+                                    <!-- LOGIN TIME -->
+                                    <ui:Column width="8rem">
+                                        <Label text="{i18n>loginTime}" />
+                                        <ui:template>
+                                            <Text text="{UserAuthLogData>LoginTime}" />
+                                        </ui:template>
+                                    </ui:Column>
 
-                                            <!-- LoginMessage -->
-                                            <ObjectStatus id="AuthCellLoginMsgId"
+                                    <!-- LOGIN MESSAGE -->
+                                    <ui:Column>
+                                        <Label text="{i18n>loginMessage}" />
+                                        <ui:template>
+                                            <ObjectStatus
                                                 text="{UserAuthLogData>LoginMessage}"
-                                                icon="{
-                                                path: 'UserAuthLogData>EventId',
-                                                formatter: '.formatter.formatLoginMessageIcon'}"
-                                                state="{
-                                                path: 'UserAuthLogData>EventId',
-                                                formatter: '.formatter.formatLoginMessageState'}" />
+                                                icon="{path:'UserAuthLogData>EventId', formatter:'.formatter.formatLoginMessageIcon'}"
+                                                state="{path:'UserAuthLogData>EventId', formatter:'.formatter.formatLoginMessageState'}" />
+                                        </ui:template>
+                                    </ui:Column>
 
-                                            <!-- LogoutDate -->
-                                            <Text id="AuthCellLogoutId"
-                                                text="{path:'UserAuthLogData>LogoutDate', formatter: '.formatter.formatISODate'}" />
+                                    <!-- LOGOUT DATE -->
+                                    <ui:Column width="10rem">
+                                        <Label text="{i18n>logoutDate}" />
+                                        <ui:template>
+                                            <Text
+                                                text="{path:'UserAuthLogData>LogoutDate', formatter:'.formatter.formatISODate'}" />
+                                        </ui:template>
+                                    </ui:Column>
 
-                                            <!-- LogoutTime -->
-                                            <Text id="AuthCellLogoutTimeId"
-                                                text="{path:'UserAuthLogData>LogoutTime', formatter: '.formatter.formatLogoutTime'}" />
-                                        </cells>
-                                    </ColumnListItem>
-                                </items>
-                            </Table>
+                                    <!-- LOGOUT TIME -->
+                                    <ui:Column width="8rem">
+                                        <Label text="{i18n>logoutTime}" />
+                                        <ui:template>
+                                            <Text
+                                                text="{path:'UserAuthLogData>LogoutTime', formatter:'.formatter.formatLogoutTime'}" />
+                                        </ui:template>
+                                    </ui:Column>
+
+                                    <!-- NAVIGATE -->
+                                    <ui:Column width="5rem" hAlign="Center">
+                                        <ui:template>
+                                            <Button
+                                                icon="sap-icon://navigation-right-arrow"
+                                                type="Transparent"
+                                                press="onNavigationToAuthDetail" />
+                                        </ui:template>
+                                    </ui:Column>
+
+                                </ui:columns>
+                            </ui:Table>
                         </VBox>
                     </f:ObjectPageSubSection>
                 </f:subSections>
@@ -386,86 +436,159 @@
                                         type="Dimension" values="Label" />
                                 </viz:feeds>
                             </viz:VizFrame>
+                            <!-- ACTIVITY -->
+                            <VBox class="sapUiMediumMarginTop">
 
-                            <!-- ACTIVITY TABLE -->
-                            <Table id="ActivityTableId"
-                                items="{
-                                path: 'UserActivityLogData>/',
-                                sorter: {
-                                    path: 'ActivityDate',
-                                    descending: true
-                                }
-                            }"
-                                growing="true" growingThreshold="10">
-                                <!-- TITLE -->
-                                <headerToolbar>
-                                    <Toolbar id="ActToolbarId">
-                                        <Title id="ActTitleId" text="{i18n>activity}" level="H2" />
-                                    </Toolbar>
-                                </headerToolbar>
+                                <!-- FILTER BAR -->
+                                <Toolbar class="sapUiSmallMarginBottom" design="Transparent">
 
-                                <!-- COLUMNS -->
-                                <columns>
-                                    <!-- LOG ID -->
-                                    <Column id="ActivityColLogId">
-                                        <Text id="ActivityColLogTextId" text="{i18n>logId}" />
-                                    </Column>
+                                    <Title text="{i18n>activity}" level="H2" />
 
-                                    <!-- ACTIVITY TYPE -->
-                                    <Column id="ActivityColTypeId">
-                                        <Text id="ActivityColTypeTextId" text="{i18n>activityType}" />
-                                    </Column>
+                                    <ToolbarSpacer />
 
-                                    <!-- TCODE -->
-                                    <Column id="ActivityColTCodeId">
-                                        <Text id="ActivityColTCodeTextId" text="{i18n>tCode}" />
-                                    </Column>
+                                    <!-- Activity Type -->
+                                    <Label text="{i18n>activityType}" class="sapUiTinyMarginEnd" />
+                                    <Select width="140px" change="onFilterActivity">
+                                        <core:Item key="" text="All" />
+                                        <core:Item key="TCODE" text="TCODE" />
+                                        <core:Item key="DUMP" text="DUMP" />
+                                    </Select>
 
-                                    <!-- TCODE NAME -->
-                                    <Column id="ActivityColTCodeNameId">
-                                        <Text id="ActivityColTCodeNameTextId"
-                                            text="{i18n>tCodeName}" />
-                                    </Column>
+                                    <!-- TCode -->
+                                    <Label text="TCode"
+                                        class="sapUiTinyMarginBegin sapUiTinyMarginEnd" />
+                                    <Input width="120px" placeholder="TCode"
+                                        liveChange="onFilterActivity" />
 
-                                    <!-- MESSAGE -->
-                                    <Column id="ActivityColMessageId">
-                                        <Text id="ActivityColMessageTextId"
-                                            text="{i18n>activityMessage}" />
-                                    </Column>
+                                    <!-- Date -->
+                                    <Label text="{i18n>activityDate}"
+                                        class="sapUiTinyMarginBegin sapUiTinyMarginEnd" />
+                                    <DatePicker width="150px" change="onFilterActivity" />
 
-                                    <!-- TIME -->
-                                    <Column id="ActivityColDateId">
-                                        <Text id="ActivityColDateTextId" text="{i18n>activityDate}" />
-                                    </Column>
+                                </Toolbar>
 
-                                    <!-- TIME -->
-                                    <Column id="ActivityColTimeId">
-                                        <Text id="ActivityColTimeTextId" text="{i18n>activityTime}" />
-                                    </Column>
-                                </columns>
+                                <!-- TABLE -->
+                                <ui:Table
+                                    id="ActivityTableId"
+                                    rows="{
+        path: 'UserActivityLogData>/',
+        sorter: {
+            path: 'ActivityDate',
+            descending: true
+        }
+    }"
+                                    visibleRowCount="8"
+                                    selectionMode="None"
+                                    alternateRowColors="true"
+                                    class="sapUiLargeMarginBottom">
 
-                                <!-- ITEMS -->
-                                <items>
-                                    <ColumnListItem id="ActivityTableItemId">
-                                        <cells>
-                                            <Text id="ActivityCellLogId"
-                                                text="{UserActivityLogData>LogId}" />
-                                            <Text id="ActivityCellTypeId"
-                                                text="{UserActivityLogData>ActivityType}" />
-                                            <Text id="ActivityCellTCodeId"
-                                                text="{UserActivityLogData>TCode}" />
-                                            <Text id="ActivityCellTCodeNameId"
-                                                text="{UserActivityLogData>TCodeName}" />
-                                            <Text id="ActivityCellMessageId"
-                                                text="{UserActivityLogData>ActivityMessage}" />
-                                            <Text id="ActivityCellDateId"
-                                                text="{path:'UserActivityLogData>ActivityDate', formatter: '.formatter.formatISODate'}" />
-                                            <Text id="ActivityCellTimeId"
-                                                text="{UserActivityLogData>ActivityTime}" />
-                                        </cells>
-                                    </ColumnListItem>
-                                </items>
-                            </Table>
+                                    <!-- HEADER TOOLBAR -->
+                                    <ui:extension>
+                                        <OverflowToolbar>
+
+                                            <Title
+                                                text="{= ${i18n>activity} + ' (' + ${view>/count} + ')' }"
+                                                level="H2" />
+
+                                            <ToolbarSpacer />
+
+                                            <!-- EXPORT -->
+                                            <Button
+                                                icon="sap-icon://excel-attachment"
+                                                tooltip="{i18n>exportExcel}"
+                                                press="onExportActivityExcel" />
+
+                                            <!-- SETTINGS -->
+                                            <Button
+                                                icon="sap-icon://action-settings"
+                                                tooltip="{i18n>settings}"
+                                                press="onOpenActivitySettings" />
+
+                                        </OverflowToolbar>
+                                    </ui:extension>
+
+                                    <!-- COLUMNS -->
+                                    <ui:columns>
+
+                                        <!-- LOG ID -->
+                                        <ui:Column width="14rem">
+                                            <Label text="{i18n>logId}" />
+                                            <ui:template>
+                                                <Text text="{UserActivityLogData>LogId}"
+                                                    wrapping="false" />
+                                            </ui:template>
+                                        </ui:Column>
+
+                                        <!-- ACTIVITY TYPE -->
+                                        <ui:Column width="10rem" hAlign="Center">
+                                            <Label text="{i18n>activityType}" />
+                                            <ui:template>
+                                                <ObjectStatus
+                                                    text="{UserActivityLogData>ActivityType}"
+                                                    icon="{path:'UserActivityLogData>ActivityType', formatter:'.formatter.formatActivityType'}"
+                                                    state="{path:'UserActivityLogData>ActivityType', formatter:'.formatter.formatActivityState'}" />
+                                            </ui:template>
+                                        </ui:Column>
+
+                                        <!-- TCODE -->
+                                        <ui:Column width="8rem">
+                                            <Label text="{i18n>tCode}" />
+                                            <ui:template>
+                                                <ObjectStatus
+                                                    text="{UserActivityLogData>TCode}"
+                                                    icon="{path:'UserActivityLogData>TCode', formatter:'.formatter.formatTCodeIcon'}" />
+                                            </ui:template>
+                                        </ui:Column>
+
+                                        <!-- TCODE NAME -->
+                                        <ui:Column width="12rem">
+                                            <Label text="{i18n>tCodeName}" />
+                                            <ui:template>
+                                                <Text text="{UserActivityLogData>TCodeName}"
+                                                    wrapping="false" />
+                                            </ui:template>
+                                        </ui:Column>
+
+                                        <!-- MESSAGE -->
+                                        <ui:Column>
+                                            <Label text="{i18n>activityMessage}" />
+                                            <ui:template>
+                                                <ObjectStatus
+                                                    text="{UserActivityLogData>ActivityMessage}"
+                                                    state="Information" />
+                                            </ui:template>
+                                        </ui:Column>
+
+                                        <!-- DATE -->
+                                        <ui:Column width="10rem">
+                                            <Label text="{i18n>activityDate}" />
+                                            <ui:template>
+                                                <Text
+                                                    text="{path:'UserActivityLogData>ActivityDate', formatter: '.formatter.formatISODate'}" />
+                                            </ui:template>
+                                        </ui:Column>
+
+                                        <!-- TIME -->
+                                        <ui:Column width="8rem">
+                                            <Label text="{i18n>activityTime}" />
+                                            <ui:template>
+                                                <Text text="{UserActivityLogData>ActivityTime}" />
+                                            </ui:template>
+                                        </ui:Column>
+
+                                        <!-- NAVIGATION -->
+                                        <ui:Column width="4rem" hAlign="Center">
+                                            <ui:template>
+                                                <Button
+                                                    icon="sap-icon://navigation-right-arrow"
+                                                    type="Transparent"
+                                                    press="onPressActivityDetail" />
+                                            </ui:template>
+                                        </ui:Column>
+
+                                    </ui:columns>
+                                </ui:Table>
+                            </VBox>
                         </VBox>
                     </f:ObjectPageSubSection>
                 </f:subSections>
