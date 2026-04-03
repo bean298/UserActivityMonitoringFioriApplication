@@ -10,6 +10,10 @@ import Formatter from "useraudit/formatter/Formatter";
 export default class UserDetail extends Controller {
   public formatter = Formatter;
 
+  private _sFromDate!: string;
+  private _sToDate!: string;
+  private _aDefaultFilters: Filter[] = [];
+
   /**
    * Called when the controller is initialized.
    **/
@@ -34,6 +38,27 @@ export default class UserDetail extends Controller {
 
     const oView = this.getView();
     if (!oView || !sUsername) return;
+
+    // Take a last 6 days
+    const oToday = new Date();
+    const o7DaysAgo = new Date();
+    o7DaysAgo.setDate(oToday.getDate() - 2);
+
+    const formatDate = (oDate: Date) => {
+      return oDate.toISOString().split("T")[0];
+    };
+
+    this._sFromDate = formatDate(o7DaysAgo);
+    this._sToDate = formatDate(oToday);
+
+    this._aDefaultFilters = [
+      new Filter({
+        path: "LoginDate",
+        operator: FilterOperator.BT,
+        value1: this._sFromDate,
+        value2: this._sToDate,
+      }),
+    ];
 
     oView.setBusy(true);
 
@@ -81,6 +106,8 @@ export default class UserDetail extends Controller {
    * Load user auth log
    **/
   private async _loadUserLogs(sUsername: string): Promise<void> {
+    const oUserAuthLogPerDayData = {} as any;
+
     const oModel = (this as any).getAppComponent().getModel() as ODataModel;
 
     // Create a list binding to /AuthLogChartByUser with $filter
@@ -88,13 +115,33 @@ export default class UserDetail extends Controller {
       "/AuthLogChartByUser",
       undefined,
       undefined,
-      [new Filter("Username", FilterOperator.EQ, sUsername)],
+      [
+        new Filter("Username", FilterOperator.EQ, sUsername),
+        ...this._aDefaultFilters,
+      ],
     ) as ODataListBinding;
 
     // Executes the OData call
     const aContextsChart = await oUserAuthChart.requestContexts();
 
     const aDataChart = aContextsChart.map((oContext) => oContext.getObject());
+
+    // Group by + SUM data
+    aDataChart.forEach((oContext) => {
+      const key = oContext.LoginResult;
+
+      if (!oUserAuthLogPerDayData[key]) {
+        oUserAuthLogPerDayData[key] = {
+          LoginResult: oContext.LoginResult,
+          CountLoginLog: 0,
+        };
+      }
+
+      oUserAuthLogPerDayData[key].CountLoginLog += oContext.CountLoginLog;
+    });
+
+    //  Convert into array
+    let aUserAuthLogPerDayData = Object.values(oUserAuthLogPerDayData);
 
     const oJsonModel = new JSONModel(aDataChart);
 
@@ -106,7 +153,10 @@ export default class UserDetail extends Controller {
       "/UserAuthLog",
       undefined,
       undefined,
-      [new Filter("Username", FilterOperator.EQ, sUsername)],
+      [
+        new Filter("Username", FilterOperator.EQ, sUsername),
+        ...this._aDefaultFilters,
+      ],
     ) as ODataListBinding;
 
     const aContextsTable = await oUserAuthTable.requestContexts();
@@ -122,19 +172,6 @@ export default class UserDetail extends Controller {
   private async _loadUserAuthLogPerDay(sUsername: string): Promise<void> {
     const oModel = (this as any).getAppComponent().getModel() as ODataModel;
 
-    const oToday = new Date();
-
-    // Take a last 6 days
-    const o7DaysAgo = new Date();
-    o7DaysAgo.setDate(oToday.getDate() - 5);
-
-    const formatDate = (oDate: Date) => {
-      return oDate.toISOString().split("T")[0];
-    };
-
-    const sFromDate = formatDate(o7DaysAgo);
-    const sToDate = formatDate(oToday);
-
     // Create a list binding to /UserAuthLogPerDay with $filter
     const oUserAuthLogPerDay = oModel.bindList(
       "/UserAuthLogPerDay",
@@ -142,8 +179,7 @@ export default class UserDetail extends Controller {
       undefined,
       [
         new Filter("UserName", FilterOperator.EQ, sUsername),
-        new Filter("login_result", FilterOperator.EQ, "SUCCESS"),
-        new Filter("LoginDate", FilterOperator.BT, sFromDate, sToDate),
+        ...this._aDefaultFilters,
       ],
     ) as ODataListBinding;
 
@@ -160,6 +196,8 @@ export default class UserDetail extends Controller {
    * Load user activity information
    **/
   private async _loadUserActivity(sUsername: string): Promise<void> {
+    const oTCodePerUserData = {} as any;
+
     const oModel = (this as any).getAppComponent().getModel() as ODataModel;
 
     // Create a list binding to /ActivityTCodeByUser with $filter
@@ -167,24 +205,55 @@ export default class UserDetail extends Controller {
       "/ActivityTCodeByUser",
       undefined,
       undefined,
-      [new Filter("Username", FilterOperator.EQ, sUsername)],
+      [
+        new Filter("Username", FilterOperator.EQ, sUsername),
+        new Filter({
+          path: "ActivityDate",
+          operator: FilterOperator.BT,
+          value1: this._sFromDate,
+          value2: this._sToDate,
+        }),
+      ],
     ) as ODataListBinding;
 
     // Executes the OData call
     const aContextsActivityTCodeByUser =
-      await oActivityTCodeByUser.requestContexts(0, 5);
+      await oActivityTCodeByUser.requestContexts();
 
-    const ActTcodeData = aContextsActivityTCodeByUser.map((oContext) => {
-      // Create label field
+    // Group by + SUM data
+    aContextsActivityTCodeByUser.forEach((oContext) => {
       const oObj = oContext.getObject();
-      oObj.Label = `${oObj.TCode} - ${oObj.TCodeName}`;
 
-      return oObj;
+      const key = oObj.TCode;
+
+      // If TCode is exist, plus TCodeCount, else create new obj
+      if (!oTCodePerUserData[key]) {
+        oTCodePerUserData[key] = {
+          TCode: oObj.TCode,
+          TCodeName: oObj.TCodeName,
+          TCodeCount: 0,
+        };
+      }
+
+      oTCodePerUserData[key].TCodeCount += oObj.TCodeCount;
     });
 
-    const oJsonModelActTcode = new JSONModel(ActTcodeData);
+    //  Convert into array
+    let aTCodePerUserData = Object.values(oTCodePerUserData);
+
+    // Sort data
+    aTCodePerUserData.sort((a: any, b: any) => b.TCodeCount - a.TCodeCount);
+
+    //  Top 5
+    aTCodePerUserData = aTCodePerUserData.slice(0, 5);
+
+    //  Add label
+    aTCodePerUserData.forEach((item: any) => {
+      item.Label = `${item.TCode} - ${item.TCodeName}`;
+    });
 
     // Set data into Model ActivityTCodeByUser
+    const oJsonModelActTcode = new JSONModel(aTCodePerUserData);
     this.getView()?.setModel(oJsonModelActTcode, "TCodeByUserData");
 
     // Create a list binding to /UserActivityLog with $filter
@@ -192,7 +261,15 @@ export default class UserDetail extends Controller {
       "/UserActivityLog",
       undefined,
       undefined,
-      [new Filter("Username", FilterOperator.EQ, sUsername)],
+      [
+        new Filter("Username", FilterOperator.EQ, sUsername),
+        new Filter({
+          path: "ActivityDate",
+          operator: FilterOperator.BT,
+          value1: this._sFromDate,
+          value2: this._sToDate,
+        }),
+      ],
     ) as ODataListBinding;
 
     const aContextsTable = await oUserActTable.requestContexts();

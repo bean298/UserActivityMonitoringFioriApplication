@@ -186,7 +186,7 @@
                                     vizType="column"
                                     vizProperties="{
                                     title: {
-                                        text: 'User Log (Last 6 Days)'
+                                        text: 'User Log'
                                     },
                                     plotArea: {
                                         dataLabel: {
