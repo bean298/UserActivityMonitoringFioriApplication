@@ -42,7 +42,7 @@ export default class UserDetail extends Controller {
     // Take a last 6 days
     const oToday = new Date();
     const o7DaysAgo = new Date();
-    o7DaysAgo.setDate(oToday.getDate() - 2);
+    o7DaysAgo.setDate(oToday.getDate() - 3);
 
     const formatDate = (oDate: Date) => {
       return oDate.toISOString().split("T")[0];
@@ -143,7 +143,7 @@ export default class UserDetail extends Controller {
     //  Convert into array
     let aUserAuthLogPerDayData = Object.values(oUserAuthLogPerDayData);
 
-    const oJsonModel = new JSONModel(aDataChart);
+    const oJsonModel = new JSONModel(aUserAuthLogPerDayData);
 
     // Set data into Model AuthLogChartByUser
     this.getView()?.setModel(oJsonModel, "AuthLogChartByUserData");
@@ -170,6 +170,8 @@ export default class UserDetail extends Controller {
    * Load User Auth Log Per Day
    **/
   private async _loadUserAuthLogPerDay(sUsername: string): Promise<void> {
+    const oLogUserPerDay = {} as any;
+
     const oModel = (this as any).getAppComponent().getModel() as ODataModel;
 
     // Create a list binding to /UserAuthLogPerDay with $filter
@@ -184,11 +186,27 @@ export default class UserDetail extends Controller {
     ) as ODataListBinding;
 
     const aContextsLogPerDay = await oUserAuthLogPerDay.requestContexts();
-    const aDataLogPerDa = aContextsLogPerDay.map((oContext) =>
-      oContext.getObject(),
-    );
 
-    const oLogPerDaModel = new JSONModel(aDataLogPerDa);
+    aContextsLogPerDay.forEach((oContext) => {
+      const oObj = oContext.getObject();
+
+      const key = oObj.LoginDate;
+
+      if (!oLogUserPerDay[key]) {
+        oLogUserPerDay[key] = {
+          LoginDate: oObj.LoginDate,
+          TotalLoginCount: 0,
+        };
+      }
+
+      oLogUserPerDay[key].TotalLoginCount += oObj.TotalLoginCount;
+    });
+
+    //  Convert into array
+    let aLogUserPerDay = Object.values(oLogUserPerDay);
+
+    const oLogPerDaModel = new JSONModel(aLogUserPerDay);
+
     this.getView()?.setModel(oLogPerDaModel, "UserAuthLogPerDayData");
   }
 

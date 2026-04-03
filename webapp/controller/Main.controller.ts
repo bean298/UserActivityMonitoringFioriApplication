@@ -52,7 +52,7 @@ export default class Main extends Controller {
     // Take a last 6 days
     const oToday = new Date();
     const o7DaysAgo = new Date();
-    o7DaysAgo.setDate(oToday.getDate() - 1);
+    o7DaysAgo.setDate(oToday.getDate() - 3);
 
     const formatDate = (oDate: Date) => {
       return oDate.toISOString().split("T")[0];

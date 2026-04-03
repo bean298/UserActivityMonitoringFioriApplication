@@ -279,7 +279,7 @@
                         </ui:Column>
 
                         <!-- LOGIN TIME COLUMN -->
-                        <ui:Column id="columnLoginTime" width="7rem" sortProperty="LoginTime">
+                        <ui:Column id="columnLoginTime" width="7rem" sortProperty="LoginTime" tooltip="{i18n>introSort}">
                             <Label id="labelLoginTime" text="{i18n>loginTime}" />
 
                             <ui:template>
