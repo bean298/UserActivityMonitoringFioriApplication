@@ -583,7 +583,7 @@
                                         </ui:Column>
 
                                         <!-- NAVIGATION -->
-                                        <ui:Column id="ActivityNavigateColumnId" width="4rem"
+                                        <!-- <ui:Column id="ActivityNavigateColumnId" width="4rem"
                                             hAlign="Center">
                                             <ui:template>
                                                 <Button id="ActivityNavigateButtonId"
@@ -591,7 +591,7 @@
                                                     type="Transparent" press="onPressActivityDetail"
                                                     tooltip="{i18n>navigateAuth}" />
                                             </ui:template>
-                                        </ui:Column>
+                                        </ui:Column> -->
                                     </ui:columns>
                                 </ui:Table>
                             </VBox>

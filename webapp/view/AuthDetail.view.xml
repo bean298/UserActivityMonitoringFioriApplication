@@ -261,13 +261,13 @@
                                     </ui:Column>
 
                                     <!-- NAVIGATION COLUMN -->
-                                    <ui:Column id="ColumnNavId" width="4rem" hAlign="Center">
+                                    <!-- <ui:Column id="ColumnNavId" width="4rem" hAlign="Center">
                                         <ui:template>
                                             <Button id="btnActivityNavigator"
                                                 icon="sap-icon://navigation-right-arrow"
                                                 type="Transparent" press="onPressActivityDetail" />
                                         </ui:template>
-                                    </ui:Column>
+                                    </ui:Column> -->
                                 </ui:columns>
                             </ui:Table>
                         </VBox>

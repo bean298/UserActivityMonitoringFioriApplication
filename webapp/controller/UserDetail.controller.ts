@@ -19,6 +19,8 @@ export default class UserDetail extends Controller {
   private _aUserFilters: Filter[] = [];
   private _aUserDateFilters: Filter[] = [];
   private _sCurrentUsername: string = "";
+  private _bIsActivityFiltered: boolean = false;
+  private _aActivityDateFilters: Filter[] = [];
 
   /**
    * Called when the controller is initialized.
@@ -275,21 +277,30 @@ export default class UserDetail extends Controller {
     const oTCodePerUserData = {} as any;
 
     const oModel = (this as any).getAppComponent().getModel() as ODataModel;
+    // SETUP FILTERS
+    const aDefaultActivityFilters = [
+      new Filter({
+        path: "ActivityDate",
+        operator: FilterOperator.BT,
+        value1: this._sFromDate,
+        value2: this._sToDate,
+      }),
+    ];
 
+    const aDateFilters = this._bIsActivityFiltered
+      ? this._aActivityDateFilters
+      : aDefaultActivityFilters;
+
+    const aFinalFilters = [
+      new Filter("Username", FilterOperator.EQ, sUsername),
+      ...aDateFilters,
+    ];
     // Create a list binding to /ActivityTCodeByUser with $filter
     const oActivityTCodeByUser = oModel.bindList(
       "/ActivityTCodeByUser",
       undefined,
       undefined,
-      [
-        new Filter("Username", FilterOperator.EQ, sUsername),
-        new Filter({
-          path: "ActivityDate",
-          operator: FilterOperator.BT,
-          value1: this._sFromDate,
-          value2: this._sToDate,
-        }),
-      ],
+      aFinalFilters,
     ) as ODataListBinding;
 
     // Executes the OData call
@@ -337,19 +348,24 @@ export default class UserDetail extends Controller {
       "/UserActivityLog",
       undefined,
       undefined,
-      [
-        new Filter("Username", FilterOperator.EQ, sUsername),
-        new Filter({
-          path: "ActivityDate",
-          operator: FilterOperator.BT,
-          value1: this._sFromDate,
-          value2: this._sToDate,
-        }),
-      ],
+      aFinalFilters,
     ) as ODataListBinding;
 
     const aContextsTable = await oUserActTable.requestContexts();
-    const aDataTable = aContextsTable.map((oContext) => oContext.getObject());
+    let aDataTable = aContextsTable.map((oContext) => oContext.getObject());
+
+    const sActivityType = (
+      this.byId("ActivityTypeSelectId") as any
+    ).getSelectedKey();
+
+    if (sActivityType && sActivityType !== "") {
+      aDataTable = aDataTable.filter((item: any) => {
+        return (
+          item.ActivityType &&
+          item.ActivityType.toUpperCase().includes(sActivityType.toUpperCase())
+        );
+      });
+    }
 
     const oTableModel = new JSONModel(aDataTable);
     this.getView()?.setModel(oTableModel, "UserActivityLogData");
@@ -375,7 +391,38 @@ export default class UserDetail extends Controller {
       }
     }
   }
+  /**
+   * Handle filter for User Activity (Activity Type & Date)
+   */
+  public async onFilterActivity(): Promise<void> {
+    const oView = this.getView();
+    if (!oView) return;
 
+    this._bIsActivityFiltered = true;
+    oView.setBusy(true);
+
+    //Extract the Date for the API request
+    const oDatePicker = this.byId("ActivityDatePickerId") as any;
+    const oDate = oDatePicker.getDateValue();
+
+    if (oDate) {
+      const sDate = DateFormat.getDateInstance({
+        pattern: "yyyy-MM-dd",
+      }).format(oDate, false);
+      this._aActivityDateFilters = [
+        new Filter("ActivityDate", FilterOperator.EQ, sDate),
+      ];
+    } else {
+      this._aActivityDateFilters = [];
+    }
+
+    try {
+      // Call the API. DUMP/TCODE filtering will be handled internally within _loadUserActivity
+      await this._loadUserActivity(this._sCurrentUsername);
+    } finally {
+      oView.setBusy(false);
+    }
+  }
   //  Exports Excel file.
   public onExportUserDetailExcel(): void {
     const sFileName = `User_${this._sFromDate}_to_${this._sToDate}.xlsx`;
