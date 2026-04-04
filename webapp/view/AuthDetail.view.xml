@@ -178,9 +178,9 @@
                                             tooltip="Export Excel" press="onExportActivityExcel" />
 
                                         <!-- SETTINGS -->
-                                        <Button id="btnActivitySettings"
+                                        <!-- <Button id="btnActivitySettings"
                                             icon="sap-icon://action-settings" tooltip="Settings"
-                                            press="onOpenActivitySettings" />
+                                            press="onOpenActivitySettings" /> -->
                                     </OverflowToolbar>
                                 </ui:extension>
 

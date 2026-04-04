@@ -287,8 +287,9 @@
 
                                         <ToolbarSpacer id="spacer02" />
 
-                                        <Button id="AuthRefreshButtonId" icon="sap-icon://refresh"
-                                            tooltip="{i18n>refreshData}" press="onRefreshTable" />
+                                        <!-- <Button id="AuthRefreshButtonId"
+                                        icon="sap-icon://refresh"
+                                            tooltip="{i18n>refreshData}" press="onRefreshTable" /> -->
 
                                         <Button id="AuthExportButtonId"
                                             icon="sap-icon://excel-attachment"
@@ -495,10 +496,10 @@
                                                 press="onExportActivityExcel" />
 
                                             <!-- SETTINGS -->
-                                            <Button id="ActivitySettingsButtonId"
+                                            <!-- <Button id="ActivitySettingsButtonId"
                                                 icon="sap-icon://action-settings"
                                                 tooltip="{i18n>viewSettings}"
-                                                press="onOpenActivitySettings" />
+                                                press="onOpenActivitySettings" /> -->
 
                                         </OverflowToolbar>
                                     </ui:extension>
