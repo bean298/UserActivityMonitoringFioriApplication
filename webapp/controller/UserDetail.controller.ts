@@ -6,6 +6,9 @@ import JSONModel from "sap/ui/model/json/JSONModel";
 import ODataListBinding from "sap/ui/model/odata/v4/ODataListBinding";
 import ODataModel from "sap/ui/model/odata/v4/ODataModel";
 import Formatter from "useraudit/formatter/Formatter";
+import Spreadsheet from "sap/ui/export/Spreadsheet";
+import MessageToast from "sap/m/MessageToast";
+import DateFormat from "sap/ca/ui/model/format/DateFormat";
 
 export default class UserDetail extends Controller {
   public formatter = Formatter;
@@ -13,6 +16,9 @@ export default class UserDetail extends Controller {
   private _sFromDate!: string;
   private _sToDate!: string;
   private _aDefaultFilters: Filter[] = [];
+  private _aUserFilters: Filter[] = [];
+  private _aUserDateFilters: Filter[] = [];
+  private _sCurrentUsername: string = "";
 
   /**
    * Called when the controller is initialized.
@@ -35,6 +41,7 @@ export default class UserDetail extends Controller {
   private async _onObjectMatched(oEvent: any): Promise<void> {
     // Get parameter from URL
     const sUsername = oEvent.getParameter("arguments").username;
+    this._sCurrentUsername = sUsername;
 
     const oView = this.getView();
     if (!oView || !sUsername) return;
@@ -59,7 +66,9 @@ export default class UserDetail extends Controller {
         value2: this._sToDate,
       }),
     ];
-
+    // Reset filter
+    this._aUserFilters = [];
+    this._aUserDateFilters = [];
     oView.setBusy(true);
 
     try {
@@ -75,14 +84,56 @@ export default class UserDetail extends Controller {
       oView.setBusy(false);
     }
   }
+  public async onFilterAuth(): Promise<void> {
+    const oView = this.getView();
+    if (!oView) return;
 
+    oView.setBusy(true);
+
+    // Get Status from Select
+    const sStatus = (this.byId("AuthStatusSelectId") as any).getSelectedKey();
+    this._aUserFilters =
+      sStatus && sStatus !== ""
+        ? [new Filter("LoginResult", FilterOperator.EQ, sStatus)]
+        : [];
+
+    // Get Date from DatePicker
+    const oDatePicker = this.byId("AuthDatePickerId") as any;
+    const oDate = oDatePicker.getDateValue();
+
+    if (oDate) {
+      const sDate = DateFormat.getDateInstance({
+        pattern: "yyyy-MM-dd",
+      }).format(oDate, false);
+      this._aUserDateFilters = [
+        new Filter("LoginDate", FilterOperator.EQ, sDate),
+      ];
+    } else {
+      this._aUserDateFilters = [];
+    }
+
+    // Call the function to reload the data
+    try {
+      await this._loadUserLogs(this._sCurrentUsername);
+    } finally {
+      oView.setBusy(false);
+    }
+  }
   /**
    * Load user detail information
    **/
   private async _loadUserDetail(sUsername: string): Promise<void> {
     const oView = this.getView();
     const oModel = (this as any).getAppComponent().getModel() as ODataModel;
-
+    const aDateFilters =
+      this._aUserDateFilters.length > 0
+        ? this._aUserDateFilters
+        : this._aDefaultFilters;
+    const aFinalFilters = [
+      new Filter("Username", FilterOperator.EQ, sUsername),
+      ...aDateFilters,
+      ...this._aUserFilters,
+    ];
     // Create a list binding to /UserDetail with $filter
     const oUserDetai = oModel.bindList("/UserDetail", undefined, undefined, [
       new Filter("UserName", FilterOperator.EQ, sUsername),
@@ -107,20 +158,25 @@ export default class UserDetail extends Controller {
    **/
   private async _loadUserLogs(sUsername: string): Promise<void> {
     const oUserAuthLogPerDayData = {} as any;
-
     const oModel = (this as any).getAppComponent().getModel() as ODataModel;
 
+    // --- SETUP FILTERS ---
+    const aDateFilters =
+      this._aUserDateFilters.length > 0
+        ? this._aUserDateFilters
+        : this._aDefaultFilters;
+    const aFinalFilters = [
+      new Filter("Username", FilterOperator.EQ, sUsername),
+      ...aDateFilters,
+      ...this._aUserFilters,
+    ];
     // Create a list binding to /AuthLogChartByUser with $filter
     const oUserAuthChart = oModel.bindList(
       "/AuthLogChartByUser",
       undefined,
       undefined,
-      [
-        new Filter("Username", FilterOperator.EQ, sUsername),
-        ...this._aDefaultFilters,
-      ],
+      aFinalFilters,
     ) as ODataListBinding;
-
     // Executes the OData call
     const aContextsChart = await oUserAuthChart.requestContexts();
 
@@ -153,10 +209,7 @@ export default class UserDetail extends Controller {
       "/UserAuthLog",
       undefined,
       undefined,
-      [
-        new Filter("Username", FilterOperator.EQ, sUsername),
-        ...this._aDefaultFilters,
-      ],
+      aFinalFilters,
     ) as ODataListBinding;
 
     const aContextsTable = await oUserAuthTable.requestContexts();
@@ -173,16 +226,21 @@ export default class UserDetail extends Controller {
     const oLogUserPerDay = {} as any;
 
     const oModel = (this as any).getAppComponent().getModel() as ODataModel;
-
+    const aDateFilters =
+      this._aUserDateFilters.length > 0
+        ? this._aUserDateFilters
+        : this._aDefaultFilters;
+    const aFinalFilters = [
+      new Filter("UserName", FilterOperator.EQ, sUsername),
+      ...aDateFilters,
+      ...this._aUserFilters,
+    ];
     // Create a list binding to /UserAuthLogPerDay with $filter
     const oUserAuthLogPerDay = oModel.bindList(
       "/UserAuthLogPerDay",
       undefined,
       undefined,
-      [
-        new Filter("UserName", FilterOperator.EQ, sUsername),
-        ...this._aDefaultFilters,
-      ],
+      aFinalFilters,
     ) as ODataListBinding;
 
     const aContextsLogPerDay = await oUserAuthLogPerDay.requestContexts();
@@ -316,5 +374,63 @@ export default class UserDetail extends Controller {
         });
       }
     }
+  }
+
+  //  Exports Excel file.
+  public onExportUserDetailExcel(): void {
+    const sFileName = `User_${this._sFromDate}_to_${this._sToDate}.xlsx`;
+
+    MessageBox.confirm("Do you want to export this data to Excel?", {
+      title: "Confirm Export",
+      actions: ["YES", "NO"],
+      emphasizedAction: "YES",
+
+      onClose: (oAction: string | null) => {
+        if (oAction === "YES") {
+          const oModel = this.getView()?.getModel(
+            "UserAuthLogData",
+          ) as JSONModel;
+          const aData = oModel?.getData();
+
+          if (!aData || aData.length === 0) {
+            MessageBox.error("No data to export.");
+            return;
+          }
+
+          const aCols = [
+            { label: "User Session", property: "SessionId", width: 25 },
+            { label: "User Name", property: "Username", width: 15 },
+            { label: "Login Result", property: "LoginResult", width: 10 },
+            { label: "Login Date", property: "LoginDate", width: 15 },
+            { label: "Login Time", property: "LoginTime", width: 15 },
+            { label: "Login Message", property: "LoginMessage", width: 150 },
+            { label: "Logout Date", property: "LogoutDate", width: 15 },
+            { label: "Logout Time", property: "LogoutTime", width: 15 },
+            { label: "Event ID", property: "EventId", width: 10 },
+          ];
+
+          const oSettings = {
+            workbook: { columns: aCols },
+            dataSource: aData,
+            fileName: sFileName,
+            worker: false,
+          };
+
+          const oSheet = new Spreadsheet(oSettings);
+
+          oSheet
+            .build()
+            .then(() => {
+              MessageToast.show("Export successful!", { duration: 3000 });
+            })
+            .catch(() => {
+              MessageBox.error("Export failed.");
+            })
+            .finally(() => {
+              oSheet.destroy();
+            });
+        }
+      },
+    });
   }
 }

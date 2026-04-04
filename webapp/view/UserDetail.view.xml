@@ -252,7 +252,7 @@
                                     <core:Item id="itemAllStatus" key="" text="{i18n>all}" />
                                     <core:Item id="itemSuccessStatus" key="SUCCESS"
                                         text="{i18n>success}" />
-                                    <core:Item id="itemFailedStatus" key="FAILED"
+                                    <core:Item id="itemFailedStatus" key="FAIL"
                                         text="{i18n>failed}" />
                                 </Select>
 
@@ -292,7 +292,8 @@
 
                                         <Button id="AuthExportButtonId"
                                             icon="sap-icon://excel-attachment"
-                                            tooltip="{i18n>exportExcel}" press="onExportExcel" />
+                                            tooltip="{i18n>exportExcel}"
+                                            press="onExportUserDetailExcel" />
 
                                     </OverflowToolbar>
                                 </ui:extension>

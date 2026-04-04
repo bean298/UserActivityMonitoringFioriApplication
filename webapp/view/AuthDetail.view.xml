@@ -29,18 +29,22 @@
                     <Title id="TitleUsername" text="{detailData>/Username}" level="H5" />
 
                     <!-- LOGIN RESULT -->
-                    <ObjectStatus id="StatusLoginResultHeader" text="{detailData>/LoginResult}" state="{
+                    <ObjectStatus id="StatusLoginResultHeader" text="{detailData>/LoginResult}"
+                        state="{
                         path: 'detailData>/LoginResult',
                         formatter: '.formatter.formatLoginResultState'
-                    }" icon="{
+                    }"
+                        icon="{
                         path: 'detailData>/LoginResult',
                         formatter: '.formatter.formatLoginResultIcon'
-                    }" class="sapUiSmallMarginBottom" />
+                    }"
+                        class="sapUiSmallMarginBottom" />
 
                     <Label id="LabelClient" text="{i18n>client}" design="Bold" />
                     <Text id="TextClient" text="{detailData>/UserClient}" />
 
-                    <Label id="LabelSystem" text="{i18n>system}" design="Bold" class="sapUiSmallMarginTop"/>
+                    <Label id="LabelSystem" text="{i18n>system}" design="Bold"
+                        class="sapUiSmallMarginTop" />
                     <Text id="TextSyste" text="{detailData>/UserSystem}" />
                 </VBox>
             </HBox>
@@ -60,19 +64,28 @@
                                 <Text id="TextSessionId" text="{detailData>/SessionId}" />
 
                                 <!-- USERNAME -->
-                                <Label id="LabelUsername" text="{i18n>username}" design="Bold" class="sapUiSmallMarginTop" />
+                                <Label id="LabelUsername" text="{i18n>username}" design="Bold"
+                                    class="sapUiSmallMarginTop" />
                                 <Text id="TextUsername" text="{detailData>/Username}" />
                             </VBox>
 
                             <!-- COLUMN 2 -->
                             <VBox id="BoxLoginResult">
                                 <!-- LOGIN RESULT -->
-                                <Label id="LabelLoginResultId" text="{i18n>loginResult}" design="Bold" />
-                                <ObjectStatus id="StatusLoginResultId" text="{detailData>/LoginResult}" state="{path: 'detailData>/LoginResult', formatter: '.formatter.formatLoginResultState'}" icon="{path: 'detailData>/LoginResult', formatter: '.formatter.formatLoginResultIcon'}" />
+                                <Label id="LabelLoginResultId" text="{i18n>loginResult}"
+                                    design="Bold" />
+                                <ObjectStatus id="StatusLoginResultId"
+                                    text="{detailData>/LoginResult}"
+                                    state="{path: 'detailData>/LoginResult', formatter: '.formatter.formatLoginResultState'}"
+                                    icon="{path: 'detailData>/LoginResult', formatter: '.formatter.formatLoginResultIcon'}" />
 
                                 <!-- LOGIN MESSAGE -->
-                                <Label id="LabelLoginMessageId" text="{i18n>loginMessage}" design="Bold" class="sapUiSmallMarginTop" />
-                                <ObjectStatus id="StatusLoginMessageId" text="{detailData>/LoginMessage}" state="{path: 'detailData>/EventId', formatter: '.formatter.formatLoginMessageState'}" icon="{path: 'detailData>/EventId', formatter: '.formatter.formatLoginMessageIcon'}" />
+                                <Label id="LabelLoginMessageId" text="{i18n>loginMessage}"
+                                    design="Bold" class="sapUiSmallMarginTop" />
+                                <ObjectStatus id="StatusLoginMessageId"
+                                    text="{detailData>/LoginMessage}"
+                                    state="{path: 'detailData>/EventId', formatter: '.formatter.formatLoginMessageState'}"
+                                    icon="{path: 'detailData>/EventId', formatter: '.formatter.formatLoginMessageIcon'}" />
                             </VBox>
 
                             <!-- COLUMN 3 -->
@@ -81,17 +94,21 @@
                                 <Label id="LabelTerminal" text="{i18n>terminalId}" design="Bold" />
                                 <Text id="TextTerminal" text="{detailData>/TerminalId}" />
                                 <!-- EVENT ID -->
-                                <Label id="LabelEvent" text="{i18n>eventId}" design="Bold" class="sapUiSmallMarginTop" />
-                                <ObjectStatus id="StatusEvent" text="{detailData>/EventId}" state="{path: 'detailData>/EventId', formatter: '.formatter.formatLoginMessageState'}" />
+                                <Label id="LabelEvent" text="{i18n>eventId}" design="Bold"
+                                    class="sapUiSmallMarginTop" />
+                                <ObjectStatus id="StatusEvent" text="{detailData>/EventId}"
+                                    state="{path: 'detailData>/EventId', formatter: '.formatter.formatLoginMessageState'}" />
                             </VBox>
 
                             <!-- COLUMN 4 -->
                             <VBox id="BoxLoginTimeInfo">
                                 <!-- LOGIN DATE -->
                                 <Label id="LabelLoginDateId" text="{i18n>loginDate}" design="Bold" />
-                                <Text id="TextLoginDateId" text="{path:'detailData>/LoginDate', formatter: '.formatter.formatISODate'}" />
+                                <Text id="TextLoginDateId"
+                                    text="{path:'detailData>/LoginDate', formatter: '.formatter.formatISODate'}" />
                                 <!-- LOGIN TIME -->
-                                <Label id="LabelLoginTimeId" text="{i18n>loginTime}" design="Bold" class="sapUiSmallMarginTop" />
+                                <Label id="LabelLoginTimeId" text="{i18n>loginTime}" design="Bold"
+                                    class="sapUiSmallMarginTop" />
                                 <Text id="TextLoginTimeId" text="{detailData>/LoginTime}" />
                             </VBox>
 
@@ -99,17 +116,23 @@
                             <VBox id="BoxLogoutTimeInfo">
                                 <!-- LOGOUT DATE -->
                                 <Label id="LabelLogoutDateId" text="{i18n>logoutDate}" design="Bold" />
-                                <Text id="TextLogoutDateId" text="{path:'detailData>/LogoutDate', formatter: '.formatter.formatISODate'}" />
+                                <Text id="TextLogoutDateId"
+                                    text="{path:'detailData>/LogoutDate', formatter: '.formatter.formatISODate'}" />
                                 <!-- LOGOUT TIME -->
-                                <Label id="LabelLogoutTimeId" text="{i18n>logoutTime}" design="Bold" class="sapUiSmallMarginTop" />
-                                <Text id="TextLogoutTimeId" text="{path:'detailData>/LogoutTime', formatter: '.formatter.formatLogoutTime'}" />
+                                <Label id="LabelLogoutTimeId" text="{i18n>logoutTime}" design="Bold"
+                                    class="sapUiSmallMarginTop" />
+                                <Text id="TextLogoutTimeId"
+                                    text="{path:'detailData>/LogoutTime', formatter: '.formatter.formatLogoutTime'}" />
                             </VBox>
 
                             <!-- COLUMN 6 -->
                             <VBox id="BoxEmail">
                                 <!-- SEND EMAIL -->
                                 <Label id="LabelSendEmailId" text="{i18n>sendEmail}" design="Bold" />
-                                <core:Icon id="icon" src="{= ${detailData>/SendMailFlag} ? 'sap-icon://accept' : 'sap-icon://decline'}" color="{= ${detailData>/SendMailFlag} ? 'green' : 'red'}" size="1.5rem" />
+                                <core:Icon id="icon"
+                                    src="{= ${detailData>/SendMailFlag} ? 'sap-icon://accept' : 'sap-icon://decline'}"
+                                    color="{= ${detailData>/SendMailFlag} ? 'green' : 'red'}"
+                                    size="1.5rem" />
                             </VBox>
                         </layout:Grid>
                     </f:ObjectPageSubSection>
@@ -122,12 +145,15 @@
                     <f:ObjectPageSubSection id="SubSectionActivity">
                         <VBox id="ActivityVBox">
                             <!-- FILTER TOOLBAR -->
-                            <Toolbar id="ActivityFilterToolbar" class="sapUiSmallMarginBottom" design="Transparent">
-                                <ToolbarSpacer id="ActivityToolbarSpacer"/>
+                            <Toolbar id="ActivityFilterToolbar" class="sapUiSmallMarginBottom"
+                                design="Transparent">
+                                <ToolbarSpacer id="ActivityToolbarSpacer" />
 
-                                <Label id="ActivityTypeLabel" text="{i18n>activityType}" class="sapUiTinyMarginEnd" />
+                                <Label id="ActivityTypeLabel" text="{i18n>activityType}"
+                                    class="sapUiTinyMarginEnd" />
 
-                                <Select id="activityTypeFilter" width="180px" change="onFilterActivityType">
+                                <Select id="activityTypeFilter" width="180px"
+                                    change="onFilterActivityType">
                                     <core:Item id="all" key="" text="{i18n>itemAll}" />
                                     <core:Item id="tcode" key="TCODE" text="{i18n>itemTcode}" />
                                     <core:Item id="dump" key="DUMP" text="{i18n>itemDump}" />
@@ -135,20 +161,26 @@
                             </Toolbar>
 
                             <!-- TABLE -->
-                            <ui:Table id="ActivityTable" rows="{detailData>/_Activity}" selectionMode="None" alternateRowColors="true">
+                            <ui:Table id="ActivityTable" rows="{detailData>/_Activity}"
+                                selectionMode="None" alternateRowColors="true">
                                 <ui:extension>
                                     <OverflowToolbar id="ActivityTableToolbar">
 
                                         <!-- TITLE -->
-                                        <Title id="ActivityTitle" text="{i18n>activityLog}" level="H6" />
+                                        <Title id="ActivityTitle" text="{i18n>activityLog}"
+                                            level="H6" />
 
-                                        <ToolbarSpacer id="ActivityTableSpacer"/>
+                                        <ToolbarSpacer id="ActivityTableSpacer" />
 
                                         <!-- EXPORT -->
-                                        <Button id="btnExportActivity" icon="sap-icon://excel-attachment" tooltip="Export Excel" press="onExportActivityExcel" />
+                                        <Button id="btnExportActivity"
+                                            icon="sap-icon://excel-attachment"
+                                            tooltip="Export Excel" press="onExportActivityExcel" />
 
                                         <!-- SETTINGS -->
-                                        <Button id="btnActivitySettings" icon="sap-icon://action-settings" tooltip="Settings" press="onOpenActivitySettings" />
+                                        <Button id="btnActivitySettings"
+                                            icon="sap-icon://action-settings" tooltip="Settings"
+                                            press="onOpenActivitySettings" />
                                     </OverflowToolbar>
                                 </ui:extension>
 
@@ -158,7 +190,8 @@
                                         <Label id="LabelLogId" text="{i18n>logId}" />
 
                                         <ui:template>
-                                            <Text id="TextLogId" text="{detailData>LogId}" wrapping="false" />
+                                            <Text id="TextLogId" text="{detailData>LogId}"
+                                                wrapping="false" />
                                         </ui:template>
                                     </ui:Column>
 
@@ -167,7 +200,10 @@
                                         <Label id="LabelActivityType" text="{i18n>activityType}" />
 
                                         <ui:template>
-                                            <ObjectStatus id="ObjectStatusActivityType" text="{detailData>ActivityType}" icon="{path:'detailData>ActivityType', formatter: '.formatter.formatActivityType'}" state="{path:'detailData>ActivityType', formatter: '.formatter.formatActivityState'}"/>
+                                            <ObjectStatus id="ObjectStatusActivityType"
+                                                text="{detailData>ActivityType}"
+                                                icon="{path:'detailData>ActivityType', formatter: '.formatter.formatActivityType'}"
+                                                state="{path:'detailData>ActivityType', formatter: '.formatter.formatActivityState'}" />
                                         </ui:template>
                                     </ui:Column>
 
@@ -176,7 +212,9 @@
                                         <Label id="LabelTCode" text="{i18n>tCode}" />
 
                                         <ui:template>
-                                            <ObjectStatus id="ObjectStatusTCode" text="{detailData>TCode}" icon="{path:'detailData>TCode', formatter: '.formatter.formatTCodeIcon'}" />
+                                            <ObjectStatus id="ObjectStatusTCode"
+                                                text="{detailData>TCode}"
+                                                icon="{path:'detailData>TCode', formatter: '.formatter.formatTCodeIcon'}" />
                                         </ui:template>
                                     </ui:Column>
 
@@ -185,16 +223,20 @@
                                         <Label id="LabelTCodeName" text="{i18n>tCodeName}" />
 
                                         <ui:template>
-                                            <Text id="TextTCodeName" text="{detailData>TCodeName}" wrapping="false" />
+                                            <Text id="TextTCodeName" text="{detailData>TCodeName}"
+                                                wrapping="false" />
                                         </ui:template>
                                     </ui:Column>
 
                                     <!-- ACTIVITY MESSAGE COLUMN -->
                                     <ui:Column id="ColumnMsgId">
-                                        <Label id="LabelActivityMessage" text="{i18n>activityMessage}" />
+                                        <Label id="LabelActivityMessage"
+                                            text="{i18n>activityMessage}" />
 
                                         <ui:template>
-                                            <ObjectStatus id="StatusActivityMessage" text="{detailData>ActivityMessage}" state="Information" />
+                                            <ObjectStatus id="StatusActivityMessage"
+                                                text="{detailData>ActivityMessage}"
+                                                state="Information" />
                                         </ui:template>
                                     </ui:Column>
 
@@ -203,7 +245,8 @@
                                         <Label id="LabelActivityDate" text="{i18n>ActivityDate}" />
 
                                         <ui:template>
-                                            <Text id="TextActivityDate" text="{detailData>ActivityDate}" wrapping="false" />
+                                            <Text id="TextActivityDate"
+                                                text="{detailData>ActivityDate}" wrapping="false" />
                                         </ui:template>
                                     </ui:Column>
 
@@ -212,14 +255,17 @@
                                         <Label id="LabelActivityTime" text="{i18n>activityTime}" />
 
                                         <ui:template>
-                                            <Text id="TextActivityTime" text="{detailData>ActivityTime}" wrapping="false" />
+                                            <Text id="TextActivityTime"
+                                                text="{detailData>ActivityTime}" wrapping="false" />
                                         </ui:template>
                                     </ui:Column>
 
                                     <!-- NAVIGATION COLUMN -->
                                     <ui:Column id="ColumnNavId" width="4rem" hAlign="Center">
                                         <ui:template>
-                                            <Button id="btnActivityNavigator" icon="sap-icon://navigation-right-arrow" type="Transparent" press="onPressActivityDetail" />
+                                            <Button id="btnActivityNavigator"
+                                                icon="sap-icon://navigation-right-arrow"
+                                                type="Transparent" press="onPressActivityDetail" />
                                         </ui:template>
                                     </ui:Column>
                                 </ui:columns>
