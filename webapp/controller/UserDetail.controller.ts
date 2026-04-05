@@ -6,12 +6,16 @@ import JSONModel from "sap/ui/model/json/JSONModel";
 import ODataListBinding from "sap/ui/model/odata/v4/ODataListBinding";
 import ODataModel from "sap/ui/model/odata/v4/ODataModel";
 import Formatter from "useraudit/formatter/Formatter";
-
+import Select from "sap/m/Select";
+import Table from "sap/ui/table/Table";
+import DatePicker from "sap/m/DatePicker";
+import DateFormat from "sap/ui/core/format/DateFormat";
 export default class UserDetail extends Controller {
   public formatter = Formatter;
 
   private _sFromDate!: string;
   private _sToDate!: string;
+
   private _aDefaultFilters: Filter[] = [];
 
   /**
@@ -19,25 +23,6 @@ export default class UserDetail extends Controller {
    **/
   public onInit(): void {
     super.onInit();
-
-    const oRouter = (this as any).getAppComponent().getRouter();
-    if (oRouter) {
-      oRouter
-        .getRoute("UserDetail")
-        .attachPatternMatched(this._onObjectMatched, this);
-    }
-  }
-
-  /**
-   * Handles route matching for AuthDetail page
-   * and loads detail data based on the navigation key.
-   **/
-  private async _onObjectMatched(oEvent: any): Promise<void> {
-    // Get parameter from URL
-    const sUsername = oEvent.getParameter("arguments").username;
-
-    const oView = this.getView();
-    if (!oView || !sUsername) return;
 
     // Take a last 6 days
     const oToday = new Date();
@@ -60,20 +45,54 @@ export default class UserDetail extends Controller {
       }),
     ];
 
+    const oRouter = (this as any).getAppComponent().getRouter();
+    if (oRouter) {
+      oRouter
+        .getRoute("UserDetail")
+        .attachPatternMatched(this._onObjectMatched, this);
+    }
+  }
+
+  /**
+   * Handles route matching for AuthDetail page
+   * and loads detail data based on the navigation key.
+   **/
+  private async _onObjectMatched(oEvent: any): Promise<void> {
+    // Get parameter from URL
+    const sUsername = oEvent.getParameter("arguments").username;
+
+    const oView = this.getView();
+    if (!oView || !sUsername) return;
+
     oView.setBusy(true);
 
     try {
       await Promise.all([
         this._loadUserDetail(sUsername),
         this._loadUserLogs(sUsername),
-        this._loadUserActivity(sUsername),
         this._loadUserAuthLogPerDay(sUsername),
+        this._loadUserActivity(sUsername),
       ]);
     } catch (oError) {
       MessageBox.error("Failed to load user data. Please try again.");
     } finally {
       oView.setBusy(false);
     }
+  }
+
+  /**
+   * Called when the View has been rendered (so its HTML is part of the document). Post-rendering manipulations of the HTML could be done here.
+   * This hook is the same one that SAPUI5 controls get after being rendered.
+   * @memberOf useraudit.controller.UserDetail
+   */
+  public onAfterRendering(): void {
+    // Set range in date picker
+    const oDatePicker = this.byId("AuthDatePickerId") as DatePicker;
+
+    if (!oDatePicker) return;
+
+    oDatePicker.setMinDate(new Date(this._sFromDate));
+    oDatePicker.setMaxDate(new Date(this._sToDate));
   }
 
   /**
@@ -315,6 +334,64 @@ export default class UserDetail extends Controller {
           key: sSessionId,
         });
       }
+    }
+  }
+
+  /**
+   * Called when the user use filter auth status
+   **/
+  public onFilterAuth(): void {
+    this.applyFilters();
+  }
+
+  /**
+   * Called when the user use filter auth date
+   **/
+  public onFilterAuthLoginDate(): void {
+    this.applyFilters();
+  }
+
+  /**
+   * Execute logic search and filter
+   **/
+  public applyFilters(): void {
+    const aFilters: Filter[] = [];
+
+    const oTable = this.byId("AuthTableId") as Table;
+    const oBinding = oTable.getBinding("rows") as ODataListBinding;
+
+    // Get value from search and select
+    const sStatus = (
+      this.byId("AuthStatusSelectId") as Select
+    ).getSelectedKey();
+
+    if (sStatus) {
+      aFilters.push(new Filter("LoginResult", FilterOperator.EQ, sStatus));
+    }
+
+    // Get value select date picker
+    const oDatePicker = this.byId("AuthDatePickerId") as DatePicker;
+    if (oDatePicker) {
+      const oDate = oDatePicker.getDateValue();
+
+      if (oDate) {
+        const oFormatter = DateFormat.getDateInstance({
+          pattern: "yyyy-MM-dd",
+        });
+
+        const sDate = oFormatter.format(oDate);
+
+        aFilters.push(new Filter("LoginDate", FilterOperator.EQ, sDate));
+      }
+    }
+
+    // Final filter and render into table
+    const aFinalFilters = oDatePicker
+      ? aFilters
+      : [...this._aDefaultFilters, ...aFilters];
+
+    if (oBinding) {
+      oBinding.filter(aFinalFilters);
     }
   }
 }
