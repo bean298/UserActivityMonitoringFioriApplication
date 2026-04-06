@@ -6,15 +6,19 @@ import JSONModel from "sap/ui/model/json/JSONModel";
 import ODataListBinding from "sap/ui/model/odata/v4/ODataListBinding";
 import ODataModel from "sap/ui/model/odata/v4/ODataModel";
 import Formatter from "useraudit/formatter/Formatter";
+import Select from "sap/m/Select";
+import Table from "sap/ui/table/Table";
+import DatePicker from "sap/m/DatePicker";
+import DateFormat from "sap/ui/core/format/DateFormat";
 import Spreadsheet from "sap/ui/export/Spreadsheet";
 import MessageToast from "sap/m/MessageToast";
-import DateFormat from "sap/ca/ui/model/format/DateFormat";
 
 export default class UserDetail extends Controller {
   public formatter = Formatter;
 
   private _sFromDate!: string;
   private _sToDate!: string;
+
   private _aDefaultFilters: Filter[] = [];
   private _aUserFilters: Filter[] = [];
   private _aUserDateFilters: Filter[] = [];
@@ -68,17 +72,34 @@ export default class UserDetail extends Controller {
         value2: this._sToDate,
       }),
     ];
-    // Reset filter
-    this._aUserFilters = [];
-    this._aUserDateFilters = [];
+
+    const oRouter = (this as any).getAppComponent().getRouter();
+    if (oRouter) {
+      oRouter
+        .getRoute("UserDetail")
+        .attachPatternMatched(this._onObjectMatched, this);
+    }
+  }
+
+  /**
+   * Handles route matching for AuthDetail page
+   * and loads detail data based on the navigation key.
+   **/
+  private async _onObjectMatched(oEvent: any): Promise<void> {
+    // Get parameter from URL
+    const sUsername = oEvent.getParameter("arguments").username;
+
+    const oView = this.getView();
+    if (!oView || !sUsername) return;
+
     oView.setBusy(true);
 
     try {
       await Promise.all([
         this._loadUserDetail(sUsername),
         this._loadUserLogs(sUsername),
-        this._loadUserActivity(sUsername),
         this._loadUserAuthLogPerDay(sUsername),
+        this._loadUserActivity(sUsername),
       ]);
     } catch (oError) {
       MessageBox.error("Failed to load user data. Please try again.");
@@ -86,41 +107,22 @@ export default class UserDetail extends Controller {
       oView.setBusy(false);
     }
   }
-  public async onFilterAuth(): Promise<void> {
-    const oView = this.getView();
-    if (!oView) return;
 
-    oView.setBusy(true);
+  /**
+   * Called when the View has been rendered (so its HTML is part of the document). Post-rendering manipulations of the HTML could be done here.
+   * This hook is the same one that SAPUI5 controls get after being rendered.
+   * @memberOf useraudit.controller.UserDetail
+   */
+  public onAfterRendering(): void {
+    // Set range in date picker
+    const oDatePicker = this.byId("AuthDatePickerId") as DatePicker;
 
-    // Get Status from Select
-    const sStatus = (this.byId("AuthStatusSelectId") as any).getSelectedKey();
-    this._aUserFilters =
-      sStatus && sStatus !== ""
-        ? [new Filter("LoginResult", FilterOperator.EQ, sStatus)]
-        : [];
+    if (!oDatePicker) return;
 
-    // Get Date from DatePicker
-    const oDatePicker = this.byId("AuthDatePickerId") as any;
-    const oDate = oDatePicker.getDateValue();
-
-    if (oDate) {
-      const sDate = DateFormat.getDateInstance({
-        pattern: "yyyy-MM-dd",
-      }).format(oDate, false);
-      this._aUserDateFilters = [
-        new Filter("LoginDate", FilterOperator.EQ, sDate),
-      ];
-    } else {
-      this._aUserDateFilters = [];
-    }
-
-    // Call the function to reload the data
-    try {
-      await this._loadUserLogs(this._sCurrentUsername);
-    } finally {
-      oView.setBusy(false);
-    }
+    oDatePicker.setMinDate(new Date(this._sFromDate));
+    oDatePicker.setMaxDate(new Date(this._sToDate));
   }
+
   /**
    * Load user detail information
    **/
@@ -391,36 +393,62 @@ export default class UserDetail extends Controller {
       }
     }
   }
+
   /**
-   * Handle filter for User Activity (Activity Type & Date)
-   */
-  public async onFilterActivity(): Promise<void> {
-    const oView = this.getView();
-    if (!oView) return;
+   * Called when the user use filter auth status
+   **/
+  public onFilterAuth(): void {
+    this.applyFilters();
+  }
 
-    this._bIsActivityFiltered = true;
-    oView.setBusy(true);
+  /**
+   * Called when the user use filter auth date
+   **/
+  public onFilterAuthLoginDate(): void {
+    this.applyFilters();
+  }
 
-    //Extract the Date for the API request
-    const oDatePicker = this.byId("ActivityDatePickerId") as any;
-    const oDate = oDatePicker.getDateValue();
+  /**
+   * Execute logic search and filter
+   **/
+  public applyFilters(): void {
+    const aFilters: Filter[] = [];
 
-    if (oDate) {
-      const sDate = DateFormat.getDateInstance({
-        pattern: "yyyy-MM-dd",
-      }).format(oDate, false);
-      this._aActivityDateFilters = [
-        new Filter("ActivityDate", FilterOperator.EQ, sDate),
-      ];
-    } else {
-      this._aActivityDateFilters = [];
+    const oTable = this.byId("AuthTableId") as Table;
+    const oBinding = oTable.getBinding("rows") as ODataListBinding;
+
+    // Get value from search and select
+    const sStatus = (
+      this.byId("AuthStatusSelectId") as Select
+    ).getSelectedKey();
+
+    if (sStatus) {
+      aFilters.push(new Filter("LoginResult", FilterOperator.EQ, sStatus));
     }
 
-    try {
-      // Call the API. DUMP/TCODE filtering will be handled internally within _loadUserActivity
-      await this._loadUserActivity(this._sCurrentUsername);
-    } finally {
-      oView.setBusy(false);
+    // Get value select date picker
+    const oDatePicker = this.byId("AuthDatePickerId") as DatePicker;
+    if (oDatePicker) {
+      const oDate = oDatePicker.getDateValue();
+
+      if (oDate) {
+        const oFormatter = DateFormat.getDateInstance({
+          pattern: "yyyy-MM-dd",
+        });
+
+        const sDate = oFormatter.format(oDate);
+
+        aFilters.push(new Filter("LoginDate", FilterOperator.EQ, sDate));
+      }
+    }
+
+    // Final filter and render into table
+    const aFinalFilters = oDatePicker
+      ? aFilters
+      : [...this._aDefaultFilters, ...aFilters];
+
+    if (oBinding) {
+      oBinding.filter(aFinalFilters);
     }
   }
   //  Exports Excel file.

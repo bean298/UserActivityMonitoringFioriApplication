@@ -81,7 +81,7 @@ export default class Main extends Controller {
   /**
    * Called when the View has been rendered (so its HTML is part of the document). Post-rendering manipulations of the HTML could be done here.
    * This hook is the same one that SAPUI5 controls get after being rendered.
-   * @memberOf useraudit.ext.main.Main
+   * @memberOf useraudit.controller.Main
    */
   public onAfterRendering(): void {
     // Set range in date picker

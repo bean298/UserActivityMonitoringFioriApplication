@@ -7,7 +7,6 @@
     xmlns:viz.feeds="sap.viz.ui5.controls.common.feeds"
     xmlns:viz.data="sap.viz.ui5.data"
     xmlns:ui="sap.ui.table">
-
     <f:ObjectPageLayout id="UserDetailObjectPageLayoutId" showTitleInHeaderContent="true"
         upperCaseAnchorBar="false">
         <!-- HEADER TITLE -->
@@ -65,67 +64,67 @@
                 <f:subSections>
                     <f:ObjectPageSubSection id="UserDetailSubSectionCombinedId">
                         <layout:Grid id="UserDetailGridCombinedId" defaultSpan="L2 M4 S12">
+                            <VBox id="UserInfoBoxId">
+                                <Label id="UserInfoUsernameLabelId" text="{i18n>username}"
+                                    design="Bold" />
+                                <Text id="UserInfoUsernameTextId" text="{UserDetailData>/UserName}" />
 
-                            <VBox id="BoxUserDetailBasicInfo">
-                                <Label id="lblUsername" text="{i18n>username}" design="Bold" />
-                                <Text id="txtUsername" text="{UserDetailData>/UserName}" />
-
-                                <Label id="lblFullName" text="{i18n>fullName}" design="Bold"
-                                    class="sapUiSmallMarginTop" />
-                                <Text id="txtFullName" text="{UserDetailData>/FullName}" />
+                                <Label id="UserInfoFullNameLabelId" text="{i18n>fullName}"
+                                    design="Bold" class="sapUiSmallMarginTop" />
+                                <Text id="UserInfoFullNameTextId" text="{UserDetailData>/FullName}" />
                             </VBox>
 
                             <VBox id="BoxGroupInfo">
-                                <Label id="lblUserGroup" text="{i18n>userGroup}" design="Bold" />
-                                <ObjectStatus id="objStatusUserGroup"
+                                <Label id="UserGroupLabelId" text="{i18n>userGroup}" design="Bold" />
+                                <ObjectStatus id="UserGroupStatusId"
                                     text="{UserDetailData>/UserGroup}" state="Information"
                                     icon="sap-icon://group" />
 
-                                <Label id="lblEmail" text="{i18n>email}" design="Bold"
+                                <Label id="UserEmailLabelId" text="{i18n>email}" design="Bold"
                                     class="sapUiSmallMarginTop" />
-                                <Link id="lnkEmail" text="{UserDetailData>/EmailAddress}"
+                                <Link id="UserEmailLinkId" text="{UserDetailData>/EmailAddress}"
                                     href="mailto:{UserDetailData>/EmailAddress}" />
                             </VBox>
 
                             <VBox id="BoxAddressGeneral">
-                                <Label id="lblAddressName" text="{i18n>addressName}" design="Bold" />
-                                <Text id="txtAddressName" text="{UserDetailData>/AddressName}" />
+                                <Label id="AddressNameLabelId" text="{i18n>addressName}"
+                                    design="Bold" />
+                                <Text id="AddressNameTextId" text="{UserDetailData>/AddressName}" />
 
-                                <Label id="lblCity" text="{i18n>city}" design="Bold"
+                                <Label id="CityLabelId" text="{i18n>city}" design="Bold"
                                     class="sapUiSmallMarginTop" />
-                                <Text id="txtCity" text="{UserDetailData>/City}" />
+                                <Text id="CityTextId" text="{UserDetailData>/City}" />
                             </VBox>
 
                             <VBox id="BoxAddressDetail">
-                                <Label id="lblStreet" text="{i18n>street}" design="Bold" />
-                                <Text id="txtStreet" text="{UserDetailData>/Street}" />
+                                <Label id="StreetLabelId" text="{i18n>street}" design="Bold" />
+                                <Text id="StreetTextId" text="{UserDetailData>/Street}" />
 
-                                <Label id="lblPostalCode" text="{i18n>postalCode}" design="Bold"
+                                <Label id="PostalCodeLabelId" text="{i18n>postalCode}" design="Bold"
                                     class="sapUiSmallMarginTop" />
-                                <Text id="txtPostalCode" text="{UserDetailData>/PostalCode}" />
+                                <Text id="PostalCodeTextId" text="{UserDetailData>/PostalCode}" />
                             </VBox>
 
                             <VBox id="BoxValidity">
-                                <Label id="lblValidFrom" text="{i18n>validFrom}" design="Bold" />
-                                <Text id="txtValidFrom"
+                                <Label id="ValidFromLabelId" text="{i18n>validFrom}" design="Bold" />
+                                <Text id="ValidFromTextId"
                                     text="{path:'UserDetailData>/ValidFrom', formatter:'.formatter.formatISODate'}" />
 
-                                <Label id="lblValidTo" text="{i18n>validTo}" design="Bold"
+                                <Label id="ValidToLabelId" text="{i18n>validTo}" design="Bold"
                                     class="sapUiSmallMarginTop" />
-                                <Text id="txtValidTo"
+                                <Text id="ValidToTextId"
                                     text="{path:'UserDetailData>/ValidTo', formatter:'.formatter.formatISODate'}" />
                             </VBox>
 
                             <VBox id="BoxCreationInfo">
-                                <Label id="lblCreatedBy" text="{i18n>createdBy}" design="Bold" />
-                                <Text id="txtCreator" text="{UserDetailData>/Creator}" />
+                                <Label id="CreatedByLabelId" text="{i18n>createdBy}" design="Bold" />
+                                <Text id="CreatedByTextId" text="{UserDetailData>/Creator}" />
 
-                                <Label id="lblCreatedOn" text="{i18n>createdOn}" design="Bold"
+                                <Label id="CreatedOnLabelId" text="{i18n>createdOn}" design="Bold"
                                     class="sapUiSmallMarginTop" />
-                                <Text id="txtCreatedOn"
+                                <Text id="CreatedOnTextId"
                                     text="{path:'UserDetailData>/CreateOn', formatter:'.formatter.formatISODate'}" />
                             </VBox>
-
                         </layout:Grid>
                     </f:ObjectPageSubSection>
                 </f:subSections>
@@ -241,7 +240,7 @@
 
                                 <Title id="AuthTitleId" text="{i18n>userAuthentication}" level="H2" />
 
-                                <ToolbarSpacer id="spacer01" />
+                                <ToolbarSpacer id="AuthToolbarSpacerId" />
 
                                 <!-- STATUS -->
                                 <Label id="AuthStatusLabelId" text="{i18n>status}"
@@ -249,20 +248,19 @@
 
                                 <Select id="AuthStatusSelectId" width="180px" change="onFilterAuth"
                                     class="sapUiSmallMarginEnd">
-                                    <core:Item id="itemAllStatus" key="" text="{i18n>all}" />
-                                    <core:Item id="itemSuccessStatus" key="SUCCESS"
+                                    <core:Item id="AuthStatusAllItemId" key="" text="{i18n>all}" />
+                                    <core:Item id="AuthStatusSuccessItemId" key="SUCCESS"
                                         text="{i18n>success}" />
-                                    <core:Item id="itemFailedStatus" key="FAIL"
+                                    <core:Item id="AuthStatusFailedItemId" key="FAILED"
                                         text="{i18n>failed}" />
                                 </Select>
 
                                 <!-- DATE -->
                                 <Label id="AuthDateLabelId" text="{i18n>filterDate}"
                                     class="sapUiSmallMarginBegin sapUiSmallMarginEnd" />
-
                                 <DatePicker id="AuthDatePickerId" width="180px"
-                                    change="onFilterAuth" class="sapUiSmallMarginEnd" />
-
+                                    placeholder="{i18n>selectDate}" change="onFilterAuthLoginDate"
+                                    class="sapUiSmallMarginEnd" />
                             </Toolbar>
 
                             <!-- AUTH TABLE -->
@@ -285,7 +283,7 @@
                                             text="{= ${i18n>headerTitleTable} + ' (' + ${view>/count} + ')' }"
                                             level="H2" />
 
-                                        <ToolbarSpacer id="spacer02" />
+                                        <ToolbarSpacer id="ToolbarSpacer" />
 
                                         <!-- <Button id="AuthRefreshButtonId"
                                         icon="sap-icon://refresh"
@@ -293,9 +291,7 @@
 
                                         <Button id="AuthExportButtonId"
                                             icon="sap-icon://excel-attachment"
-                                            tooltip="{i18n>exportExcel}"
-                                            press="onExportUserDetailExcel" />
-
+                                            tooltip="{i18n>exportExcel}" press="onExportExcel" />
                                     </OverflowToolbar>
                                 </ui:extension>
 
@@ -403,7 +399,6 @@
                             }"
                                 id="tcodeChartByUser" vizType="pie" width="500px" height="300px">
                                 <!-- Define data of chart -->
-                                <!-- Define data of chart -->
                                 <viz:dataset>
                                     <viz.data:FlattenedDataset id="TCodeByUserDatasetId"
                                         data="{TCodeByUserData>/}">
@@ -430,9 +425,9 @@
                                         type="Dimension" values="Label" />
                                 </viz:feeds>
                             </viz:VizFrame>
+
                             <!-- ACTIVITY -->
                             <VBox id="ActivityVBoxContentId" class="sapUiMediumMarginTop">
-
                                 <!-- FILTER BAR -->
                                 <Toolbar id="ActivityToolbarId" class="sapUiSmallMarginBottom"
                                     design="Transparent">
@@ -447,13 +442,13 @@
 
                                     <Select id="ActivityTypeSelectId" width="140px"
                                         change="onFilterActivity">
-                                        <core:Item id="itemTypeAll" key="" text="{i18n>all}" />
-                                        <core:Item id="itemTypeTcode" key="TCODE"
+                                        <core:Item id="ActivityTypeAllItemId" key=""
+                                            text="{i18n>all}" />
+                                        <core:Item id="ActivityTypeTcodeItemId" key="TCODE"
                                             text="{i18n>itemTcode}" />
-                                        <core:Item id="itemTypeDump" key="DUMP"
+                                        <core:Item id="ActivityTypeDumpItemId" key="DUMP"
                                             text="{i18n>itemDump}" />
                                     </Select>
-
 
                                     <Input id="ActivityTCodeInputId" width="120px"
                                         placeholder="{i18n>tCode}" liveChange="onFilterActivity" />
@@ -461,28 +456,24 @@
                                     <!-- Date -->
                                     <Label id="ActivityDateLabelId" text="{i18n>activityDate}"
                                         class="sapUiTinyMarginBegin sapUiTinyMarginEnd" />
-
                                     <DatePicker id="ActivityDatePickerId" width="150px"
                                         change="onFilterActivity" />
-
                                 </Toolbar>
 
                                 <!-- TABLE -->
                                 <ui:Table id="ActivityTableId"
                                     rows="{
-            path: 'UserActivityLogData>/',
-            sorter: {
-                path: 'ActivityDate',
-                descending: true
-            }
-        }"
+                                    path: 'UserActivityLogData>/',
+                                    sorter: {
+                                        path: 'ActivityDate',
+                                        descending: true
+                                    }
+                                }"
                                     visibleRowCount="8" selectionMode="None"
                                     alternateRowColors="true" class="sapUiLargeMarginBottom">
-
                                     <!-- HEADER TOOLBAR -->
                                     <ui:extension>
                                         <OverflowToolbar id="ActivityTableToolbarId">
-
                                             <Title id="ActivityTableTitleId"
                                                 text="{= ${i18n>activity} + ' (' + ${view>/count} + ')' }"
                                                 level="H2" />
@@ -496,22 +487,20 @@
                                                 press="onExportActivityExcel" />
 
                                             <!-- SETTINGS -->
-                                            <!-- <Button id="ActivitySettingsButtonId"
+                                            <Button id="ActivitySettingsButtonId"
                                                 icon="sap-icon://action-settings"
                                                 tooltip="{i18n>viewSettings}"
-                                                press="onOpenActivitySettings" /> -->
-
+                                                press="onOpenActivitySettings" />
                                         </OverflowToolbar>
                                     </ui:extension>
 
                                     <!-- COLUMNS -->
                                     <ui:columns>
-
                                         <!-- LOG ID -->
                                         <ui:Column id="ActivityLogIdColumnId" width="14rem">
                                             <Label id="ActivityLogIdLabelId" text="{i18n>logId}" />
                                             <ui:template>
-                                                <Text id="txtLogId"
+                                                <Text id="ActivityLogIdTextId"
                                                     text="{UserActivityLogData>LogId}"
                                                     wrapping="false" />
                                             </ui:template>
@@ -523,7 +512,7 @@
                                             <Label id="ActivityTypeColumnLabelId"
                                                 text="{i18n>activityType}" />
                                             <ui:template>
-                                                <ObjectStatus id="objActivityTypeStatus"
+                                                <ObjectStatus id="ActivityTypeStatusId"
                                                     text="{UserActivityLogData>ActivityType}"
                                                     icon="{path:'UserActivityLogData>ActivityType', formatter:'.formatter.formatActivityType'}"
                                                     state="{path:'UserActivityLogData>ActivityType', formatter:'.formatter.formatActivityState'}" />
@@ -535,7 +524,7 @@
                                             <Label id="ActivityTCodeColumnLabelId"
                                                 text="{i18n>tCode}" />
                                             <ui:template>
-                                                <ObjectStatus id="objTCodeStatus"
+                                                <ObjectStatus id="ActivityTCodeStatusId"
                                                     text="{UserActivityLogData>TCode}"
                                                     icon="{path:'UserActivityLogData>TCode', formatter:'.formatter.formatTCodeIcon'}" />
                                             </ui:template>
@@ -546,7 +535,7 @@
                                             <Label id="ActivityTCodeNameLabelId"
                                                 text="{i18n>tCodeName}" />
                                             <ui:template>
-                                                <Text id="txtTCodeName"
+                                                <Text id="ActivityTCodeNameTextId"
                                                     text="{UserActivityLogData>TCodeName}"
                                                     wrapping="false" />
                                             </ui:template>
@@ -557,7 +546,7 @@
                                             <Label id="ActivityMessageLabelId"
                                                 text="{i18n>activityMessage}" />
                                             <ui:template>
-                                                <ObjectStatus id="objActivityMessageStatus"
+                                                <ObjectStatus id="ActivityMessageStatusId"
                                                     text="{UserActivityLogData>ActivityMessage}"
                                                     state="Information" />
                                             </ui:template>
@@ -568,7 +557,7 @@
                                             <Label id="ActivityDateColumnLabelId"
                                                 text="{i18n>activityDate}" />
                                             <ui:template>
-                                                <Text id="txtActivityDate"
+                                                <Text id="ActivityDateTextId"
                                                     text="{path:'UserActivityLogData>ActivityDate', formatter: '.formatter.formatISODate'}" />
                                             </ui:template>
                                         </ui:Column>
@@ -578,7 +567,7 @@
                                             <Label id="ActivityTimeColumnLabelId"
                                                 text="{i18n>activityTime}" />
                                             <ui:template>
-                                                <Text id="txtActivityTime"
+                                                <Text id="ActivityTimeTextId"
                                                     text="{UserActivityLogData>ActivityTime}" />
                                             </ui:template>
                                         </ui:Column>
