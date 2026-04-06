@@ -1,3 +1,11 @@
+/* GLOBAL FILTER */
+.globalFilterTitle {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #6a6d70;
+  letter-spacing: 0.05em;
+}
+
 /* KPI BOX */
 .kpiBox {
   border-radius: 14px;

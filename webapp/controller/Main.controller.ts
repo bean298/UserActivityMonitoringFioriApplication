@@ -24,10 +24,6 @@ export default class Main extends Controller {
   private _oViewSettingsDialog: Dialog | null = null;
   private _oUserSearchHelpDialog: Dialog | null = null;
 
-  private _sFromDate!: string;
-  private _sToDate!: string;
-
-  private _aDefaultFilters: Filter[] = [];
   private _aUserFilters: Filter[] = [];
   private _aUserDateFilters: Filter[] = [];
 
@@ -49,26 +45,6 @@ export default class Main extends Controller {
     });
     this.getView()?.setModel(oOverviewModel, "Overview");
 
-    // Take a last 6 days
-    const oToday = new Date();
-    const o7DaysAgo = new Date();
-    o7DaysAgo.setDate(oToday.getDate() - 3);
-
-    const formatDate = (oDate: Date) => {
-      return oDate.toISOString().split("T")[0];
-    };
-
-    this._sFromDate = formatDate(o7DaysAgo);
-    this._sToDate = formatDate(oToday);
-
-    this._aDefaultFilters = [
-      new Filter({
-        path: "LoginDate",
-        operator: FilterOperator.BT,
-        value1: this._sFromDate,
-        value2: this._sToDate,
-      }),
-    ];
     this._rebindTable();
 
     this.onInitCount();
@@ -89,8 +65,10 @@ export default class Main extends Controller {
 
     if (!oDatePicker) return;
 
-    oDatePicker.setMinDate(new Date(this._sFromDate));
-    oDatePicker.setMaxDate(new Date(this._sToDate));
+    const { from, to } = this.getGlobalDateRange();
+
+    oDatePicker.setMinDate(new Date(from));
+    oDatePicker.setMaxDate(new Date(to));
   }
 
   /**
@@ -105,7 +83,7 @@ export default class Main extends Controller {
     const aDateFilters =
       this._aUserDateFilters.length > 0
         ? this._aUserDateFilters
-        : this._aDefaultFilters;
+        : this.getGlobalDateFilter();
 
     const aAllFilters = [...aDateFilters, ...this._aUserFilters];
 
@@ -116,6 +94,46 @@ export default class Main extends Controller {
       sorter: [new Sorter("LoginDate", true)],
     });
   }
+
+  /**
+   * Get date from Global filter and format it
+   * because date from DateRange filter is object
+   * START
+   **/
+  private getGlobalDateFilter(): Filter[] {
+    const { from, to } = this.getGlobalDateRange();
+
+    return [
+      new Filter({
+        path: "LoginDate",
+        operator: FilterOperator.BT,
+        value1: from,
+        value2: to,
+      }),
+    ];
+  }
+
+  private getGlobalDateRange() {
+    const oComponent = this.getAppComponent();
+    const oGlobalModel = oComponent?.getModel("global") as JSONModel;
+
+    if (!oGlobalModel) {
+      return { from: "", to: "" };
+    }
+
+    const oFrom = oGlobalModel.getProperty("/fromDate");
+    const oTo = oGlobalModel.getProperty("/toDate");
+
+    const formatDate = (d: Date) => d.toISOString().split("T")[0];
+
+    return {
+      from: formatDate(oFrom),
+      to: formatDate(oTo),
+    };
+  }
+  /**
+   * END
+   **/
 
   /**
    * Fetches the total number of records from the UserAuthLog entity
@@ -134,7 +152,7 @@ export default class Main extends Controller {
       // Get model Overview
       const oOverviewModel = this.getView()?.getModel("Overview") as JSONModel;
 
-      const aFilters = [...this._aDefaultFilters];
+      const aFilters = this.getGlobalDateFilter();
 
       // Create a list binding to /UserAuthLog with $count enabled
       const oBinding = oModel.bindList(
@@ -172,7 +190,7 @@ export default class Main extends Controller {
       // Get model Overview
       const oOverviewModel = this.getView()?.getModel("Overview") as JSONModel;
 
-      const aFilters = [...this._aDefaultFilters];
+      const aFilters = this.getGlobalDateFilter();
 
       // Create a list binding to /UserSearchHelp
       const oBindingTotalUser = oModel.bindList(
@@ -205,6 +223,8 @@ export default class Main extends Controller {
       // Create property of view model
       oOverviewModel.setProperty("/totalUsers", aUserSearchHelpData?.length);
 
+      const { from, to } = this.getGlobalDateRange();
+
       // Create a list binding to /UserActivityLog
       const oBindingTotalDump = oModel.bindList(
         "/UserActivityLog",
@@ -215,8 +235,8 @@ export default class Main extends Controller {
           new Filter({
             path: "ActivityDate",
             operator: FilterOperator.BT,
-            value1: this._sFromDate,
-            value2: this._sToDate,
+            value1: from,
+            value2: to,
           }),
         ],
         {
@@ -235,7 +255,7 @@ export default class Main extends Controller {
       const oFilterUser = new Filter({
         filters: [
           new Filter("EventId", FilterOperator.EQ, "AUC"),
-          ...this._aDefaultFilters,
+          ...this.getGlobalDateFilter(),
         ],
         and: true,
       });
@@ -294,7 +314,7 @@ export default class Main extends Controller {
       // Get model Overview
       const oOverviewModel = this.getView()?.getModel("Overview") as JSONModel;
 
-      const aFilters = [...this._aDefaultFilters];
+      const aFilters = this.getGlobalDateFilter();
 
       // Create a list binding to /UserAuthLogChart
       const oBinding = oModel.bindList(
@@ -342,6 +362,8 @@ export default class Main extends Controller {
    **/
   public async onInitTcodeCount(): Promise<void> {
     try {
+      const { from, to } = this.getGlobalDateRange();
+
       const oTCodeChartData = {} as any;
 
       // Get OData V4 model from the App Component
@@ -352,12 +374,7 @@ export default class Main extends Controller {
         "/ActivityLogChart",
         undefined,
         undefined,
-        new Filter(
-          "ActivityDate",
-          FilterOperator.BT,
-          this._sFromDate,
-          this._sToDate,
-        ),
+        new Filter("ActivityDate", FilterOperator.BT, from, to),
         {
           $orderby: "TCodeCount desc",
         },
@@ -411,6 +428,8 @@ export default class Main extends Controller {
    **/
   public async onInitDumpCount(): Promise<void> {
     try {
+      const { from, to } = this.getGlobalDateRange();
+
       const oDumpChartData = {} as any;
 
       // Get OData V4 model from the App Component
@@ -421,12 +440,7 @@ export default class Main extends Controller {
         "/DumpActivityChart",
         undefined,
         undefined,
-        new Filter(
-          "ActivityDate",
-          FilterOperator.BT,
-          this._sFromDate,
-          this._sToDate,
-        ),
+        new Filter("ActivityDate", FilterOperator.BT, from, to),
         {
           $orderby: "DumpCount desc",
         },
@@ -538,7 +552,9 @@ export default class Main extends Controller {
    * based on the current OData V4 list binding.
    */
   public onExportExcel(): void {
-    const sFileName = `UserAuthenticationLogs_${this._sFromDate}_to_${this._sToDate}.xlsx`;
+    const { from, to } = this.getGlobalDateRange();
+
+    const sFileName = `UserAuthenticationLogs_${from}_to_${to}.xlsx`;
 
     MessageBox.confirm("Do you want to export this data to Excel?", {
       title: "Confirm Export",
@@ -596,6 +612,8 @@ export default class Main extends Controller {
    **/
   public async onUserSearchHelp(): Promise<void> {
     try {
+      const { from, to } = this.getGlobalDateRange();
+
       const oUserSearchHelpData = {} as any;
 
       // Get OData V4 model from the App Component
@@ -609,8 +627,8 @@ export default class Main extends Controller {
         new Filter({
           path: "LoginDate",
           operator: FilterOperator.BT,
-          value1: this._sFromDate,
-          value2: this._sToDate,
+          value1: from,
+          value2: to,
         }),
       ) as ODataListBinding;
 
