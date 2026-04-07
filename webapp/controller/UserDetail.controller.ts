@@ -16,37 +16,11 @@ import MessageToast from "sap/m/MessageToast";
 export default class UserDetail extends Controller {
   public formatter = Formatter;
 
-  private _sFromDate!: string;
-  private _sToDate!: string;
-
-  private _aDefaultFilters: Filter[] = [];
-
   /**
    * Called when the controller is initialized.
    **/
   public onInit(): void {
     super.onInit();
-
-    // Take a last 6 days
-    const oToday = new Date();
-    const o7DaysAgo = new Date();
-    o7DaysAgo.setDate(oToday.getDate() - 3);
-
-    const formatDate = (oDate: Date) => {
-      return oDate.toISOString().split("T")[0];
-    };
-
-    this._sFromDate = formatDate(o7DaysAgo);
-    this._sToDate = formatDate(oToday);
-
-    this._aDefaultFilters = [
-      new Filter({
-        path: "LoginDate",
-        operator: FilterOperator.BT,
-        value1: this._sFromDate,
-        value2: this._sToDate,
-      }),
-    ];
 
     const oRouter = (this as any).getAppComponent().getRouter();
     if (oRouter) {
@@ -55,6 +29,46 @@ export default class UserDetail extends Controller {
         .attachPatternMatched(this._onObjectMatched, this);
     }
   }
+
+  /**
+   * Get date from Global filter and format it
+   * because date from DateRange filter is object
+   * START
+   **/
+  private getGlobalDateFilter(): Filter[] {
+    const { from, to } = this.getGlobalDateRange();
+
+    return [
+      new Filter({
+        path: "LoginDate",
+        operator: FilterOperator.BT,
+        value1: from,
+        value2: to,
+      }),
+    ];
+  }
+
+  private getGlobalDateRange() {
+    const oComponent = this.getAppComponent();
+    const oGlobalModel = oComponent?.getModel("global") as JSONModel;
+
+    if (!oGlobalModel) {
+      return { from: "", to: "" };
+    }
+
+    const oFrom = oGlobalModel.getProperty("/fromDate");
+    const oTo = oGlobalModel.getProperty("/toDate");
+
+    const formatDate = (d: Date) => d.toISOString().split("T")[0];
+
+    return {
+      from: formatDate(oFrom),
+      to: formatDate(oTo),
+    };
+  }
+  /**
+   * END
+   **/
 
   /**
    * Handles route matching for AuthDetail page
@@ -89,13 +103,15 @@ export default class UserDetail extends Controller {
    * @memberOf useraudit.controller.UserDetail
    */
   public onAfterRendering(): void {
+    const { from, to } = this.getGlobalDateRange();
+
     // Set range in date picker
     const oDatePicker = this.byId("AuthDatePickerId") as DatePicker;
 
     if (!oDatePicker) return;
 
-    oDatePicker.setMinDate(new Date(this._sFromDate));
-    oDatePicker.setMaxDate(new Date(this._sToDate));
+    oDatePicker.setMinDate(new Date(from));
+    oDatePicker.setMaxDate(new Date(to));
   }
 
   /**
@@ -139,7 +155,7 @@ export default class UserDetail extends Controller {
       undefined,
       [
         new Filter("Username", FilterOperator.EQ, sUsername),
-        ...this._aDefaultFilters,
+        ...this.getGlobalDateFilter(),
       ],
     ) as ODataListBinding;
 
@@ -177,7 +193,7 @@ export default class UserDetail extends Controller {
       undefined,
       [
         new Filter("Username", FilterOperator.EQ, sUsername),
-        ...this._aDefaultFilters,
+        ...this.getGlobalDateFilter(),
       ],
     ) as ODataListBinding;
 
@@ -203,7 +219,7 @@ export default class UserDetail extends Controller {
       undefined,
       [
         new Filter("UserName", FilterOperator.EQ, sUsername),
-        ...this._aDefaultFilters,
+        ...this.getGlobalDateFilter(),
       ],
     ) as ODataListBinding;
 
@@ -236,6 +252,8 @@ export default class UserDetail extends Controller {
    * Load user activity information
    **/
   private async _loadUserActivity(sUsername: string): Promise<void> {
+    const { from, to } = this.getGlobalDateRange();
+
     const oTCodePerUserData = {} as any;
 
     const oModel = (this as any).getAppComponent().getModel() as ODataModel;
@@ -250,8 +268,8 @@ export default class UserDetail extends Controller {
         new Filter({
           path: "ActivityDate",
           operator: FilterOperator.BT,
-          value1: this._sFromDate,
-          value2: this._sToDate,
+          value1: from,
+          value2: to,
         }),
       ],
     ) as ODataListBinding;
@@ -306,8 +324,8 @@ export default class UserDetail extends Controller {
         new Filter({
           path: "ActivityDate",
           operator: FilterOperator.BT,
-          value1: this._sFromDate,
-          value2: this._sToDate,
+          value1: from,
+          value2: to,
         }),
       ],
     ) as ODataListBinding;
@@ -391,7 +409,7 @@ export default class UserDetail extends Controller {
     // Final filter and render into table
     const aFinalFilters = oDatePicker
       ? aFilters
-      : [...this._aDefaultFilters, ...aFilters];
+      : [...this.getGlobalDateFilter(), ...aFilters];
 
     if (oBinding) {
       oBinding.filter(aFinalFilters);

@@ -18,6 +18,19 @@
                 <f:expandedContent>
                     <Label id="subTitleId" text="{i18n>subTitle}" />
                 </f:expandedContent>
+
+                <!-- GLOBAL FILTER -->
+                <f:actions>
+                    <HBox id="globalFilterBox" alignItems="Center" class="sapUiSmallMarginEnd">
+                        <VBox id="globalFilterContainer">
+                            <Text id="globalFilterLabel" text="{i18n>globalfilter}"
+                                class="globalFilterTitle" />
+                            <DateRangeSelection id="globalDateRange" width="280px"
+                                displayFormat="yyyy-MM-dd" valueFormat="yyyy-MM-dd" delimiter=" - "
+                                dateValue="{global>/fromDate}" secondDateValue="{global>/toDate}" />
+                        </VBox>
+                    </HBox>
+                </f:actions>
             </f:DynamicPageTitle>
         </f:title>
 
@@ -323,6 +336,8 @@
                         </ui:Column>
 
                         <!-- LOGIN RESULT COLUMN -->
+                        <ui:Column id="columnLoginResult" width="9rem" sortProperty="LoginResult"
+                            filterProperty="LoginResult" tooltip="{i18n>introSort}">
                         <ui:Column id="columnLoginResult" width="9rem" sortProperty="LoginResult"
                             filterProperty="LoginResult" tooltip="{i18n>introSort}">
                             <Label id="labelLoginResult" text="{i18n>loginResult}" />
