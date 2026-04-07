@@ -20,37 +20,12 @@ export default class UserDetail extends Controller {
   private _sToDate!: string;
 
   private _aDefaultFilters: Filter[] = [];
-  private _aUserFilters: Filter[] = [];
-  private _aUserDateFilters: Filter[] = [];
-  private _sCurrentUsername: string = "";
-  private _bIsActivityFiltered: boolean = false;
-  private _aActivityDateFilters: Filter[] = [];
 
   /**
    * Called when the controller is initialized.
    **/
   public onInit(): void {
     super.onInit();
-
-    const oRouter = (this as any).getAppComponent().getRouter();
-    if (oRouter) {
-      oRouter
-        .getRoute("UserDetail")
-        .attachPatternMatched(this._onObjectMatched, this);
-    }
-  }
-
-  /**
-   * Handles route matching for AuthDetail page
-   * and loads detail data based on the navigation key.
-   **/
-  private async _onObjectMatched(oEvent: any): Promise<void> {
-    // Get parameter from URL
-    const sUsername = oEvent.getParameter("arguments").username;
-    this._sCurrentUsername = sUsername;
-
-    const oView = this.getView();
-    if (!oView || !sUsername) return;
 
     // Take a last 6 days
     const oToday = new Date();
@@ -129,15 +104,7 @@ export default class UserDetail extends Controller {
   private async _loadUserDetail(sUsername: string): Promise<void> {
     const oView = this.getView();
     const oModel = (this as any).getAppComponent().getModel() as ODataModel;
-    const aDateFilters =
-      this._aUserDateFilters.length > 0
-        ? this._aUserDateFilters
-        : this._aDefaultFilters;
-    const aFinalFilters = [
-      new Filter("Username", FilterOperator.EQ, sUsername),
-      ...aDateFilters,
-      ...this._aUserFilters,
-    ];
+
     // Create a list binding to /UserDetail with $filter
     const oUserDetai = oModel.bindList("/UserDetail", undefined, undefined, [
       new Filter("UserName", FilterOperator.EQ, sUsername),
@@ -162,25 +129,20 @@ export default class UserDetail extends Controller {
    **/
   private async _loadUserLogs(sUsername: string): Promise<void> {
     const oUserAuthLogPerDayData = {} as any;
+
     const oModel = (this as any).getAppComponent().getModel() as ODataModel;
 
-    // --- SETUP FILTERS ---
-    const aDateFilters =
-      this._aUserDateFilters.length > 0
-        ? this._aUserDateFilters
-        : this._aDefaultFilters;
-    const aFinalFilters = [
-      new Filter("Username", FilterOperator.EQ, sUsername),
-      ...aDateFilters,
-      ...this._aUserFilters,
-    ];
     // Create a list binding to /AuthLogChartByUser with $filter
     const oUserAuthChart = oModel.bindList(
       "/AuthLogChartByUser",
       undefined,
       undefined,
-      aFinalFilters,
+      [
+        new Filter("Username", FilterOperator.EQ, sUsername),
+        ...this._aDefaultFilters,
+      ],
     ) as ODataListBinding;
+
     // Executes the OData call
     const aContextsChart = await oUserAuthChart.requestContexts();
 
@@ -213,7 +175,10 @@ export default class UserDetail extends Controller {
       "/UserAuthLog",
       undefined,
       undefined,
-      aFinalFilters,
+      [
+        new Filter("Username", FilterOperator.EQ, sUsername),
+        ...this._aDefaultFilters,
+      ],
     ) as ODataListBinding;
 
     const aContextsTable = await oUserAuthTable.requestContexts();
@@ -230,21 +195,16 @@ export default class UserDetail extends Controller {
     const oLogUserPerDay = {} as any;
 
     const oModel = (this as any).getAppComponent().getModel() as ODataModel;
-    const aDateFilters =
-      this._aUserDateFilters.length > 0
-        ? this._aUserDateFilters
-        : this._aDefaultFilters;
-    const aFinalFilters = [
-      new Filter("UserName", FilterOperator.EQ, sUsername),
-      ...aDateFilters,
-      ...this._aUserFilters,
-    ];
+
     // Create a list binding to /UserAuthLogPerDay with $filter
     const oUserAuthLogPerDay = oModel.bindList(
       "/UserAuthLogPerDay",
       undefined,
       undefined,
-      aFinalFilters,
+      [
+        new Filter("UserName", FilterOperator.EQ, sUsername),
+        ...this._aDefaultFilters,
+      ],
     ) as ODataListBinding;
 
     const aContextsLogPerDay = await oUserAuthLogPerDay.requestContexts();
@@ -279,30 +239,21 @@ export default class UserDetail extends Controller {
     const oTCodePerUserData = {} as any;
 
     const oModel = (this as any).getAppComponent().getModel() as ODataModel;
-    // SETUP FILTERS
-    const aDefaultActivityFilters = [
-      new Filter({
-        path: "ActivityDate",
-        operator: FilterOperator.BT,
-        value1: this._sFromDate,
-        value2: this._sToDate,
-      }),
-    ];
 
-    const aDateFilters = this._bIsActivityFiltered
-      ? this._aActivityDateFilters
-      : aDefaultActivityFilters;
-
-    const aFinalFilters = [
-      new Filter("Username", FilterOperator.EQ, sUsername),
-      ...aDateFilters,
-    ];
     // Create a list binding to /ActivityTCodeByUser with $filter
     const oActivityTCodeByUser = oModel.bindList(
       "/ActivityTCodeByUser",
       undefined,
       undefined,
-      aFinalFilters,
+      [
+        new Filter("Username", FilterOperator.EQ, sUsername),
+        new Filter({
+          path: "ActivityDate",
+          operator: FilterOperator.BT,
+          value1: this._sFromDate,
+          value2: this._sToDate,
+        }),
+      ],
     ) as ODataListBinding;
 
     // Executes the OData call
@@ -350,24 +301,19 @@ export default class UserDetail extends Controller {
       "/UserActivityLog",
       undefined,
       undefined,
-      aFinalFilters,
+      [
+        new Filter("Username", FilterOperator.EQ, sUsername),
+        new Filter({
+          path: "ActivityDate",
+          operator: FilterOperator.BT,
+          value1: this._sFromDate,
+          value2: this._sToDate,
+        }),
+      ],
     ) as ODataListBinding;
 
     const aContextsTable = await oUserActTable.requestContexts();
-    let aDataTable = aContextsTable.map((oContext) => oContext.getObject());
-
-    const sActivityType = (
-      this.byId("ActivityTypeSelectId") as any
-    ).getSelectedKey();
-
-    if (sActivityType && sActivityType !== "") {
-      aDataTable = aDataTable.filter((item: any) => {
-        return (
-          item.ActivityType &&
-          item.ActivityType.toUpperCase().includes(sActivityType.toUpperCase())
-        );
-      });
-    }
+    const aDataTable = aContextsTable.map((oContext) => oContext.getObject());
 
     const oTableModel = new JSONModel(aDataTable);
     this.getView()?.setModel(oTableModel, "UserActivityLogData");
@@ -451,7 +397,7 @@ export default class UserDetail extends Controller {
       oBinding.filter(aFinalFilters);
     }
   }
-  //  Exports Excel file.
+  //  Exports Excel file
   public onExportUserDetailExcel(): void {
     const sFileName = `User_${this._sFromDate}_to_${this._sToDate}.xlsx`;
 
