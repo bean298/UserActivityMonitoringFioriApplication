@@ -573,15 +573,17 @@
                                         </ui:Column>
 
                                         <!-- NAVIGATION -->
-                                        <!-- <ui:Column id="ActivityNavigateColumnId" width="4rem"
+                                        <ui:Column id="ActivityNavigateColumnId" width="4rem"
                                             hAlign="Center">
+                                            <Label id="ActivitySentMaileColumnLabelId"
+                                                text="{i18n>sentMailAlert}" />
                                             <ui:template>
                                                 <Button id="ActivityNavigateButtonId"
                                                     icon="sap-icon://navigation-right-arrow"
                                                     type="Transparent" press="onPressActivityDetail"
                                                     tooltip="{i18n>navigateAuth}" />
                                             </ui:template>
-                                        </ui:Column> -->
+                                        </ui:Column>
                                     </ui:columns>
                                 </ui:Table>
                             </VBox>
