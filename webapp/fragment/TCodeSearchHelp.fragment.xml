@@ -1,0 +1,21 @@
+<core:FragmentDefinition xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+    <Dialog id="TCodeSearchDialog" title="{i18n>selectTCode}" contentWidth="400px" contentHeight="500px" draggable="true" resizable="true">
+        <content>
+            <VBox id="VBoxId" width="100%">
+                <!-- TCODE LIST -->
+                <List id="TCodeList" mode="SingleSelectMaster" items="{
+                        path: 'TCodeSeachHelp>/'
+                    }" selectionChange="onTCodeSelect">
+
+                    <StandardListItem id="TCodeStandardListItem" title="{TCodeSeachHelp>TCode}" />
+                </List>
+            </VBox>
+        </content>
+
+        <!-- CLOSE BUTTON -->
+        <endButton>
+            <Button id="btnclose" text="{i18n>cancel}" press="onCloseTCodeDialog"/>
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>
