@@ -250,7 +250,7 @@
 
                     <ui:columns>
                         <!-- SESSION ID COLUMN -->
-                        <ui:Column id="columnSession" width="12rem">
+                        <ui:Column id="columnSession" width="12rem" sortProperty="SessionId" tooltip="{i18n>introSort}">
                             <Label id="labelSession" text="{i18n>sessionId}"/>
 
                             <ui:template>
@@ -259,7 +259,7 @@
                         </ui:Column>
 
                         <!-- USERNAME COLUMN -->
-                        <ui:Column id="columnName" width="10rem">
+                        <ui:Column id="columnName" width="10rem" sortProperty="Username" tooltip="{i18n>introSort}">
                             <Label id="labelName" text="{i18n>username}" />
 
                             <ui:template>
@@ -280,7 +280,7 @@
                         </ui:Column>
 
                         <!-- LOGIN DATE COLUMN -->
-                        <ui:Column id="columnLoginDate" width="9rem" sortProperty="LoginDate" filterProperty="LoginDate" tooltip="{i18n>introSort}">
+                        <ui:Column id="columnLoginDate" width="9rem" sortProperty="LoginDate" tooltip="{i18n>introSort}">
                             <Label id="labelLoginDate" text="{i18n>loginDate}" />
 
                             <ui:template>
@@ -307,7 +307,7 @@
                         </ui:Column>
 
                         <!-- LOGOUT DATE COLUMN -->
-                        <ui:Column id="columnLogoutDate" width="9rem">
+                        <ui:Column id="columnLogoutDate" width="9rem" sortProperty="LogoutDate" tooltip="{i18n>introSort}">
                             <Label id="labelLogoutDate" text="{i18n>logoutDate}" />
 
                             <ui:template>
@@ -316,7 +316,7 @@
                         </ui:Column>
 
                         <!-- LOGOUT TIME COLUMN -->
-                        <ui:Column id="columnLogoutTime" width="7rem">
+                        <ui:Column id="columnLogoutTime" width="7rem" sortProperty="LogoutTime" tooltip="{i18n>introSort}">
                             <Label id="labelLogoutTime" text="{i18n>logoutTime}" />
 
                             <ui:template>
