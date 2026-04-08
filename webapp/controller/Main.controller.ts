@@ -20,6 +20,8 @@ import Sorter from "sap/ui/model/Sorter";
 export default class Main extends Controller {
   public formatter = Formatter;
 
+  private _timer: any;
+
   // Default variable
   private _oViewSettingsDialog: Dialog | null = null;
   private _oUserSearchHelpDialog: Dialog | null = null;
@@ -45,6 +47,10 @@ export default class Main extends Controller {
     });
     this.getView()?.setModel(oOverviewModel, "Overview");
 
+    const oGlobalModel = this.getAppComponent().getModel("global");
+    if (oGlobalModel)
+      oGlobalModel.attachPropertyChange(this.onGlobalDateChanged, this);
+
     this._rebindTable();
 
     this.onInitCount();
@@ -52,6 +58,35 @@ export default class Main extends Controller {
     this.onInitTcodeCount();
     this.onInitDumpCount();
     this.onInitOverviewData();
+  }
+
+  /**
+   *Change date when user select global date range
+   */
+  public onGlobalDateChanged(oEvent: any): void {
+    if (oEvent.getParameter("path") !== "/toDate") return;
+
+    clearTimeout(this._timer);
+
+    this._timer = setTimeout(async () => {
+      const oView = this.getView();
+      if (!oView) return;
+      oView.setBusy(true);
+
+      try {
+        this._rebindTable();
+
+        await Promise.all([
+          this.onInitCount(),
+          this.onInitLogCount(),
+          this.onInitTcodeCount(),
+          this.onInitDumpCount(),
+          this.onInitOverviewData(),
+        ]);
+      } finally {
+        oView.setBusy(false);
+      }
+    }, 200);
   }
 
   /**
@@ -124,7 +159,13 @@ export default class Main extends Controller {
     const oFrom = oGlobalModel.getProperty("/fromDate");
     const oTo = oGlobalModel.getProperty("/toDate");
 
-    const formatDate = (d: Date) => d.toISOString().split("T")[0];
+    const formatDate = (d: Date) => {
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+
+      return `${year}-${month}-${day}`;
+    };
 
     return {
       from: formatDate(oFrom),
@@ -254,7 +295,7 @@ export default class Main extends Controller {
 
       const oFilterUser = new Filter({
         filters: [
-          new Filter("EventId", FilterOperator.EQ, "AUC"),
+          new Filter("EventId", FilterOperator.EQ, "AUM"),
           ...this.getGlobalDateFilter(),
         ],
         and: true,
@@ -318,7 +359,7 @@ export default class Main extends Controller {
 
       // Create a list binding to /UserAuthLogChart
       const oBinding = oModel.bindList(
-        "/UserAuthLogChart",
+        "/AuthLogChartByUser",
         undefined,
         undefined,
         aFilters,
@@ -328,7 +369,7 @@ export default class Main extends Controller {
       ) as ODataListBinding;
 
       // Executes the OData call
-      const aContexts = await oBinding.requestContexts();
+      const aContexts = await oBinding.requestContexts(0, 10000);
 
       const aData = aContexts.map((oContext) => oContext.getObject());
 
@@ -369,9 +410,9 @@ export default class Main extends Controller {
       // Get OData V4 model from the App Component
       const oModel = this.getAppComponent().getModel() as ODataModel;
 
-      // Create a list binding to /ActivityLogChart
+      // Create a list binding to /ActivityTCodeByUser
       const oBinding = oModel.bindList(
-        "/ActivityLogChart",
+        "/ActivityTCodeByUser",
         undefined,
         undefined,
         new Filter("ActivityDate", FilterOperator.BT, from, to),
@@ -506,44 +547,57 @@ export default class Main extends Controller {
    * Execute logic search and filter
    **/
   public applyFilters(): void {
-    const aFilters: Filter[] = [];
-    this._aUserDateFilters = [];
+    const oTable = this.byId("maiTableId") as Table;
+    oTable.setBusy(true);
 
-    // Get value from search and select
-    const sSearch = (this.byId("userSearchId") as Input).getValue();
-    if (sSearch) {
-      aFilters.push(new Filter("Username", FilterOperator.Contains, sSearch));
-    }
+    try {
+      const aFilters: Filter[] = [];
+      this._aUserDateFilters = [];
 
-    const sStatus = (
-      this.byId("mainHeaderSelectId") as Select
-    ).getSelectedKey();
-
-    if (sStatus) {
-      aFilters.push(new Filter("LoginResult", FilterOperator.EQ, sStatus));
-    }
-
-    // Get value select date picker
-    const oDatePicker = this.byId("mainDatePickerId") as DatePicker;
-
-    if (oDatePicker) {
-      const oDate = oDatePicker.getDateValue();
-
-      if (oDate) {
-        const oFormatter = DateFormat.getDateInstance({
-          pattern: "yyyy-MM-dd",
-        });
-
-        const sDate = oFormatter.format(oDate);
-
-        this._aUserDateFilters = [
-          new Filter("LoginDate", FilterOperator.EQ, sDate),
-        ];
+      // Get value from search and select
+      const sSearch = (this.byId("userSearchId") as Input).getValue();
+      if (sSearch) {
+        aFilters.push(new Filter("Username", FilterOperator.Contains, sSearch));
       }
-    }
 
-    this._aUserFilters = aFilters;
-    this._rebindTable();
+      const sStatus = (
+        this.byId("mainHeaderSelectId") as Select
+      ).getSelectedKey();
+
+      if (sStatus) {
+        aFilters.push(new Filter("LoginResult", FilterOperator.EQ, sStatus));
+      }
+
+      // Get value select date picker
+      const oDatePicker = this.byId("mainDatePickerId") as DatePicker;
+
+      if (oDatePicker) {
+        const oDate = oDatePicker.getDateValue();
+
+        if (oDate) {
+          const oFormatter = DateFormat.getDateInstance({
+            pattern: "yyyy-MM-dd",
+          });
+
+          const sDate = oFormatter.format(oDate);
+
+          this._aUserDateFilters = [
+            new Filter("LoginDate", FilterOperator.EQ, sDate),
+          ];
+        }
+      }
+
+      this._aUserFilters = aFilters;
+      this._rebindTable();
+
+      // Turn off busy after load data
+      const oBinding = oTable.getBinding("rows") as ODataListBinding;
+      oBinding.requestContexts().finally(() => {
+        oTable.setBusy(false);
+      });
+    } catch (error) {
+      oTable.setBusy(false);
+    }
   }
 
   /**

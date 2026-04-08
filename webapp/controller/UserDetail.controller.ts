@@ -10,8 +10,14 @@ import Select from "sap/m/Select";
 import Table from "sap/ui/table/Table";
 import DatePicker from "sap/m/DatePicker";
 import DateFormat from "sap/ui/core/format/DateFormat";
+import Dialog from "sap/m/Dialog";
+import Fragment from "sap/ui/core/Fragment";
 export default class UserDetail extends Controller {
   public formatter = Formatter;
+
+  private _oTCodeSearchHelpDialog: Dialog | null = null;
+
+  private _sUsername: string = "";
 
   /**
    * Called when the controller is initialized.
@@ -56,7 +62,13 @@ export default class UserDetail extends Controller {
     const oFrom = oGlobalModel.getProperty("/fromDate");
     const oTo = oGlobalModel.getProperty("/toDate");
 
-    const formatDate = (d: Date) => d.toISOString().split("T")[0];
+    const formatDate = (d: Date) => {
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+
+      return `${year}-${month}-${day}`;
+    };
 
     return {
       from: formatDate(oFrom),
@@ -74,6 +86,8 @@ export default class UserDetail extends Controller {
   private async _onObjectMatched(oEvent: any): Promise<void> {
     // Get parameter from URL
     const sUsername = oEvent.getParameter("arguments").username;
+
+    this._sUsername = sUsername;
 
     const oView = this.getView();
     if (!oView || !sUsername) return;
@@ -104,11 +118,15 @@ export default class UserDetail extends Controller {
 
     // Set range in date picker
     const oDatePicker = this.byId("AuthDatePickerId") as DatePicker;
+    const oActDatePicker = this.byId("ActivityDatePickerId") as DatePicker;
 
     if (!oDatePicker) return;
 
     oDatePicker.setMinDate(new Date(from));
     oDatePicker.setMaxDate(new Date(to));
+
+    oActDatePicker.setMinDate(new Date(from));
+    oActDatePicker.setMaxDate(new Date(to));
   }
 
   /**
@@ -332,6 +350,30 @@ export default class UserDetail extends Controller {
 
     const oTableModel = new JSONModel(aDataTable);
     this.getView()?.setModel(oTableModel, "UserActivityLogData");
+
+    // Create a list binding to /UserActivittyPerDay with $filter
+    const oUserActPerDate = oModel.bindList(
+      "/UserActivittyPerDay",
+      undefined,
+      undefined,
+      [
+        new Filter("Username", FilterOperator.EQ, sUsername),
+        new Filter({
+          path: "ActivityDate",
+          operator: FilterOperator.BT,
+          value1: from,
+          value2: to,
+        }),
+      ],
+    ) as ODataListBinding;
+
+    const aContextActPerD = await oUserActPerDate.requestContexts();
+    const aDataActPerDate = aContextActPerD.map((oContext) =>
+      oContext.getObject(),
+    );
+
+    const oActPerDayModel = new JSONModel(aDataActPerDate);
+    this.getView()?.setModel(oActPerDayModel, "ActPerDateData");
   }
 
   /**
@@ -410,6 +452,132 @@ export default class UserDetail extends Controller {
 
     if (oBinding) {
       oBinding.filter(aFinalFilters);
+    }
+  }
+
+  /**
+   * Called when the user use filter activity
+   **/
+  public onFilterActivity(): void {
+    this.applyActivityFilters();
+  }
+
+  /**
+   * Execute logic filter activity
+   **/
+  public applyActivityFilters(): void {
+    const aFilters: Filter[] = [];
+    const { from, to } = this.getGlobalDateRange();
+
+    const oTable = this.byId("ActivityTableId") as Table;
+    const oBinding = oTable.getBinding("rows") as ODataListBinding;
+
+    // Get value from search and select
+    const sStatus = (
+      this.byId("ActivityTypeSelectId") as Select
+    ).getSelectedKey();
+
+    if (sStatus) {
+      aFilters.push(new Filter("ActivityType", FilterOperator.EQ, sStatus));
+    }
+
+    // Get value select date picker
+    const oDatePicker = this.byId("ActivityDatePickerId") as DatePicker;
+    if (oDatePicker) {
+      const oDate = oDatePicker.getDateValue();
+
+      if (oDate) {
+        const oFormatter = DateFormat.getDateInstance({
+          pattern: "yyyy-MM-dd",
+        });
+
+        const sDate = oFormatter.format(oDate);
+
+        aFilters.push(new Filter("ActivityDate", FilterOperator.EQ, sDate));
+      }
+
+      // Final filter and render into table
+      const aFinalFilters = oDatePicker
+        ? aFilters
+        : [
+            new Filter({
+              path: "ActivityDate",
+              operator: FilterOperator.BT,
+              value1: from,
+              value2: to,
+            }),
+            ...aFilters,
+          ];
+
+      if (oBinding) {
+        oBinding.filter(aFinalFilters);
+      }
+    }
+  }
+
+  /**
+   * Called when the value help of the user search input is triggered.
+   * Fetches data from the OData service
+   **/
+  public async onUserSearchHelpTCode(): Promise<void> {
+    try {
+      const { from, to } = this.getGlobalDateRange();
+
+      const oTCodeSearchHelpData = {} as any;
+
+      // Get OData V4 model from the App Component
+      const oModel = this.getAppComponent().getModel() as ODataModel;
+
+      // Create a list binding to /UserSearchHelp
+      const oBinding = oModel.bindList(
+        "/UserSearchHelpTCode",
+        undefined,
+        undefined,
+        [
+          new Filter({
+            path: "ActivityDate",
+            operator: FilterOperator.BT,
+            value1: from,
+            value2: to,
+          }),
+          new Filter("Username", FilterOperator.EQ, this._sUsername),
+        ],
+      ) as ODataListBinding;
+
+      // Executes the OData call and load data
+      const aContexts = await oBinding.requestContexts();
+
+      aContexts.forEach((oContext) => {
+        const oObj = oContext.getObject();
+        const key = oObj.TCode;
+
+        if (!oTCodeSearchHelpData[key]) {
+          oTCodeSearchHelpData[key] = {
+            TCode: oObj.TCode,
+          };
+        }
+      });
+
+      //  Convert into array
+      let aTCodeSearchHelpData = Object.values(oTCodeSearchHelpData);
+
+      const oJsonModel = new JSONModel(aTCodeSearchHelpData);
+
+      this.getView()?.setModel(oJsonModel, "TCodeSeachHelp");
+
+      if (!this._oTCodeSearchHelpDialog) {
+        // Load fragment
+        this._oTCodeSearchHelpDialog = (await Fragment.load({
+          name: "useraudit.fragment.TCodeSearchHelp",
+          controller: this,
+        })) as Dialog;
+
+        this.getView()?.addDependent(this._oTCodeSearchHelpDialog);
+      }
+
+      this._oTCodeSearchHelpDialog.open();
+    } catch (error) {
+      MessageBox.error("Failed to load TCode search help.");
     }
   }
 }

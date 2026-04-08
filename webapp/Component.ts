@@ -20,7 +20,7 @@ export default class Component extends BaseComponent {
     // SET GLOBAL FILTER DATE
     const oToday = new Date();
     const oFrom = new Date();
-    oFrom.setDate(oToday.getDate() - 3);
+    oFrom.setDate(oToday.getDate() - 4);
 
     const oGlobalModel = new JSONModel({
       fromDate: oFrom,
