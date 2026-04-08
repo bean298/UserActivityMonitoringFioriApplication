@@ -336,8 +336,7 @@
                         </ui:Column>
 
                         <!-- LOGIN RESULT COLUMN -->
-                        <ui:Column id="columnLoginResult" width="9rem" sortProperty="LoginResult"
-                            filterProperty="LoginResult" tooltip="{i18n>introSort}">
+
                         <ui:Column id="columnLoginResult" width="9rem" sortProperty="LoginResult"
                             filterProperty="LoginResult" tooltip="{i18n>introSort}">
                             <Label id="labelLoginResult" text="{i18n>loginResult}" />

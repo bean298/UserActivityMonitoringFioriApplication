@@ -17,7 +17,8 @@ import MessageToast from "sap/m/MessageToast";
 
 export default class UserDetail extends Controller {
   public formatter = Formatter;
-
+  private _sFromDate!: string;
+  private _sToDate!: string;
   private _oTCodeSearchHelpDialog: Dialog | null = null;
 
   private _sUsername: string = "";

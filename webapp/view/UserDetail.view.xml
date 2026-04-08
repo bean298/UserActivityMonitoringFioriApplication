@@ -184,7 +184,7 @@
                                 </viz:VizFrame>
 
                                 <!-- AUTH PER DAY - COLUMN CHART -->
-                                <viz:VizFrame id="AuthPerDayVizFrameId" height="300px" width="500px"
+                                <viz:VizFrame id="AuthPerDayVizFrameId" height="300px" width="700px"
                                     vizType="column"
                                     vizProperties="{
                                     title: {
@@ -285,9 +285,8 @@
 
                                         <ToolbarSpacer id="ToolbarSpacer" />
 
-                                        <!-- <Button id="AuthRefreshButtonId"
-                                        icon="sap-icon://refresh"
-                                            tooltip="{i18n>refreshData}" press="onRefreshTable" /> -->
+                                        <Button id="AuthRefreshButtonId" icon="sap-icon://refresh"
+                                            tooltip="{i18n>refreshData}" press="onRefreshTable" />
 
                                         <Button id="AuthExportButtonId"
                                             icon="sap-icon://excel-attachment"
@@ -386,45 +385,83 @@
                 <f:subSections>
                     <f:ObjectPageSubSection id="UserDetailSubSectionActivity">
                         <VBox id="ActivityVBoxId" class="sapUiMediumMargin sapUiContentPadding">
-                            <!-- TCODE USAGE - PIE CHART -->
-                            <viz:VizFrame
-                                vizProperties="{
-                                title: { visible: true, text: 'Top 5 TCode Usage By User' },
-                                plotArea: {
-                                    dataLabel: {
-                                        visible: true,
-                                        type: 'percentage'
+                            <HBox id="hBoxActChart" class="sapUiSmallMarginBottom"
+                                justifyContent="SpaceAround">
+                                <!-- TCODE USAGE - PIE CHART -->
+                                <viz:VizFrame
+                                    vizProperties="{
+                                    title: { visible: true, text: 'Top 5 TCode Usage By User' },
+                                    plotArea: {
+                                        dataLabel: {
+                                            visible: true,
+                                            type: 'percentage'
+                                        }
                                     }
-                                }
-                            }"
-                                id="tcodeChartByUser" vizType="pie" width="500px" height="300px">
-                                <!-- Define data of chart -->
-                                <viz:dataset>
-                                    <viz.data:FlattenedDataset id="TCodeByUserDatasetId"
-                                        data="{TCodeByUserData>/}">
-                                        <!-- DIMENSION -->
-                                        <viz.data:dimensions>
-                                            <viz.data:DimensionDefinition id="TCodeByUserDimId"
-                                                name="Label" value="{TCodeByUserData>Label}" />
-                                        </viz.data:dimensions>
+                                }"
+                                    id="tcodeChartByUser" vizType="pie" width="670px" height="300px">
+                                    <!-- Define data of chart -->
+                                    <viz:dataset>
+                                        <viz.data:FlattenedDataset id="TCodeByUserDatasetId"
+                                            data="{TCodeByUserData>/}">
+                                            <!-- DIMENSION -->
+                                            <viz.data:dimensions>
+                                                <viz.data:DimensionDefinition id="TCodeByUserDimId"
+                                                    name="Label" value="{TCodeByUserData>Label}" />
+                                            </viz.data:dimensions>
 
-                                        <!-- MEASURE -->
-                                        <viz.data:measures>
-                                            <viz.data:MeasureDefinition
-                                                id="TCodeByUserMeasureCountId" name="Usage"
-                                                value="{TCodeByUserData>TCodeCount}" />
-                                        </viz.data:measures>
-                                    </viz.data:FlattenedDataset>
-                                </viz:dataset>
+                                            <!-- MEASURE -->
+                                            <viz.data:measures>
+                                                <viz.data:MeasureDefinition
+                                                    id="TCodeByUserMeasureCountId" name="Usage"
+                                                    value="{TCodeByUserData>TCodeCount}" />
+                                            </viz.data:measures>
+                                        </viz.data:FlattenedDataset>
+                                    </viz:dataset>
 
-                                <!-- Mapping dimension/measure into chart -->
-                                <viz:feeds>
-                                    <viz.feeds:FeedItem id="ActTcodeMeasure" uid="size"
-                                        type="Measure" values="Usage" />
-                                    <viz.feeds:FeedItem id="ActTcodeValue" uid="color"
-                                        type="Dimension" values="Label" />
-                                </viz:feeds>
-                            </viz:VizFrame>
+                                    <!-- Mapping dimension/measure into chart -->
+                                    <viz:feeds>
+                                        <viz.feeds:FeedItem id="ActTcodeMeasure" uid="size"
+                                            type="Measure" values="Usage" />
+                                        <viz.feeds:FeedItem id="ActTcodeValue" uid="color"
+                                            type="Dimension" values="Label" />
+                                    </viz:feeds>
+                                </viz:VizFrame>
+
+                                <!-- ACTIVITY PERDAY - LINE CHART -->
+                                <viz:VizFrame
+                                    vizProperties="{
+                                    title: { visible: true, text: 'Activity of User' }
+                                }"
+                                    id="idLineChart" width="600px" height="400px" vizType="line">
+                                    <viz:dataset>
+                                        <viz.data:FlattenedDataset id="ActDatasetId"
+                                            data="{ActPerDateData>/}">
+                                            <!-- DIMENSION -->
+                                            <viz.data:dimensions>
+                                                <viz.data:DimensionDefinition id="ActDimId"
+                                                    name="Date"
+                                                    value="{ActPerDateData>ActivityDate}" />
+                                            </viz.data:dimensions>
+
+                                            <!-- MEASURE -->
+                                            <viz.data:measures>
+                                                <viz.data:MeasureDefinition id="ActMeasureCountId"
+                                                    name="Activity Count"
+                                                    value="{ActPerDateData>ActivityCount}" />
+                                            </viz.data:measures>
+                                        </viz.data:FlattenedDataset>
+                                    </viz:dataset>
+
+                                    <!-- Mapping dimension/measure into chart -->
+                                    <viz:feeds>
+                                        <viz.feeds:FeedItem id="ActMeasure" uid="valueAxis"
+                                            type="Measure" values="Activity Count" />
+                                        <viz.feeds:FeedItem id="ActValue" uid="categoryAxis"
+                                            type="Dimension" values="Date" />
+                                    </viz:feeds>
+                                </viz:VizFrame>
+                            </HBox>
+
 
                             <!-- ACTIVITY -->
                             <VBox id="ActivityVBoxContentId" class="sapUiMediumMarginTop">
@@ -451,13 +488,16 @@
                                     </Select>
 
                                     <Input id="ActivityTCodeInputId" width="120px"
-                                        placeholder="{i18n>tCode}" liveChange="onFilterActivity" />
+                                        placeholder="{i18n>tCode}" showValueHelp="true"
+                                        liveChange="onSearchTCode"
+                                        valueHelpRequest="onUserSearchHelpTCode"
+                                        showClearIcon="true" class="sapUiSmallMarginEnd" />
 
                                     <!-- Date -->
                                     <Label id="ActivityDateLabelId" text="{i18n>activityDate}"
                                         class="sapUiTinyMarginBegin sapUiTinyMarginEnd" />
                                     <DatePicker id="ActivityDatePickerId" width="150px"
-                                        change="onFilterActivity" />
+                                        placeholder="{i18n>selectDate}" change="onFilterActivity" />
                                 </Toolbar>
 
                                 <!-- TABLE -->
@@ -578,10 +618,10 @@
                                             <Label id="ActivitySentMaileColumnLabelId"
                                                 text="{i18n>sentMailAlert}" />
                                             <ui:template>
-                                                <Button id="ActivityNavigateButtonId"
-                                                    icon="sap-icon://navigation-right-arrow"
-                                                    type="Transparent" press="onPressActivityDetail"
-                                                    tooltip="{i18n>navigateAuth}" />
+                                                <core:Icon id="ActivitySentMail"
+                                                    src="{= ${UserActivityLogData>mail_sent} ? 'sap-icon://accept' : 'sap-icon://decline'}"
+                                                    color="{= ${UserActivityLogData>mail_sent} ? 'green' : 'red'}"
+                                                    size="1.5rem" />
                                             </ui:template>
                                         </ui:Column>
                                     </ui:columns>
