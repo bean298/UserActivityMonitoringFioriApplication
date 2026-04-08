@@ -389,7 +389,7 @@
                                         <core:Item id="ActivityTypeDumpItemId" key="DUMP" text="{i18n>itemDump}" />
                                     </Select>
 
-                                    <Input id="ActivityTCodeInputId" width="120px" placeholder="{i18n>tCode}" showValueHelp="true" liveChange="onSearchTCode" valueHelpRequest="onUserSearchHelpTCode" showClearIcon="true" class="sapUiSmallMarginEnd" />
+                                    <Input id="ActivityTCodeInputId" width="200px" placeholder="{i18n>tCode}" showValueHelp="true" liveChange="onSearchTCode" valueHelpRequest="onUserSearchHelpTCode" showClearIcon="true" class="sapUiSmallMarginEnd" />
 
                                     <!-- Date -->
                                     <Label id="ActivityDateLabelId" text="{i18n>activityDate}" class="sapUiTinyMarginBegin sapUiTinyMarginEnd" />

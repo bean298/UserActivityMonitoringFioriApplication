@@ -12,6 +12,7 @@ import DatePicker from "sap/m/DatePicker";
 import DateFormat from "sap/ui/core/format/DateFormat";
 import Dialog from "sap/m/Dialog";
 import Fragment from "sap/ui/core/Fragment";
+import Input from "sap/m/Input";
 export default class UserDetail extends Controller {
   public formatter = Formatter;
 
@@ -463,6 +464,13 @@ export default class UserDetail extends Controller {
   }
 
   /**
+   * Called when the user use filter TCode
+   **/
+  public onSearchTCode(): void {
+    this.applyActivityFilters();
+  }
+
+  /**
    * Execute logic filter activity
    **/
   public applyActivityFilters(): void {
@@ -471,6 +479,12 @@ export default class UserDetail extends Controller {
 
     const oTable = this.byId("ActivityTableId") as Table;
     const oBinding = oTable.getBinding("rows") as ODataListBinding;
+
+    // Get value from search and select
+    const sSearch = (this.byId("ActivityTCodeInputId") as Input).getValue();
+    if (sSearch) {
+      aFilters.push(new Filter("TCode", FilterOperator.Contains, sSearch));
+    }
 
     // Get value from search and select
     const sStatus = (
@@ -579,5 +593,30 @@ export default class UserDetail extends Controller {
     } catch (error) {
       MessageBox.error("Failed to load TCode search help.");
     }
+  }
+
+  /**
+   * Select TCode SearchHelp
+   **/
+  public onTCodeSelect(oEvent: any): void {
+    const oItem = oEvent.getParameter("listItem");
+
+    const oContext = oItem.getBindingContext("TCodeSeachHelp");
+    const oSelected = oContext?.getObject();
+
+    if (oSelected) {
+      (this.byId("ActivityTCodeInputId") as Input).setValue(oSelected.TCode);
+    }
+
+    this.applyActivityFilters();
+
+    this._oTCodeSearchHelpDialog?.close();
+  }
+
+  /**
+   * Close Fragment TCode Search Help
+   **/
+  public onCloseTCodeDialog(): void {
+    this._oTCodeSearchHelpDialog?.close();
   }
 }
