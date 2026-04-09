@@ -113,14 +113,27 @@
                         <VBox id="AuthBoxId" class="sapUiMediumMargin sapUiContentPadding">
                             <!-- AUTH - DONUT CHART -->
                             <HBox id="hBoxChart" class="sapUiSmallMarginBottom" justifyContent="SpaceAround">
-                                <viz:VizFrame id="AuthVizFrameId" height="300px" width="400px" vizType="donut" vizProperties="{
+                                <viz:VizFrame id="AuthVizFrameId" height="300px" width="500px" vizType="donut" vizProperties="{
                                     title: {
                                         text: 'User Authentication Result'
                                     },
                                     plotArea: {
-                                        colorPalette: ['#e74c3c', '#2ecc71'],
                                         dataLabel: {
                                             visible: true
+                                        },
+                                        dataPointStyle: {
+                                            rules: [
+                                                {
+                                                    dataContext: { 'Login Result': 'SUCCESS' },
+                                                    properties: { color: '#2ecc71' },
+                                                    displayName: 'Login Success'
+                                                },
+                                                {
+                                                    dataContext: { 'Login Result': 'FAIL' },
+                                                    properties: { color: '#e74c3c' },
+                                                    displayName: 'Login Fail'
+                                                }
+                                            ]
                                         }
                                     },
                                     legend: {
@@ -229,16 +242,18 @@
 
                                         <ToolbarSpacer id="ToolbarSpacer"/>
 
-                                        <Button id="AuthRefreshButtonId" icon="sap-icon://refresh" tooltip="{i18n>refreshData}" press="onRefreshTable" />
+                                        <!-- EXPORT -->
+                                        <Button id="AuthExportButtonId" icon="sap-icon://excel-attachment" tooltip="{i18n>exportExcel}" press="onExportAuthExcel" />
 
-                                        <Button id="AuthExportButtonId" icon="sap-icon://excel-attachment" tooltip="{i18n>exportExcel}" press="onExportExcel" />
+                                        <!-- SETTINGS -->
+                                        <Button id="AuthSettingsButtonId" icon="sap-icon://action-settings" tooltip="{i18n>viewSettings}" press="onOpenAuthSettings" />
                                     </OverflowToolbar>
                                 </ui:extension>
 
                                 <!-- COLUMNS -->
                                 <ui:columns>
                                     <!-- SESSION ID -->
-                                    <ui:Column id="AuthSessionIdColumnId" width="14rem">
+                                    <ui:Column id="AuthSessionIdColumnId" width="14rem" sortProperty="UserAuthLogData>SessionId" tooltip="{i18n>introSort}">
                                         <Label id="AuthSessionIdLabelId" text="{i18n>sessionId}" />
                                         <ui:template>
                                             <Text id="AuthSessionIdTextId" text="{UserAuthLogData>SessionId}" wrapping="false" />
@@ -246,7 +261,7 @@
                                     </ui:Column>
 
                                     <!-- LOGIN RESULT -->
-                                    <ui:Column id="AuthLoginResultColumnId" width="9rem">
+                                    <ui:Column id="AuthLoginResultColumnId" width="9rem" sortProperty="UserAuthLogData>LoginResult" tooltip="{i18n>introSort}">
                                         <Label id="AuthLoginResultLabelId" text="{i18n>loginResult}" />
                                         <ui:template>
                                             <ObjectStatus id="AuthLoginResultStatusId" text="{UserAuthLogData>LoginResult}" icon="{path:'UserAuthLogData>LoginResult', formatter:'.formatter.formatLoginResultIcon'}" state="{path:'UserAuthLogData>LoginResult', formatter:'.formatter.formatLoginResultState'}" />
@@ -254,7 +269,7 @@
                                     </ui:Column>
 
                                     <!-- LOGIN DATE -->
-                                    <ui:Column id="AuthLoginDateColumnId" width="10rem">
+                                    <ui:Column id="AuthLoginDateColumnId" width="10rem" sortProperty="UserAuthLogData>LoginDate" tooltip="{i18n>introSort}">
                                         <Label id="AuthLoginDateLabelId" text="{i18n>loginDate}" />
                                         <ui:template>
                                             <Text id="AuthLoginDateTextId" text="{path:'UserAuthLogData>LoginDate', formatter:'.formatter.formatISODate'}" />
@@ -262,7 +277,7 @@
                                     </ui:Column>
 
                                     <!-- LOGIN TIME -->
-                                    <ui:Column id="AuthLoginTimeColumnId" width="8rem">
+                                    <ui:Column id="AuthLoginTimeColumnId" width="8rem" sortProperty="UserAuthLogData>LoginTime" tooltip="{i18n>introSort}">
                                         <Label id="AuthLoginTimeLabelId" text="{i18n>loginTime}" />
                                         <ui:template>
                                             <Text id="AuthLoginTimeTextId" text="{UserAuthLogData>LoginTime}" />
@@ -270,7 +285,7 @@
                                     </ui:Column>
 
                                     <!-- LOGIN MESSAGE -->
-                                    <ui:Column id="AuthLoginMessageColumnId">
+                                    <ui:Column id="AuthLoginMessageColumnId" sortProperty="UserAuthLogData>LoginMessage" tooltip="{i18n>introSort}">
                                         <Label id="AuthLoginMessageLabelId" text="{i18n>loginMessage}" />
                                         <ui:template>
                                             <ObjectStatus id="AuthLoginMessageStatusId" text="{UserAuthLogData>LoginMessage}" icon="{path:'UserAuthLogData>EventId', formatter:'.formatter.formatLoginMessageIcon'}" state="{path:'UserAuthLogData>EventId', formatter:'.formatter.formatLoginMessageState'}" />
@@ -278,7 +293,7 @@
                                     </ui:Column>
 
                                     <!-- LOGOUT DATE -->
-                                    <ui:Column id="AuthLogoutDateColumnId" width="10rem">
+                                    <ui:Column id="AuthLogoutDateColumnId" width="10rem" sortProperty="UserAuthLogData>LogoutDate" tooltip="{i18n>introSort}">
                                         <Label id="AuthLogoutDateLabelId" text="{i18n>logoutDate}" />
                                         <ui:template>
                                             <Text id="AuthLogoutDateTextId" text="{path:'UserAuthLogData>LogoutDate', formatter:'.formatter.formatISODate'}" />
@@ -286,7 +301,7 @@
                                     </ui:Column>
 
                                     <!-- LOGOUT TIME -->
-                                    <ui:Column id="AuthLogoutTimeColumnId" width="8rem">
+                                    <ui:Column id="AuthLogoutTimeColumnId" width="8rem" sortProperty="UserAuthLogData>LogoutTime" tooltip="{i18n>introSort}">
                                         <Label id="AuthLogoutTimeLabelId" text="{i18n>logoutTime}" />
                                         <ui:template>
                                             <Text id="AuthLogoutTimeTextId" text="{path:'UserAuthLogData>LogoutTime', formatter:'.formatter.formatLogoutTime'}" />
@@ -344,13 +359,13 @@
                                     </viz:feeds>
                                 </viz:VizFrame>
 
-                                 <!-- ACTIVITY PERDAY - LINE CHART -->
+                                <!-- ACTIVITY PERDAY - LINE CHART -->
                                 <viz:VizFrame vizProperties="{
                                     title: { visible: true, text: 'Activity of User' }
                                 }" id="idLineChart" width="600px" height="400px" vizType="line">
                                     <viz:dataset>
                                         <viz.data:FlattenedDataset id="ActDatasetId" data="{ActPerDateData>/}">
-                                             <!-- DIMENSION -->
+                                            <!-- DIMENSION -->
                                             <viz.data:dimensions>
                                                 <viz.data:DimensionDefinition id="ActDimId" name="Date" value="{ActPerDateData>ActivityDate}" />
                                             </viz.data:dimensions>
@@ -422,7 +437,7 @@
                                     <!-- COLUMNS -->
                                     <ui:columns>
                                         <!-- LOG ID -->
-                                        <ui:Column id="ActivityLogIdColumnId" width="14rem">
+                                        <ui:Column id="ActivityLogIdColumnId" width="14rem" sortProperty="UserActivityLogData>LogId" tooltip="{i18n>introSort}">
                                             <Label id="ActivityLogIdLabelId" text="{i18n>logId}" />
                                             <ui:template>
                                                 <Text id="ActivityLogIdTextId" text="{UserActivityLogData>LogId}" wrapping="false" />
@@ -430,7 +445,7 @@
                                         </ui:Column>
 
                                         <!-- ACTIVITY TYPE -->
-                                        <ui:Column id="ActivityTypeColumnId" width="10rem" hAlign="Center">
+                                        <ui:Column id="ActivityTypeColumnId" width="10rem" hAlign="Center" sortProperty="UserActivityLogData>ActivityType" tooltip="{i18n>introSort}">
                                             <Label id="ActivityTypeColumnLabelId" text="{i18n>activityType}" />
                                             <ui:template>
                                                 <ObjectStatus id="ActivityTypeStatusId" text="{UserActivityLogData>ActivityType}" icon="{path:'UserActivityLogData>ActivityType', formatter:'.formatter.formatActivityType'}" state="{path:'UserActivityLogData>ActivityType', formatter:'.formatter.formatActivityState'}" />
@@ -438,7 +453,7 @@
                                         </ui:Column>
 
                                         <!-- TCODE -->
-                                        <ui:Column id="ActivityTCodeColumnId" width="8rem">
+                                        <ui:Column id="ActivityTCodeColumnId" width="8rem" sortProperty="UserActivityLogData>TCode" tooltip="{i18n>introSort}">
                                             <Label id="ActivityTCodeColumnLabelId" text="{i18n>tCode}" />
                                             <ui:template>
                                                 <ObjectStatus id="ActivityTCodeStatusId" text="{UserActivityLogData>TCode}" icon="{path:'UserActivityLogData>TCode', formatter:'.formatter.formatTCodeIcon'}" />
@@ -446,7 +461,7 @@
                                         </ui:Column>
 
                                         <!-- TCODE NAME -->
-                                        <ui:Column id="ActivityTCodeNameColumnId" width="12rem">
+                                        <ui:Column id="ActivityTCodeNameColumnId" width="12rem" sortProperty="UserActivityLogData>TCodeName" tooltip="{i18n>introSort}">
                                             <Label id="ActivityTCodeNameLabelId" text="{i18n>tCodeName}" />
                                             <ui:template>
                                                 <Text id="ActivityTCodeNameTextId" text="{UserActivityLogData>TCodeName}" wrapping="false" />
@@ -454,7 +469,7 @@
                                         </ui:Column>
 
                                         <!-- MESSAGE -->
-                                        <ui:Column id="ActivityMessageColumnId">
+                                        <ui:Column id="ActivityMessageColumnId" sortProperty="UserActivityLogData>ActivityMessage" tooltip="{i18n>introSort}">
                                             <Label id="ActivityMessageLabelId" text="{i18n>activityMessage}" />
                                             <ui:template>
                                                 <ObjectStatus id="ActivityMessageStatusId" text="{UserActivityLogData>ActivityMessage}" state="Information" />
@@ -462,7 +477,7 @@
                                         </ui:Column>
 
                                         <!-- DATE -->
-                                        <ui:Column id="ActivityDateColumnId" width="10rem">
+                                        <ui:Column id="ActivityDateColumnId" width="10rem" sortProperty="UserActivityLogData>ActivityDate" tooltip="{i18n>introSort}">
                                             <Label id="ActivityDateColumnLabelId" text="{i18n>activityDate}" />
                                             <ui:template>
                                                 <Text id="ActivityDateTextId" text="{path:'UserActivityLogData>ActivityDate', formatter: '.formatter.formatISODate'}" />
@@ -470,19 +485,19 @@
                                         </ui:Column>
 
                                         <!-- TIME -->
-                                        <ui:Column id="ActivityTimeColumnId" width="8rem">
+                                        <ui:Column id="ActivityTimeColumnId" width="8rem" sortProperty="UserActivityLogData>ActivityTime" tooltip="{i18n>introSort}"> 
                                             <Label id="ActivityTimeColumnLabelId" text="{i18n>activityTime}" />
                                             <ui:template>
                                                 <Text id="ActivityTimeTextId" text="{UserActivityLogData>ActivityTime}" />
                                             </ui:template>
                                         </ui:Column>
 
-                                        <!-- NAVIGATION -->
+                                        <!-- SENT MAIL -->
                                         <ui:Column id="ActivityNavigateColumnId" width="4rem" hAlign="Center">
                                             <Label id="ActivitySentMaileColumnLabelId" text="{i18n>sentMailAlert}" />
                                             <ui:template>
                                                 <core:Icon id="ActivitySentMail" src="{= ${UserActivityLogData>mail_sent} ? 'sap-icon://accept' : 'sap-icon://decline'}" color="{= ${UserActivityLogData>mail_sent} ? 'green' : 'red'}" size="1.5rem" />
-                                             </ui:template>
+                                            </ui:template>
                                         </ui:Column>
                                     </ui:columns>
                                 </ui:Table>

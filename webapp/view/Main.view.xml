@@ -24,7 +24,7 @@
                     <HBox id="globalFilterBox" alignItems="Center" class="sapUiSmallMarginEnd">
                         <VBox id="globalFilterContainer">
                             <Text id="globalFilterLabel" text="{i18n>globalfilter}" class="globalFilterTitle"/>
-                            <DateRangeSelection id="globalDateRange" width="280px" displayFormat="yyyy-MM-dd" valueFormat="yyyy-MM-dd" delimiter=" - " dateValue="{global>/fromDate}" secondDateValue="{global>/toDate}" />
+                            <DateRangeSelection id="globalDateRange" change="onGlobalDateRangeChange" width="280px" displayFormat="yyyy-MM-dd" valueFormat="yyyy-MM-dd" delimiter=" - " dateValue="{global>/fromDate}" secondDateValue="{global>/toDate}" />
                         </VBox>
                     </HBox>
                 </f:actions>
