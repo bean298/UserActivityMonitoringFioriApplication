@@ -84,7 +84,7 @@ export default class Main extends Controller {
           this.onInitOverviewData(),
         ]);
 
-        // Set range in date picker
+        // Reset Min Max Date after filter global
         const oDatePicker = this.byId("mainDatePickerId") as DatePicker;
 
         if (!oDatePicker) return;
