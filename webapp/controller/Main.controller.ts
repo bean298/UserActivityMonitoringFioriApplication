@@ -83,6 +83,16 @@ export default class Main extends Controller {
           this.onInitDumpCount(),
           this.onInitOverviewData(),
         ]);
+
+        // Set range in date picker
+        const oDatePicker = this.byId("mainDatePickerId") as DatePicker;
+
+        if (!oDatePicker) return;
+
+        const { from, to } = this.getGlobalDateRange();
+
+        oDatePicker.setMinDate(new Date(from));
+        oDatePicker.setMaxDate(new Date(to));
       } finally {
         oView.setBusy(false);
       }
