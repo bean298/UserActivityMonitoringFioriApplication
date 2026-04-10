@@ -8,9 +8,13 @@ import Formatter from "useraudit/formatter/Formatter";
 import MessageBox from "sap/m/MessageBox";
 import MessageToast from "sap/m/MessageToast";
 import Spreadsheet from "sap/ui/export/Spreadsheet";
+import Dialog from "sap/m/Dialog";
+import Fragment from "sap/ui/core/Fragment";
 
 export default class AuthDetail extends Controller {
   public formatter = Formatter;
+
+  private _oActViewSettingsDialog: Dialog | null = null;
 
   /**
    * Called when the controller is initialized.
@@ -142,5 +146,89 @@ export default class AuthDetail extends Controller {
         }
       },
     });
+  }
+
+  /**
+   * Open Act Fragment Settings Columns
+   **/
+  public async onOpenActivitySettings(): Promise<void> {
+    if (!this._oActViewSettingsDialog) {
+      // Load fragment
+      this._oActViewSettingsDialog = (await Fragment.load({
+        id: this.getView()?.getId(), //Fix duplicate id in fragment
+        name: "useraudit.fragment.ActivityViewSettingsDialog",
+        controller: this,
+      })) as Dialog;
+
+      // Add Fragment into view
+      this.getView()?.addDependent(this._oActViewSettingsDialog);
+
+      this.initializeActivityColumnModel();
+    }
+
+    // Open
+    this._oActViewSettingsDialog.open();
+  }
+
+  /**
+   * Activity
+   * Read columns list of table -> JSONModel
+   * Bring it into Dialog View
+   **/
+  public initializeActivityColumnModel(): void {
+    // Get table and its colums
+    const oTable = this.byId("ActivityTable") as any;
+    const aColumns = oTable.getColumns();
+
+    // Create new array contain every column object
+    const aColumnData = aColumns.map((oColumn: any) => {
+      const oLabel = oColumn.getLabel();
+
+      return {
+        id: oColumn.getId(),
+        label: oLabel ? oLabel.getText() : oColumn.getId(),
+        visible: oColumn.getVisible(),
+      };
+    });
+
+    // Create JSONModel, property columns
+    const oModel = new JSONModel({
+      columns: aColumnData,
+    });
+
+    this.getView()?.setModel(oModel, "ActivityColumnsModel");
+  }
+
+  /**
+   * Open Activity Fragment Settings Columns
+   **/
+  public onActConfirmViewSettings(): void {
+    // Get table and its colums
+    const oTable = this.byId("ActivityTable") as any;
+    const aColumns = oTable.getColumns();
+
+    // Get model and property
+    const oModel = this.getView()?.getModel(
+      "ActivityColumnsModel",
+    ) as JSONModel;
+    const aData = oModel.getProperty("/columns");
+
+    // Set visible for column
+    aColumns.forEach((oColumn: any) => {
+      const oMatch = aData.find((column: any) => column.id === oColumn.getId());
+
+      if (oMatch) {
+        oColumn.setVisible(oMatch.visible);
+      }
+    });
+
+    this._oActViewSettingsDialog?.close();
+  }
+
+  /**
+   * Close Activity Fragment Settings Columns
+   **/
+  public onActCancelViewSettings(): void {
+    this._oActViewSettingsDialog?.close();
   }
 }

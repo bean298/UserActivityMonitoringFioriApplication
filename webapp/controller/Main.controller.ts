@@ -83,6 +83,16 @@ export default class Main extends Controller {
           this.onInitDumpCount(),
           this.onInitOverviewData(),
         ]);
+
+        // Reset Min Max Date after filter global
+        const oDatePicker = this.byId("mainDatePickerId") as DatePicker;
+
+        if (!oDatePicker) return;
+
+        const { from, to } = this.getGlobalDateRange();
+
+        oDatePicker.setMinDate(new Date(from));
+        oDatePicker.setMaxDate(new Date(to));
       } finally {
         oView.setBusy(false);
       }
@@ -901,6 +911,37 @@ export default class Main extends Controller {
           username: sUsername,
         });
       }
+    }
+  }
+
+  /**
+   * Validate in global filter daterange
+   * Not allow to filter more than 6 days
+   **/
+  public onGlobalDateRangeChange(oEvent: any): void {
+    const oSource = oEvent.getSource();
+
+    const oFrom = oSource.getDateValue();
+    const oTo = oSource.getSecondDateValue();
+
+    if (!oFrom || !oTo) return;
+
+    // Calculate date
+    const iDiffTime = oTo.getTime() - oFrom.getTime();
+    const iDiffDays = iDiffTime / (1000 * 60 * 60 * 24);
+
+    if (iDiffDays > 6) {
+      MessageToast.show("Max range is 6 days");
+
+      const oToday = new Date();
+
+      const oFromNew = new Date(oToday);
+      oFromNew.setDate(oToday.getDate() - 5);
+
+      const oToNew = oToday;
+
+      oSource.setDateValue(oFromNew);
+      oSource.setSecondDateValue(oToNew);
     }
   }
 }

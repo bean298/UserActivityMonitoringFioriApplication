@@ -15,9 +15,11 @@ import Fragment from "sap/ui/core/Fragment";
 import Input from "sap/m/Input";
 import Spreadsheet from "sap/ui/export/Spreadsheet";
 import MessageToast from "sap/m/MessageToast";
-
 export default class UserDetail extends Controller {
   public formatter = Formatter;
+
+  private _oAuthViewSettingsDialog: Dialog | null = null;
+  private _oActViewSettingsDialog: Dialog | null = null;
   private _sFromDate!: string;
   private _sToDate!: string;
   private _oTCodeSearchHelpDialog: Dialog | null = null;
@@ -622,6 +624,336 @@ export default class UserDetail extends Controller {
    **/
   public onCloseTCodeDialog(): void {
     this._oTCodeSearchHelpDialog?.close();
+  }
+
+  /**
+   * AUTHENTICATION
+   * Exports the currently bound table data to an Excel file.
+   * Uses sap.ui.export.Spreadsheet to generate the file
+   * based on the current OData V4 list binding.
+   */
+  public onExportAuthExcel(): void {
+    const { from, to } = this.getGlobalDateRange();
+
+    const sFileName = `UserAuthenticationLogs_of_${this._sUsername}_${from}_to_${to}.xlsx`;
+
+    MessageBox.confirm("Do you want to export this data to Excel?", {
+      title: "Confirm Export",
+      actions: ["YES", "NO"],
+      emphasizedAction: "YES",
+
+      onClose: (oAction: string | null) => {
+        if (oAction === "YES") {
+          // Get table and its OData list binding
+          const oTable = this.byId("AuthTableId");
+          const oBinding = oTable?.getBinding("rows") as ODataListBinding;
+
+          // Format in Excel
+          const aCols = [
+            {
+              label: "User Session",
+              property: "SessionId",
+              width: 25,
+            },
+            {
+              label: "User Name",
+              property: "Username",
+              width: 15,
+            },
+            {
+              label: "Login Result",
+              property: "LoginResult",
+              width: 10,
+            },
+            {
+              label: "Login Date",
+              property: "LoginDate",
+              width: 15,
+            },
+            {
+              label: "Login Time",
+              property: "LoginTime",
+              width: 15,
+            },
+            {
+              label: "Login Message",
+              property: "LoginMessage",
+              width: 150,
+            },
+            {
+              label: "Logout Date",
+              property: "LogoutDate",
+              width: 15,
+            },
+            {
+              label: "Logout Time",
+              property: "LogoutTime",
+              width: 15,
+            },
+            {
+              label: "Event ID",
+              property: "EventId",
+              width: 10,
+            },
+          ];
+
+          // Spreadsheet config
+          const oSettings = {
+            workbook: { columns: aCols },
+            dataSource: oBinding,
+            fileName: sFileName,
+            worker: false,
+          };
+
+          // Spreadsheet config
+          const oSheet = new Spreadsheet(oSettings);
+          // Create Excel file and download it
+          oSheet
+            .build()
+            .then(() => {
+              MessageToast.show("Export successful!", { duration: 3000 });
+            })
+            .catch(() => {
+              MessageBox.error("Export failed.");
+            })
+            .finally(() => {
+              oSheet.destroy();
+            });
+        }
+      },
+    });
+  }
+
+  /**
+   * Open Fragment Settings Columns
+   **/
+  public async onOpenAuthSettings(): Promise<void> {
+    if (!this._oAuthViewSettingsDialog) {
+      // Load fragment
+      this._oAuthViewSettingsDialog = (await Fragment.load({
+        id: this.getView()?.getId(), //Fix duplicate id in fragment
+        name: "useraudit.fragment.ViewSettingsDialog",
+        controller: this,
+      })) as Dialog;
+
+      // Add Fragment into view
+      this.getView()?.addDependent(this._oAuthViewSettingsDialog);
+
+      this.initializeAuthColumnModel();
+    }
+
+    // Open
+    this._oAuthViewSettingsDialog.open();
+  }
+
+  /**
+   * Read auth columns list of table -> JSONModel
+   * Bring it into Dialog View
+   **/
+  public initializeAuthColumnModel(): void {
+    // Get table and its colums
+    const oTable = this.byId("AuthTableId") as any;
+    const aColumns = oTable.getColumns();
+
+    // Remove Navigator column
+    const aFilteredColumns = aColumns.filter(
+      (oColumn: any) => !oColumn.getId().includes("AuthNavigateColumnId"),
+    );
+
+    // Create new array contain every column object
+    const aColumnData = aFilteredColumns.map((oColumn: any) => {
+      const oLabel = oColumn.getLabel();
+
+      return {
+        id: oColumn.getId(),
+        label: oLabel ? oLabel.getText() : oColumn.getId(),
+        visible: oColumn.getVisible(),
+      };
+    });
+
+    // Create JSONModel, property columns
+    const oModel = new JSONModel({
+      columns: aColumnData,
+    });
+
+    this.getView()?.setModel(oModel, "columnsModel");
+  }
+
+  /**
+   * Open Fragment Settings Columns
+   **/
+  public onConfirmViewSettings(): void {
+    // Get table and its colums
+    const oTable = this.byId("AuthTableId") as any;
+    const aColumns = oTable.getColumns();
+
+    // Get model and property
+    const oModel = this.getView()?.getModel("columnsModel") as JSONModel;
+    const aData = oModel.getProperty("/columns");
+
+    // Set visible for column
+    aColumns.forEach((oColumn: any) => {
+      const oMatch = aData.find((column: any) => column.id === oColumn.getId());
+
+      if (oMatch) {
+        oColumn.setVisible(oMatch.visible);
+      }
+    });
+
+    this._oAuthViewSettingsDialog?.close();
+  }
+
+  /**
+   * Close Fragment Auth Settings Columns
+   **/
+  public onCancelViewSettings(): void {
+    this._oAuthViewSettingsDialog?.close();
+  }
+
+  /**
+   * ACTIVITY
+   * Exports the currently bound table data to an Excel file.
+   * Uses sap.ui.export.Spreadsheet to generate the file
+   * based on the current OData V4 list binding.
+   */
+  public onExportActivityExcel(): void {
+    const { from, to } = this.getGlobalDateRange();
+
+    const sFileName = `UserActivityLogs_of_${this._sUsername}_${from}_to_${to}.xlsx`;
+
+    MessageBox.confirm("Do you want to export this data to Excel?", {
+      title: "Confirm Export",
+      actions: ["YES", "NO"],
+      emphasizedAction: "YES",
+
+      onClose: (oAction: string | null) => {
+        if (oAction === "YES") {
+          // Get table and its OData list binding
+          const oTable = this.byId("ActivityTableId");
+          const oBinding = oTable?.getBinding("rows") as ODataListBinding;
+
+          // Format in Excel
+          const aCols = [
+            { label: "Log Id", property: "LogId", width: 25 },
+            { label: "TCode", property: "TCode", width: 15 },
+            { label: "TCode Name", property: "TCodeName", width: 10 },
+            {
+              label: "Activity Message",
+              property: "ActivityMessage",
+              width: 15,
+            },
+            { label: "Activity Time", property: "ActivityTime", width: 15 },
+            { label: "Activity Date", property: "ActivityDate", width: 150 },
+          ];
+
+          // Spreadsheet config
+          const oSettings = {
+            workbook: { columns: aCols },
+            dataSource: oBinding,
+            fileName: sFileName,
+            worker: false,
+          };
+
+          // Spreadsheet config
+          const oSheet = new Spreadsheet(oSettings);
+          // Create Excel file and download it
+          oSheet
+            .build()
+            .then(() => {
+              MessageToast.show("Export successful!", { duration: 3000 });
+            })
+            .catch(() => {
+              MessageBox.error("Export failed.");
+            })
+            .finally(() => {
+              oSheet.destroy();
+            });
+        }
+      },
+    });
+  }
+
+  /**
+   * Open Act Fragment Settings Columns
+   **/
+  public async onOpenActivitySettings(): Promise<void> {
+    if (!this._oActViewSettingsDialog) {
+      // Load fragment
+      this._oActViewSettingsDialog = (await Fragment.load({
+        name: "useraudit.fragment.ActivityViewSettingsDialog",
+        controller: this,
+      })) as Dialog;
+
+      // Add Fragment into view
+      this.getView()?.addDependent(this._oActViewSettingsDialog);
+
+      this.initializeActivityColumnModel();
+    }
+
+    // Open
+    this._oActViewSettingsDialog.open();
+  }
+
+  /**
+   * Activity
+   * Read columns list of table -> JSONModel
+   * Bring it into Dialog View
+   **/
+  public initializeActivityColumnModel(): void {
+    // Get table and its colums
+    const oTable = this.byId("ActivityTableId") as any;
+    const aColumns = oTable.getColumns();
+
+    // Create new array contain every column object
+    const aColumnData = aColumns.map((oColumn: any) => {
+      const oLabel = oColumn.getLabel();
+
+      return {
+        id: oColumn.getId(),
+        label: oLabel ? oLabel.getText() : oColumn.getId(),
+        visible: oColumn.getVisible(),
+      };
+    });
+
+    // Create JSONModel, property columns
+    const oModel = new JSONModel({
+      columns: aColumnData,
+    });
+
+    this.getView()?.setModel(oModel, "ActivityColumnsModel");
+  }
+
+  /**
+   * Open Activity Fragment Settings Columns
+   **/
+  public onActConfirmViewSettings(): void {
+    // Get table and its colums
+    const oTable = this.byId("ActivityTableId") as any;
+    const aColumns = oTable.getColumns();
+
+    // Get model and property
+    const oModel = this.getView()?.getModel(
+      "ActivityColumnsModel",
+    ) as JSONModel;
+    const aData = oModel.getProperty("/columns");
+
+    // Set visible for column
+    aColumns.forEach((oColumn: any) => {
+      const oMatch = aData.find((column: any) => column.id === oColumn.getId());
+
+      if (oMatch) {
+        oColumn.setVisible(oMatch.visible);
+      }
+    });
+
+    this._oActViewSettingsDialog?.close();
+  }
+
+  /**
+   * Close Activity Fragment Settings Columns
+   **/
+  public onActCancelViewSettings(): void {
+    this._oActViewSettingsDialog?.close();
   }
   //  Exports Excel file
   public onExportUserDetailExcel(): void {

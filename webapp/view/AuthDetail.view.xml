@@ -186,7 +186,8 @@
 
                                 <ui:columns>
                                     <!-- LOGID COLUMN -->
-                                    <ui:Column id="ColumnLogId" width="18rem">
+                                    <ui:Column id="ColumnLogId" width="18rem"
+                                        sortProperty="detailData>LogId" tooltip="{i18n>introSort}">
                                         <Label id="LabelLogId" text="{i18n>logId}" />
 
                                         <ui:template>
@@ -196,7 +197,10 @@
                                     </ui:Column>
 
                                     <!-- ACTIVITY TYPE COLUMN -->
-                                    <ui:Column id="ColumnActivityTypeId" width="8rem">
+                                    <ui:Column
+                                        id="ColumnActivityTypeId" width="8rem"
+                                        sortProperty="detailData>ActivityType"
+                                        tooltip="{i18n>introSort}">
                                         <Label id="LabelActivityType" text="{i18n>activityType}" />
 
                                         <ui:template>
@@ -208,7 +212,9 @@
                                     </ui:Column>
 
                                     <!-- TCODE COLUMN -->
-                                    <ui:Column id="ColumnTCodeId" width="6rem">
+                                    <ui:Column
+                                        id="ColumnTCodeId" width="6rem"
+                                        sortProperty="detailData>TCode" tooltip="{i18n>introSort}">
                                         <Label id="LabelTCode" text="{i18n>tCode}" />
 
                                         <ui:template>
@@ -219,7 +225,10 @@
                                     </ui:Column>
 
                                     <!-- TCODE NAME COLUMN -->
-                                    <ui:Column id="ColumnTCodeNameId" width="8rem">
+                                    <ui:Column
+                                        id="ColumnTCodeNameId" width="8rem"
+                                        sortProperty="detailData>TCodeName"
+                                        tooltip="{i18n>introSort}">
                                         <Label id="LabelTCodeName" text="{i18n>tCodeName}" />
 
                                         <ui:template>
@@ -229,7 +238,9 @@
                                     </ui:Column>
 
                                     <!-- ACTIVITY MESSAGE COLUMN -->
-                                    <ui:Column id="ColumnMsgId">
+                                    <ui:Column
+                                        id="ColumnMsgId" sortProperty="detailData>ActivityMessage"
+                                        tooltip="{i18n>introSort}">
                                         <Label id="LabelActivityMessage"
                                             text="{i18n>activityMessage}" />
 
@@ -241,8 +252,11 @@
                                     </ui:Column>
 
                                     <!-- DATE COLUMN -->
-                                    <ui:Column id="ColumnDateId" width="8rem">
-                                        <Label id="LabelActivityDate" text="{i18n>ActivityDate}" />
+                                    <ui:Column
+                                        id="ColumnDateId" width="8rem"
+                                        sortProperty="detailData>ActivityDate"
+                                        tooltip="{i18n>introSort}">
+                                        <Label id="LabelActivityDate" text="{i18n>activityDate}" />
 
                                         <ui:template>
                                             <Text id="TextActivityDate"
@@ -251,7 +265,10 @@
                                     </ui:Column>
 
                                     <!-- TIME COLUMN -->
-                                    <ui:Column id="ColumnTieId" width="8rem">
+                                    <ui:Column
+                                        id="ColumnTieId" width="8rem"
+                                        sortProperty="detailData>ActivityTime"
+                                        tooltip="{i18n>introSort}">
                                         <Label id="LabelActivityTime" text="{i18n>activityTime}" />
 
                                         <ui:template>
@@ -260,15 +277,19 @@
                                         </ui:template>
                                     </ui:Column>
 
-                                    <!-- NAVIGATION COLUMN -->
-                                    <!-- <ui:Column id="ColumnNavId" width="4rem" hAlign="Center">
+                                    <!-- SENT MAIL -->
+                                    <ui:Column
+                                        id="ColumnNavId" width="4rem" hAlign="Center">
+                                        <Label id="ActivitySentMaileColumnLabel"
+                                            text="{i18n>sentMailAlert}" />
                                         <ui:template>
-                                            <Button id="btnActivityNavigator"
-                                                icon="sap-icon://navigation-right-arrow"
-                                                type="Transparent" press="onPressActivityDetail" />
+                                            <core:Icon id="ActivitySentMailId"
+                                                src="{= ${detailData>mail_sent} ? 'sap-icon://accept' : 'sap-icon://decline'}"
+                                                color="{= ${detailData>mail_sent} ? 'green' : 'red'}"
+                                                size="1.5rem" />
                                         </ui:template>
-                                    </ui:Column> -->
-                                </ui:columns>
+                                    </ui:Column>
+                                    --> </ui:columns>
                             </ui:Table>
                         </VBox>
                     </f:ObjectPageSubSection>
