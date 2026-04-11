@@ -159,7 +159,7 @@
                                         class="sapUiTinyMarginEnd" />
                                     <Select id="activityTypeFilter" width="140px"
                                         change="onFilterActivity">
-                                        <core:Item id="all" key="" text="{i18n>itemall}" />
+                                        <core:Item id="all" key="" text="{i18n>itemAll}" />
                                         <core:Item id="tcode" key="TCODE" text="{i18n>itemTcode}" />
                                         <core:Item id="dump" key="DUMP" text="{i18n>itemDump}" />
                                     </Select>
