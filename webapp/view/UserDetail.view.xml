@@ -248,34 +248,38 @@
                                 </viz:VizFrame>
                             </HBox>
                             <!-- AUTHENTICATION -->
-                            <Toolbar id="AuthToolbarId" class="sapUiSmallMarginBottom"
-                                design="Transparent">
+                            <Panel id="authFilterPanel" width="100%"
+                                headerText="{i18n>filter}"
+                                expandable="true" expanded="true"
+                                class="customFilterPanel sapUiSmallMarginBottom">
+                                <content>
+                                    <Toolbar id="AuthToolbarId" class="sapUiSmallMarginBottom"
+                                        design="Transparent">
+                                        <!-- STATUS -->
+                                        <Label id="AuthStatusLabelId" text="{i18n>status}"
+                                            class="sapUiSmallMarginBegin sapUiSmallMarginEnd" />
 
-                                <Title id="AuthTitleId" text="{i18n>userAuthentication}" level="H2" />
+                                        <Select id="AuthStatusSelectId" width="180px"
+                                            change="onFilterAuth"
+                                            class="sapUiSmallMarginEnd">
+                                            <core:Item id="AuthStatusAllItemId" key=""
+                                                text="{i18n>all}" />
+                                            <core:Item id="AuthStatusSuccessItemId" key="SUCCESS"
+                                                text="{i18n>success}" />
+                                            <core:Item id="AuthStatusFailedItemId" key="FAILED"
+                                                text="{i18n>failed}" />
+                                        </Select>
 
-                                <ToolbarSpacer id="AuthToolbarSpacerId" />
-
-                                <!-- STATUS -->
-                                <Label id="AuthStatusLabelId" text="{i18n>status}"
-                                    class="sapUiSmallMarginBegin sapUiSmallMarginEnd" />
-
-                                <Select id="AuthStatusSelectId" width="180px" change="onFilterAuth"
-                                    class="sapUiSmallMarginEnd">
-                                    <core:Item id="AuthStatusAllItemId" key="" text="{i18n>all}" />
-                                    <core:Item id="AuthStatusSuccessItemId" key="SUCCESS"
-                                        text="{i18n>success}" />
-                                    <core:Item id="AuthStatusFailedItemId" key="FAILED"
-                                        text="{i18n>failed}" />
-                                </Select>
-
-                                <!-- DATE -->
-                                <Label id="AuthDateLabelId" text="{i18n>filterDate}"
-                                    class="sapUiSmallMarginBegin sapUiSmallMarginEnd" />
-                                <DatePicker id="AuthDatePickerId" width="180px"
-                                    placeholder="{i18n>selectDate}" change="onFilterAuthLoginDate"
-                                    class="sapUiSmallMarginEnd" />
-                            </Toolbar>
-
+                                        <!-- DATE -->
+                                        <Label id="AuthDateLabelId" text="{i18n>filterDate}"
+                                            class="sapUiSmallMarginBegin sapUiSmallMarginEnd" />
+                                        <DatePicker id="AuthDatePickerId" width="180px"
+                                            placeholder="{i18n>selectDate}"
+                                            change="onFilterAuthLoginDate"
+                                            class="sapUiSmallMarginEnd" />
+                                    </Toolbar>
+                                </content>
+                            </Panel>
                             <!-- AUTH TABLE -->
                             <ui:Table id="AuthTableId"
                                 rows="{
@@ -292,8 +296,7 @@
                                 <ui:extension>
                                     <OverflowToolbar id="AuthTableToolbarId">
 
-                                        <Title id="AuthTableTitleId"
-                                            text="{= ${i18n>headerTitleTable} + ' (' + ${view>/count} + ')' }"
+                                        <Title id="AuthTableTitleId" text="{i18n>headerTitleTable}"
                                             level="H2" />
 
                                         <ToolbarSpacer id="ToolbarSpacer" />
@@ -492,43 +495,49 @@
                                 </viz:VizFrame>
                             </HBox>
 
-
                             <!-- ACTIVITY -->
                             <VBox id="ActivityVBoxContentId" class="sapUiMediumMarginTop">
                                 <!-- FILTER BAR -->
-                                <Toolbar id="ActivityToolbarId" class="sapUiSmallMarginBottom"
-                                    design="Transparent">
+                                <Panel id="activityUserFilterPanel"
+                                    width="100%"
+                                    headerText="{i18n>filter}"
+                                    expandable="true"
+                                    expanded="true"
+                                    class="customFilterPanel sapUiSmallMarginBottom">
+                                    <Toolbar id="ActivityUserToolbarId"
+                                        class="sapUiSmallMarginBottom"
+                                        design="Transparent">
 
-                                    <Title id="ActivityTitleId" text="{i18n>activity}" level="H2" />
+                                        <!-- Activity Type -->
+                                        <Label id="ActivityTypeLabelId" text="{i18n>activityType}"
+                                            class="sapUiTinyMarginEnd" />
 
-                                    <ToolbarSpacer id="ActivityToolbarSpacerId" />
+                                        <Select id="ActivityTypeSelectId" width="140px"
+                                            change="onFilterActivity">
+                                            <core:Item id="ActivityTypeAllItemId" key=""
+                                                text="{i18n>all}" />
+                                            <core:Item id="ActivityTypeTcodeItemId" key="TCODE"
+                                                text="{i18n>itemTcode}" />
+                                            <core:Item id="ActivityTypeDumpItemId" key="DUMP"
+                                                text="{i18n>itemDump}" />
+                                        </Select>
+                                        <!-- Tcode -->
+                                        <Label id="ActivityTCodeLabelId" text="{i18n>tCode}"
+                                            class="sapUiTinyMarginBegin sapUiTinyMarginEnd" />
+                                        <Input id="ActivityTCodeInputId" width="200px"
+                                            placeholder="{i18n>tCode}" showValueHelp="true"
+                                            liveChange="onSearchTCode"
+                                            valueHelpRequest="onUserSearchHelpTCode"
+                                            showClearIcon="true" class="sapUiSmallMarginEnd" />
 
-                                    <!-- Activity Type -->
-                                    <Label id="ActivityTypeLabelId" text="{i18n>activityType}"
-                                        class="sapUiTinyMarginEnd" />
-
-                                    <Select id="ActivityTypeSelectId" width="140px"
-                                        change="onFilterActivity">
-                                        <core:Item id="ActivityTypeAllItemId" key=""
-                                            text="{i18n>all}" />
-                                        <core:Item id="ActivityTypeTcodeItemId" key="TCODE"
-                                            text="{i18n>itemTcode}" />
-                                        <core:Item id="ActivityTypeDumpItemId" key="DUMP"
-                                            text="{i18n>itemDump}" />
-                                    </Select>
-
-                                    <Input id="ActivityTCodeInputId" width="200px"
-                                        placeholder="{i18n>tCode}" showValueHelp="true"
-                                        liveChange="onSearchTCode"
-                                        valueHelpRequest="onUserSearchHelpTCode"
-                                        showClearIcon="true" class="sapUiSmallMarginEnd" />
-
-                                    <!-- Date -->
-                                    <Label id="ActivityDateLabelId" text="{i18n>activityDate}"
-                                        class="sapUiTinyMarginBegin sapUiTinyMarginEnd" />
-                                    <DatePicker id="ActivityDatePickerId" width="150px"
-                                        placeholder="{i18n>selectDate}" change="onFilterActivity" />
-                                </Toolbar>
+                                        <!-- Date -->
+                                        <Label id="ActivityDateLabelId" text="{i18n>activityDate}"
+                                            class="sapUiTinyMarginBegin sapUiTinyMarginEnd" />
+                                        <DatePicker id="ActivityDatePickerId" width="150px"
+                                            placeholder="{i18n>selectDate}"
+                                            change="onFilterActivity" />
+                                    </Toolbar>
+                                </Panel>
 
                                 <!-- TABLE -->
                                 <ui:Table id="ActivityTableId"
@@ -545,9 +554,8 @@
                                     <ui:extension>
                                         <OverflowToolbar id="ActivityTableToolbarId">
                                             <Title id="ActivityTableTitleId"
-                                                text="{= ${i18n>activity} + ' (' + ${view>/count} + ')' }"
+                                                text="{i18n>activityTable}"
                                                 level="H2" />
-
                                             <ToolbarSpacer id="ActivityTableSpacerId" />
 
                                             <!-- EXPORT -->

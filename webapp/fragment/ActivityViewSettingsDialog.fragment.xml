@@ -1,24 +1,28 @@
 <core:FragmentDefinition xmlns="sap.m"
     xmlns:core="sap.ui.core">
     <!-- Main Dialog for Column Settings -->
-    <Dialog id="viewSettingsDialogId" title="{i18n>viewSettings}" contentWidth="400px" contentHeight="500px" draggable="true" resizable="true">
+    <Dialog id="viewSettingsDialogId" title="{i18n>viewSettings}" contentWidth="400px"
+        contentHeight="500px" draggable="true" resizable="true">
         <!-- Container for dialog content -->
         <VBox id="viewSettingsVBoxId" class="sapUiSmallMargin">
-            <Title id="columnsTitleId" text="Columns" level="H5"/>
+            <Title id="columnsTitleId" text="Columns" level="H5" />
 
             <List id="columnListId" mode="MultiSelect" items="{ActivityColumnsModel>/columns}">
-                <StandardListItem id="columnListItemId" title="{ActivityColumnsModel>label}" selected="{ActivityColumnsModel>visible}"/>
+                <StandardListItem id="columnListItemId" title="{ActivityColumnsModel>label}"
+                    selected="{ActivityColumnsModel>visible}" />
             </List>
         </VBox>
 
         <!-- Confirm button: Apply column visibility changes -->
         <beginButton>
-            <Button id="confirmViewSettingsButtonId" text="{i18n>ok}" press="onActConfirmViewSettings" type="Emphasized"/>
+            <Button id="confirmViewSettingsButtonId" text="{i18n>ok}"
+                press="onActConfirmViewSettings" type="Emphasized" />
         </beginButton>
 
         <!-- Cancel button: Close dialog without applying changes -->
         <endButton>
-            <Button id="cancelViewSettingsButtonId" text="{i18n>cancel}" press="onActCancelViewSettings"/>
+            <Button id="cancelViewSettingsButtonId" text="{i18n>cancel}"
+                press="onActCancelViewSettings" />
         </endButton>
     </Dialog>
 </core:FragmentDefinition>

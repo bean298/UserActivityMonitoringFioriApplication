@@ -53,7 +53,7 @@
         <!-- SECTIONS -->
         <f:sections>
             <!-- DETAIL SECTIONS -->
-            <f:ObjectPageSection id="SectionDetail" title="{i18n>detailSectionTitle}">
+            <f:ObjectPageSection id="SectionDetail" title="{i18n>headerTitleTable}">
                 <f:subSections>
                     <f:ObjectPageSubSection id="SubSectionDetail">
                         <layout:Grid id="GridDetail" defaultSpan="L2 M4 S12">
@@ -143,23 +143,39 @@
             <f:ObjectPageSection id="SectionActivity" title="{i18n>activityLog}">
                 <f:subSections>
                     <f:ObjectPageSubSection id="SubSectionActivity">
-                        <VBox id="ActivityVBox">
+                        <VBox id="ActivityVBox" class="sapUiMediumMarginTop">
                             <!-- FILTER TOOLBAR -->
-                            <Toolbar id="ActivityFilterToolbar" class="sapUiSmallMarginBottom"
-                                design="Transparent">
-                                <ToolbarSpacer id="ActivityToolbarSpacer" />
+                            <Panel id="activityFilterPanel"
+                                width="100%"
+                                headerText="{i18n>filter}"
+                                expandable="true"
+                                expanded="true"
+                                class="customFilterPanel sapUiSmallMarginBottom">
+                                <Toolbar id="ActivityFilterToolbar"
+                                    class="sapUiSmallMarginBottom"
+                                    design="Transparent">
+                                    <!-- Activity Type -->
+                                    <Label id="ActivityTypeLabel" text="{i18n>activityType}"
+                                        class="sapUiTinyMarginEnd" />
+                                    <Select id="activityTypeFilter" width="140px"
+                                        change="onFilterActivity">
+                                        <core:Item id="all" key="" text="{i18n>itemall}" />
+                                        <core:Item id="tcode" key="TCODE" text="{i18n>itemTcode}" />
+                                        <core:Item id="dump" key="DUMP" text="{i18n>itemDump}" />
+                                    </Select>
+                                    <!-- Tcode -->
+                                    <Label id="ActivityTCodeLabel" text="{i18n>tCode}"
+                                        class="sapUiTinyMarginBegin sapUiTinyMarginEnd" />
+                                    <Input id="activityTCodeFilter" width="200px"
+                                        placeholder="{i18n>tCode}"
+                                        showValueHelp="true"
+                                        liveChange="onApplyFilters"
+                                        valueHelpRequest="onUserSearchHelpTCode"
+                                        showClearIcon="true"
+                                        class="sapUiSmallMarginEnd" />
 
-                                <Label id="ActivityTypeLabel" text="{i18n>activityType}"
-                                    class="sapUiTinyMarginEnd" />
-
-                                <Select id="activityTypeFilter" width="180px"
-                                    change="onFilterActivityType">
-                                    <core:Item id="all" key="" text="{i18n>itemAll}" />
-                                    <core:Item id="tcode" key="TCODE" text="{i18n>itemTcode}" />
-                                    <core:Item id="dump" key="DUMP" text="{i18n>itemDump}" />
-                                </Select>
-                            </Toolbar>
-
+                                </Toolbar>
+                            </Panel>
                             <!-- TABLE -->
                             <ui:Table id="ActivityTable" rows="{detailData>/_Activity}"
                                 selectionMode="None" alternateRowColors="true">
@@ -178,9 +194,9 @@
                                             tooltip="Export Excel" press="onExportActivityExcel" />
 
                                         <!-- SETTINGS -->
-                                        <!-- <Button id="btnActivitySettings"
+                                        <Button id="btnActivitySettings"
                                             icon="sap-icon://action-settings" tooltip="Settings"
-                                            press="onOpenActivitySettings" /> -->
+                                            press="onOpenActivitySettings" />
                                     </OverflowToolbar>
                                 </ui:extension>
 
@@ -289,7 +305,7 @@
                                                 size="1.5rem" />
                                         </ui:template>
                                     </ui:Column>
-                                    --> </ui:columns>
+                                </ui:columns>
                             </ui:Table>
                         </VBox>
                     </f:ObjectPageSubSection>
