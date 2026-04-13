@@ -930,8 +930,8 @@ export default class Main extends Controller {
     const iDiffTime = oTo.getTime() - oFrom.getTime();
     const iDiffDays = iDiffTime / (1000 * 60 * 60 * 24);
 
-    if (iDiffDays > 6) {
-      MessageToast.show("Max range is 6 days");
+    if (iDiffDays > 30) {
+      MessageToast.show("Max range is 30 days");
 
       const oToday = new Date();
 
