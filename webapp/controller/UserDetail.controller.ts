@@ -23,7 +23,6 @@ export default class UserDetail extends Controller {
   private _sFromDate!: string;
   private _sToDate!: string;
   private _oTCodeSearchHelpDialog: Dialog | null = null;
-
   private _sUsername: string = "";
 
   /**
