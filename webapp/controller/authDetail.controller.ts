@@ -15,7 +15,7 @@ export default class AuthDetail extends Controller {
   public formatter = Formatter;
 
   private _oActViewSettingsDialog: Dialog | null = null;
-
+  private _oTCodeSearchHelpDialog: Dialog | null = null;
   /**
    * Called when the controller is initialized.
    **/
@@ -30,6 +30,106 @@ export default class AuthDetail extends Controller {
     }
   }
 
+  /**
+   * Apply all active filters (TCode, Activity Type) to the table
+   **/
+  public onApplyFilters(): void {
+    const aFilters = [];
+
+    // Filter by TCode
+    const sTCodeSearch = (this.byId("activityTCodeFilter") as any).getValue();
+    if (sTCodeSearch) {
+      aFilters.push(new Filter("TCode", FilterOperator.Contains, sTCodeSearch));
+    }
+
+    // Filter by Activity Type
+    const sActivityType = (
+      this.byId("activityTypeFilter") as any
+    ).getSelectedKey();
+    if (sActivityType) {
+      aFilters.push(
+        new Filter("ActivityType", FilterOperator.EQ, sActivityType),
+      );
+    }
+
+    // Execute filter on the Table
+    const oTable = this.byId("ActivityTable") as any;
+    const oBinding = oTable?.getBinding("rows") || oTable?.getBinding("items");
+
+    if (oBinding) {
+      oBinding.filter(aFilters);
+    }
+  }
+  /**
+   * Handle Activity Type dropdown change
+   **/
+  public onFilterActivity(): void {
+    this.onApplyFilters();
+  }
+  /**
+   * Open TCode Search Help Dialog using local table data
+   **/
+  public async onUserSearchHelpTCode(): Promise<void> {
+    try {
+      if (!this._oTCodeSearchHelpDialog) {
+        this._oTCodeSearchHelpDialog = (await Fragment.load({
+          id: this.getView()?.getId(),
+          name: "useraudit.fragment.TCodeSearchHelp", // Đảm bảo đúng đường dẫn
+          controller: this,
+        })) as Dialog;
+        this.getView()?.addDependent(this._oTCodeSearchHelpDialog);
+      }
+
+      // Get loaded activities from detail model
+      const oDetailModel = this.getView()?.getModel("detailData") as JSONModel;
+      if (oDetailModel) {
+        const aActivities = oDetailModel.getProperty("/_Activity") || [];
+        const oTCodeSearchHelpData: any = {};
+
+        // Extract unique TCodes
+        aActivities.forEach((oAct: any) => {
+          const sTCode = oAct.TCode;
+          if (sTCode && !oTCodeSearchHelpData[sTCode]) {
+            oTCodeSearchHelpData[sTCode] = {
+              TCode: sTCode,
+            };
+          }
+        });
+
+        // Bind unique TCodes to dialog model
+        const aTCodeSearchHelpData = Object.values(oTCodeSearchHelpData);
+        const oJsonModel = new JSONModel(aTCodeSearchHelpData);
+        this.getView()?.setModel(oJsonModel, "TCodeSeachHelp");
+      }
+
+      this._oTCodeSearchHelpDialog.open();
+    } catch (error) {
+      console.error(error);
+      MessageBox.error("Failed to load TCode search help.");
+    }
+  }
+  /**
+   * Handle TCode selection from the dialog
+   * Event: selectionChange="onTCodeSelect"
+   **/
+  public onTCodeSelect(oEvent: any): void {
+    const oItem = oEvent.getParameter("listItem");
+    const oContext = oItem.getBindingContext("TCodeSeachHelp");
+    const oSelected = oContext?.getObject();
+
+    if (oSelected) {
+      (this.byId("activityTCodeFilter") as any).setValue(oSelected.TCode);
+
+      this.onApplyFilters();
+    }
+
+    this.onCloseTCodeDialog();
+  }
+
+  // CloseTCodeDialog
+  public onCloseTCodeDialog(): void {
+    this._oTCodeSearchHelpDialog?.close();
+  }
   /**
    * Handles route matching for AuthDetail page
    * and loads detail data based on the navigation key.

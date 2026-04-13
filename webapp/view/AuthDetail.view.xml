@@ -300,8 +300,8 @@
                                             text="{i18n>sentMailAlert}" />
                                         <ui:template>
                                             <core:Icon id="ActivitySentMailId"
-                                                src="{= ${detailData>mail_sent} ? 'sap-icon://accept' : 'sap-icon://decline'}"
-                                                color="{= ${detailData>mail_sent} ? 'green' : 'red'}"
+                                                src="{= ${detailData>mail_sent} ? 'sap-icon://email' : 'sap-icon://less'}"
+                                                color="{= ${detailData>mail_sent} ? 'Positive' : 'Neutral'}"
                                                 size="1.5rem" />
                                         </ui:template>
                                     </ui:Column>

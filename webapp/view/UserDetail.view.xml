@@ -266,7 +266,7 @@
                                                 text="{i18n>all}" />
                                             <core:Item id="AuthStatusSuccessItemId" key="SUCCESS"
                                                 text="{i18n>success}" />
-                                            <core:Item id="AuthStatusFailedItemId" key="FAILED"
+                                            <core:Item id="AuthStatusFailedItemId" key="FAIL"
                                                 text="{i18n>failed}" />
                                         </Select>
 
@@ -671,8 +671,8 @@
                                                 text="{i18n>sentMailAlert}" />
                                             <ui:template>
                                                 <core:Icon id="ActivitySentMail"
-                                                    src="{= ${UserActivityLogData>mail_sent} ? 'sap-icon://accept' : 'sap-icon://decline'}"
-                                                    color="{= ${UserActivityLogData>mail_sent} ? 'green' : 'red'}"
+                                                    src="{= ${detailData>mail_sent} ? 'sap-icon://email' : 'sap-icon://less'}"
+                                                    color="{= ${detailData>mail_sent} ? 'Positive' : 'Neutral'}"
                                                     size="1.5rem" />
                                             </ui:template>
                                         </ui:Column>
